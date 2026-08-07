@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a1628">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YENLLET">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Register - YENLLET</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,188,212,0.08) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .logo-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20vw;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0,188,212,0.03) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            pointer-events: none;
+            z-index: 0;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .register-container {
+            background: rgba(10, 22, 40, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 45px 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0,188,212,0.1);
+            max-width: 520px;
+            width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .register-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .register-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .register-container::-webkit-scrollbar-thumb {
+            background: rgba(0,188,212,0.3);
+            border-radius: 3px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .logo p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.85);
+            font-weight: 500;
+            font-size: 0.88rem;
+        }
+
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.35);
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.15);
+        }
+
+        .form-group input[readonly] {
+            background: rgba(255,255,255,0.03);
+            cursor: not-allowed;
+            color: var(--accent-light);
+        }
+
+        .form-group select option {
+            background: var(--primary-dark);
+            color: var(--white);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .plan-info {
+            background: rgba(46, 125, 50, 0.1);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-top: 6px;
+            font-size: 0.82rem;
+            color: #81c784;
+            border: 1px solid rgba(46, 125, 50, 0.2);
+            display: none;
+        }
+
+        .country-info {
+            background: rgba(21, 101, 192, 0.1);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-top: 6px;
+            font-size: 0.82rem;
+            color: var(--accent-light);
+            border: 1px solid rgba(0, 188, 212, 0.2);
+            display: none;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 8px;
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.3);
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 188, 212, 0.4);
+        }
+
+        .register-btn:disabled {
+            background: #334155;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: rgba(46, 125, 50, 0.15);
+            color: #81c784;
+            border: 1px solid rgba(46, 125, 50, 0.3);
+        }
+
+        .alert-error {
+            background: rgba(198, 40, 40, 0.15);
+            color: #ef5350;
+            border: 1px solid rgba(198, 40, 40, 0.3);
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 22px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .links a {
+            color: var(--accent-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .links a:hover {
+            color: var(--white);
+            text-decoration: underline;
+        }
+
+        .ref-highlight {
+            background: rgba(46, 125, 50, 0.15) !important;
+            color: #81c784 !important;
+            font-weight: 600 !important;
+            border-color: rgba(46, 125, 50, 0.3) !important;
+        }
+
+        .coupon-guide {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: var(--gray);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .coupon-guide strong {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .input-error {
+            border-color: #f44336 !important;
+        }
+
+        .error-text {
+            color: #ef5350;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            display: none;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="logo-watermark">YENLLET</div>
+
+    <div class="register-container">
+        <div class="logo">
+            <h1>YENLLET</h1>
+            <p>Create your account</p>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required minlength="3" placeholder="Choose a username">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required placeholder="your@email.com">
+                    <div class="error-text" id="emailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" required placeholder="+234..." minlength="5">
+                    <div class="error-text" id="phoneError"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required minlength="6" placeholder="Min 6 characters">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required placeholder="Re-enter password">
+                    <div class="error-text" id="passwordError"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="referrerDisplay">Referred By</label>
+                <input type="text" id="referrerDisplay" value="No referrer" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="country">
+                    <i class="bi bi-globe"></i> Select Country
+                </label>
+                <select id="country" required onchange="updateCountryInfo()">
+                    <option value="">-- Choose Country --</option>
+                    <option value="NG">🇳🇬 Nigeria (₦ Naira)</option>
+                    <option value="GH">🇬🇭 Ghana (GHS Cedis)</option>
+                    <option value="CM">🇨🇲 Cameroon (XAF Francs)</option>
+                </select>
+                <div id="countryInfo" class="country-info"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="plan">
+                    <i class="bi bi-star"></i> Choose Plan
+                </label>
+                <select id="plan" class="plan-select" required onchange="updatePlanInfo()">
+                    <option value="">-- Select a Plan --</option>
+                    <option value="LITE">🌟 LITE Plan</option>
+                    <option value="PRO">💎 PRO Plan</option>
+                    <option value="VITE">👑 VITE Plan</option>
+                </select>
+                <div id="planInfo" class="plan-info"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="couponCode">Coupon Code (Must match your plan)</label>
+                <input type="text" id="couponCode" required placeholder="e.g., LITEABC12" style="text-transform: uppercase;">
+                <div class="coupon-guide">
+                    <strong>Coupon Prefixes:</strong><br>
+                    LITE Plan → starts with <strong style="color: var(--accent-light);">LITE</strong> (e.g., LITEABC12)<br>
+                    PRO Plan → starts with <strong style="color: var(--accent-light);">PRO</strong> (e.g., PROXYZ99)<br>
+                    VITE Plan → starts with <strong style="color: var(--accent-light);">VITE</strong> (e.g., VITEPQR11)
+                </div>
+            </div>
+
+            <button type="submit" class="register-btn" id="registerBtn">Register</button>
+        </form>
+
+        <div class="links">
+            Already have an account? <a href="login.html">Login</a> | <a href="forgot-password.html">Forgot Password?</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let referrerUsername = null;
+
+        const planInfo = {
+            'LITE': {
+                planName: 'YENLITE',
+                prefix: 'LITE',
+                description: '¥267.31 welcome bonus • Earn from tasks & videos • Direct referral: ¥267.31',
+                enabled: true
+            },
+            'PRO': {
+                planName: 'YENPRO',
+                prefix: 'PRO',
+                description: '¥748.48 welcome bonus • Premium earnings • Direct referral: ¥801.94',
+                enabled: true
+            },
+            'VITE': {
+                planName: 'YENVITE',
+                prefix: 'VITE',
+                description: '¥1200 welcome bonus • Elite features • Direct referral: ¥1500',
+                enabled: true
+            }
+        };
+
+        const countryInfo = {
+            'NG': {
+                name: 'Nigeria',
+                currency: '₦ Naira',
+                description: 'Bank transfers in Nigerian Naira'
+            },
+            'GH': {
+                name: 'Ghana',
+                currency: 'GHS Cedis',
+                description: 'Bank transfers in Ghanaian Cedis'
+            },
+            'CM': {
+                name: 'Cameroon',
+                currency: 'XAF Francs',
+                description: 'Bank transfers in Cameroonian Francs'
+            }
+        };
+
+        // Get referrer from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const refParam = urlParams.get('ref');
+
+        if (refParam) {
+            referrerUsername = refParam;
+            document.getElementById('referrerDisplay').value = refParam;
+            document.getElementById('referrerDisplay').classList.add('ref-highlight');
+        }
+
+        function updateCountryInfo() {
+            const selectedCountry = document.getElementById('country').value;
+            const countryInfoDiv = document.getElementById('countryInfo');
+
+            if (selectedCountry && countryInfo[selectedCountry]) {
+                const info = countryInfo[selectedCountry];
+                countryInfoDiv.textContent = `${info.name} - ${info.currency} • ${info.description}`;
+                countryInfoDiv.style.display = 'block';
+            } else {
+                countryInfoDiv.style.display = 'none';
+            }
+        }
+
+        function updatePlanInfo() {
+            const selectedPlan = document.getElementById('plan').value;
+            const planInfoDiv = document.getElementById('planInfo');
+
+            if (selectedPlan && planInfo[selectedPlan]) {
+                const info = planInfo[selectedPlan];
+                planInfoDiv.textContent = `${info.description} | Coupon starts with: ${info.prefix}`;
+                planInfoDiv.style.display = 'block';
+
+                if (!info.enabled) {
+                    showAlert('This plan is not available yet. Please choose another plan.', 'error');
+                    document.getElementById('plan').value = '';
+                    planInfoDiv.style.display = 'none';
+                }
+            } else {
+                planInfoDiv.style.display = 'none';
+            }
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function validatePhone(phone) {
+            return phone.trim().length >= 5;
+        }
+
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const selectedPlan = document.getElementById('plan').value;
+            const selectedCountry = document.getElementById('country').value;
+            const couponCode = document.getElementById('couponCode').value.trim().toUpperCase();
+
+            // Clear previous errors
+            document.getElementById('emailError').style.display = 'none';
+            document.getElementById('phoneError').style.display = 'none';
+            document.getElementById('passwordError').style.display = 'none';
+
+            // Validation
+            if (!validateEmail(email)) {
+                showError('emailError', 'Invalid email format');
+                return;
+            }
+
+            if (!validatePhone(phone)) {
+                showError('phoneError', 'Phone number must be at least 5 characters');
+                return;
+            }
+
+            if (!selectedCountry) {
+                showAlert('Please select a country!', 'error');
+                return;
+            }
+
+            if (!selectedPlan) {
+                showAlert('Please select a plan!', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('passwordError', 'Passwords do not match');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('passwordError', 'Password must be at least 6 characters');
+                return;
+            }
+
+            // Check if coupon matches selected plan
+            const planPrefix = planInfo[selectedPlan].prefix;
+            if (!couponCode.startsWith(planPrefix)) {
+                showAlert(`❌ Invalid coupon! ${selectedPlan} coupons must start with "${planPrefix}"\n\nExample: ${planPrefix}ABC12`, 'error');
+                return;
+            }
+
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Registering...';
+
+            const payload = {
+                username: username,
+                email: email,
+                phone_number: phone,
+                password: password,
+                coupon_code: couponCode,
+                plan: planInfo[selectedPlan].planName,
+                country: selectedCountry,
+                referrer_username: referrerUsername
+            };
+
+            console.log('Sending registration:', payload);
+
+            try {
+                const response = await fetch(`${API_URL}/api/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                console.log('Registration response:', data);
+
+                if (response.ok) {
+                    showAlert('✅ Registration successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showAlert(data.error || 'Registration failed!', 'error');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'Register';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Network error! Please try again.', 'error');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+            }
+        });
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert alert-${type}`;
+            alertBox.innerHTML = message;
+            alertBox.style.display = 'block';
+
+            if (type === 'error') {
+                setTimeout(() => {
+                    alertBox.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('✅ Service Worker registered'))
+                    .catch(err => console.log('❌ Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>

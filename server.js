@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
-const session = require('express-session');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
@@ -9,9 +8,11 @@ const multer = require('multer');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cloudinary = require('cloudinary').v2;
+const jwt = require('jsonwebtoken'); // ADDED JWT
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key_change_this';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -48,12 +49,6 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, sameSite: 'lax', maxAge: 24 * 60 * 60 * 1000 }
-}));
 // ============================================================
 // 🗄️ DATABASE
 // ============================================================
@@ -68,7 +63,7 @@ const pool = new Pool({
 if (!process.env.VERCEL) {
     pool.query('SELECT NOW()', (err) => {
         if (err) console.error('❌ Database connection error:', err.message);
-        else console.log(`✅ Connected to Database: ${process.env.DB_NAME}`);
+        else console.log(`✅ Connected to Neon Database successfully!`);
     });
 }
 
@@ -196,18 +191,28 @@ app.use((req, res, next) => {
 });
 
 // ============================================================
-// 🔧 UTILITIES
+// 🔧 UTILITIES & JWT AUTH MIDDLEWARE
 // ============================================================
 function hashPassword(password) { return crypto.createHash('sha256').update(password).digest('hex'); }
 function hashPin(pin) { return crypto.createHash('sha256').update(pin.toString()).digest('hex'); }
 
 function isAuthenticated(req, res, next) {
-    if (req.session.user_id !== undefined) return next();
-    res.status(401).json({ error: 'Authentication required' });
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+    if (!token) return res.status(401).json({ error: 'Authentication required' });
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded; // Attach user payload { user_id, username, role } to request
+        next();
+    } catch (err) {
+        return res.status(403).json({ error: 'Invalid or expired token' });
+    }
 }
 
 const isAdmin = (req, res, next) => {
-    if (req.session.user_id && (req.session.role === 'superadmin' || req.session.role === 'assistant')) return next();
+    if (req.user && (req.user.role === 'superadmin' || req.user.role === 'assistant')) return next();
     res.status(403).json({ error: 'Admin access required' });
 };
 
@@ -245,7 +250,7 @@ app.post('/api/upload-chat-file', isAuthenticated, chatUpload.single('file'), as
 
 app.post('/api/send-message', isAuthenticated, async (req, res) => {
     const { receiver_id, message, message_type, file_url, file_name, duration } = req.body;
-    const sender_id = req.session.user_id;
+    const sender_id = req.user.user_id; // Changed from req.session
     if (!receiver_id) return res.status(400).json({ error: 'Receiver required' });
 
     const validTypes = ['text', 'image', 'voice', 'sticker'];
@@ -264,7 +269,7 @@ app.post('/api/send-message', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/chat-messages/:partnerId', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id; // Changed from req.session
     const partnerId = parseInt(req.params.partnerId);
     if (isNaN(partnerId)) return res.status(400).json({ error: 'Invalid partner ID' });
 
@@ -286,7 +291,7 @@ app.post('/api/mark-messages-read/:partnerId', isAuthenticated, async (req, res)
     const partnerId = parseInt(req.params.partnerId);
     if (isNaN(partnerId)) return res.status(400).json({ error: 'Invalid partner ID' });
     try {
-        await pool.query(`UPDATE chat_messages SET read = true WHERE receiver_id = $1 AND sender_id = $2`, [req.session.user_id, partnerId]);
+        await pool.query(`UPDATE chat_messages SET read = true WHERE receiver_id = $1 AND sender_id = $2`, [req.user.user_id, partnerId]);
         res.json({ success: true });
     } catch (err) {
         console.error('Mark read error:', err);
@@ -295,7 +300,7 @@ app.post('/api/mark-messages-read/:partnerId', isAuthenticated, async (req, res)
 });
 
 app.post('/api/start-chat-session', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { partner_id } = req.body;
     if (!partner_id || isNaN(parseInt(partner_id))) return res.status(400).json({ error: 'Valid partner ID required' });
 
@@ -312,7 +317,7 @@ app.post('/api/start-chat-session', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/complete-chat-session', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { partner_id, duration } = req.body;
     if (!partner_id || isNaN(parseInt(partner_id)) || !duration || duration < 120) return res.status(400).json({ error: 'Valid partner ID required and chat must be at least 2 minutes' });
 
@@ -359,7 +364,7 @@ app.post('/api/complete-chat-session', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/update-online-status', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { going_offline } = req.body || {};
     try {
         if (going_offline === true) {
@@ -375,7 +380,7 @@ app.post('/api/update-online-status', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/all-users', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const result = await pool.query(`SELECT u.id, u.username, u.profile_picture, u.plan, COALESCE(uos.is_online, false) as is_online, uos.last_seen FROM users u LEFT JOIN user_online_status uos ON u.id = uos.user_id WHERE u.id != $1 AND u.is_banned = false AND u.is_admin = false ORDER BY uos.is_online DESC NULLS LAST, u.username ASC`, [userId]);
         res.json(result.rows);
@@ -446,8 +451,6 @@ app.post('/api/register', authLimiter, async (req, res) => {
         const userId = userResult.rows[0].id;
         
         await client.query('UPDATE coupon_codes SET used = true, used_by = $1 WHERE UPPER(code) = UPPER($2)', [userId, cleanCoupon]);
-        req.session.user_id = userId;
-        req.session.username = username.trim();
         
         await addActivityFeed(userId, 'Welcome Bonus', newUserRewards.WELCOME_BONUS, 'Registration bonus added');
         await createNotification(userId, `🎉 Welcome ${username}! You received ¥${newUserRewards.WELCOME_BONUS.toLocaleString()} bonus!`);
@@ -468,7 +471,11 @@ app.post('/api/register', authLimiter, async (req, res) => {
             }
         }
         await client.query('COMMIT');
-        res.status(201).json({ success: true, message: 'Registration successful!', redirect: '/dashboard.html' });
+
+        // Generate JWT
+        const token = jwt.sign({ user_id: userId, username: username.trim(), role: 'user' }, JWT_SECRET, { expiresIn: '7d' });
+
+        res.status(201).json({ success: true, token, message: 'Registration successful!', redirect: '/dashboard.html' });
     } catch (err) { 
         if (client) await client.query('ROLLBACK'); 
         console.error('Registration error:', err); 
@@ -488,35 +495,36 @@ app.post('/api/login', authLimiter, async (req, res) => {
         if (!user) return res.status(401).json({ error: 'Invalid username or password' });
         if (user.is_banned) return res.status(403).json({ error: 'Your account has been banned' });
         
-        req.session.user_id = user.id;
-        req.session.role = user.role || 'user';
-        req.session.username = user.username;
+        // Generate JWT
+        const token = jwt.sign(
+            { user_id: user.id, username: user.username, role: user.role || 'user' },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
         
         let redirectUrl = '/dashboard.html';
         if (user.role === 'superadmin') redirectUrl = '/admin.html';
         else if (user.role === 'assistant') redirectUrl = '/Assistance.html';
         
-        res.json({ success: true, user_id: user.id, username: user.username, is_admin: (user.role === 'superadmin' || user.role === 'assistant'), redirect: redirectUrl });
+        res.json({ success: true, token, user_id: user.id, username: user.username, is_admin: (user.role === 'superadmin' || user.role === 'assistant'), redirect: redirectUrl });
     } catch (err) { console.error('Login error:', err); res.status(500).json({ error: 'Login failed' }); }
 });
 
 app.get('/api/check-session', isAuthenticated, (req, res) => {
-    res.json({ user_id: req.session.user_id, username: req.session.username, role: req.session.role, is_admin: (req.session.role === 'superadmin' || req.session.role === 'assistant'), authenticated: true });
+    // Verify token is valid and return user data
+    res.json({ user_id: req.user.user_id, username: req.user.username, role: req.user.role, is_admin: (req.user.role === 'superadmin' || req.user.role === 'assistant'), authenticated: true });
 });
 
 app.post('/api/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) return res.status(500).json({ error: 'Logout failed' });
-        res.clearCookie('connect.sid', { path: '/', httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-        res.json({ message: 'Logged out successfully' });
-    });
+    // With JWT, logout is handled client-side by deleting the token.
+    res.json({ message: 'Logged out successfully' });
 });
 
 // ============================================================
 // 👤 PROFILE ENDPOINTS
 // ============================================================
 app.get('/api/profile', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const userResult = await pool.query(
             `SELECT username, email, phone_number, activity_wallet, referral_wallet, tiktok_wallet, bank_name, account_number, profile_picture, coupon_code, plan, country, last_spin, dark_mode, created_at, total_referral_earnings, withdrawal_pin, is_vendor
@@ -538,7 +546,7 @@ app.get('/api/profile', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/upload-profile-picture', isAuthenticated, upload.single('profile_picture'), async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     try {
         const result = await uploadToCloudinary(req.file.buffer, 'profile_pictures');
@@ -556,7 +564,7 @@ app.post('/api/upload-profile-picture', isAuthenticated, upload.single('profile_
 // 🏦 BANK SETUP & WITHDRAWAL PIN ENDPOINTS
 // ============================================================
 app.post('/api/setup-bank', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { bank_name, account_number, account_name, pin, confirm_pin } = req.body;
 
     if (!bank_name || !account_number || !account_name || !pin || !confirm_pin) return res.status(400).json({ error: 'All fields are required: bank_name, account_number, account_name, pin, confirm_pin' });
@@ -580,7 +588,7 @@ app.post('/api/setup-bank', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/bank-details', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const result = await pool.query(`SELECT bank_name, account_number, account_name, withdrawal_pin FROM users WHERE id = $1`, [userId]);
         const user = result.rows[0];
@@ -590,7 +598,7 @@ app.get('/api/bank-details', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/update-bank', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { bank_name, account_number, account_name, current_pin } = req.body;
     if (!bank_name || !account_number || !account_name || !current_pin) return res.status(400).json({ error: 'All fields required: bank_name, account_number, account_name, current_pin' });
 
@@ -608,7 +616,7 @@ app.post('/api/update-bank', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/change-withdrawal-pin', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { old_pin, new_pin, confirm_new_pin } = req.body;
     if (!old_pin || !new_pin || !confirm_new_pin) return res.status(400).json({ error: 'Old PIN, new PIN, and confirm new PIN are required' });
 
@@ -630,7 +638,7 @@ app.post('/api/change-withdrawal-pin', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/toggle-dark-mode', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { dark_mode } = req.body;
     if (typeof dark_mode !== 'boolean') return res.status(400).json({ error: 'dark_mode must be a boolean' });
     try {
@@ -640,7 +648,7 @@ app.post('/api/toggle-dark-mode', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/change-password', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { old_password, new_password } = req.body;
     if (!old_password || !new_password) return res.status(400).json({ error: 'Old password and new password are required' });
     if (new_password.length < 6) return res.status(400).json({ error: 'New password must be at least 6 characters' });
@@ -658,7 +666,7 @@ app.post('/api/change-password', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/update-profile', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { bank_name, account_number } = req.body;
     try {
         if (bank_name && account_number) {
@@ -672,7 +680,7 @@ app.post('/api/update-profile', isAuthenticated, async (req, res) => {
 // 📋 TASKS, VIDEOS, QUIZZES, ARTICLES
 // ============================================================
 app.get('/api/tasks', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const userRes = await pool.query('SELECT plan FROM users WHERE id = $1', [userId]);
         const user = userRes.rows[0];
@@ -684,7 +692,7 @@ app.get('/api/tasks', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/complete-task/:taskId', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const taskId = parseInt(req.params.taskId);
     let client;
     try {
@@ -707,7 +715,7 @@ app.post('/api/complete-task/:taskId', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/videos', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const userRes = await pool.query('SELECT plan FROM users WHERE id = $1', [userId]);
         const user = userRes.rows[0];
@@ -719,7 +727,7 @@ app.get('/api/videos', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/complete-video/:videoId', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const videoId = parseInt(req.params.videoId);
     let client;
     try {
@@ -742,7 +750,7 @@ app.post('/api/complete-video/:videoId', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/quizzes', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const result = await pool.query(`SELECT q.id, q.question, q.option_a, q.option_b, q.option_c, q.option_d, q.created_at FROM quizzes q LEFT JOIN quiz_completions qc ON q.id = qc.quiz_id AND qc.user_id = $1 WHERE qc.id IS NULL ORDER BY q.created_at DESC LIMIT 100`, [userId]);
         res.json(result.rows);
@@ -750,7 +758,7 @@ app.get('/api/quizzes', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/submit-quiz/:quizId', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const quizId = parseInt(req.params.quizId);
     const { answer } = req.body;
     if (!quizId || !answer) return res.status(400).json({ error: 'Quiz ID and answer are required' });
@@ -777,7 +785,7 @@ app.post('/api/submit-quiz/:quizId', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/articles', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const userData = (await pool.query('SELECT plan FROM users WHERE id = $1', [userId])).rows[0];
         const userRewards = getRewardsForPlan(userData.plan);
@@ -787,7 +795,7 @@ app.get('/api/articles', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/articles/:articleId', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const articleId = parseInt(req.params.articleId);
     if (!articleId) return res.status(400).json({ error: 'Invalid article ID' });
     try {
@@ -801,7 +809,7 @@ app.get('/api/articles/:articleId', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/complete-article/:articleId', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const articleId = parseInt(req.params.articleId);
     if (!articleId) return res.status(400).json({ error: 'Invalid article ID' });
     try {
@@ -823,7 +831,7 @@ app.post('/api/complete-article/:articleId', isAuthenticated, async (req, res) =
 // 💰 TRANSFER ENDPOINTS
 // ============================================================
 app.post('/api/transfer-activity', isAuthenticated, async (req, res) => {
-    const senderId = req.session.user_id;
+    const senderId = req.user.user_id;
     const { recipient_username, amount } = req.body;
     const transferAmount = parseFloat(amount);
     if (!recipient_username || !amount || transferAmount <= 0) return res.status(400).json({ error: 'Recipient username and positive amount are required' });
@@ -873,7 +881,7 @@ app.post('/api/transfer-activity', isAuthenticated, async (req, res) => {
 // ============================================================
 app.post('/api/withdraw', isAuthenticated, async (req, res) => {
     const { wallet_type, amount, pin } = req.body;
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     if (!wallet_type || !amount || pin === undefined) return res.status(400).json({ error: 'All fields (wallet, amount, pin) are required' });
     let client;
     try {
@@ -911,7 +919,7 @@ app.post('/api/withdraw', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/user-withdrawals', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const result = await pool.query(`SELECT id, wallet_type, amount, status, created_at FROM withdrawals WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50`, [userId]);
         res.json(result.rows);
@@ -919,7 +927,7 @@ app.get('/api/user-withdrawals', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/withdrawal-receipt/:id', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const withdrawalId = parseInt(req.params.id);
     if (!withdrawalId) return res.status(400).json({ error: 'Invalid withdrawal ID' });
     try {
@@ -941,7 +949,7 @@ app.get('/api/withdrawal-settings', isAuthenticated, async (req, res) => {
 // 📱 WHATSAPP, TIKTOK, SOCIAL, LEADERBOARD
 // ============================================================
 app.get('/api/check-whatsapp-daily-limit', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const result = await pool.query(`SELECT COUNT(*)::int as count FROM whatsapp_posts WHERE user_id = $1 AND DATE(created_at) = CURRENT_DATE`, [userId]);
         res.json({ limit_reached: result.rows[0].count >= 1, posts_today: result.rows[0].count, max_daily_posts: 1 });
@@ -949,7 +957,7 @@ app.get('/api/check-whatsapp-daily-limit', isAuthenticated, async (req, res) => 
 });
 
 app.post('/api/create-whatsapp-post', isAuthenticated, uploadWhatsapp.single('image'), async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { title, description } = req.body;
     if (!title || !description || !req.file) return res.status(400).json({ error: 'Title, description, and image are required' });
     try {
@@ -966,7 +974,7 @@ app.post('/api/create-whatsapp-post', isAuthenticated, uploadWhatsapp.single('im
 });
 
 app.post('/api/mark-whatsapp-shared', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { post_id } = req.body;
     if (!post_id) return res.status(400).json({ error: 'Post ID required' });
     let client;
@@ -990,13 +998,13 @@ app.post('/api/mark-whatsapp-shared', isAuthenticated, async (req, res) => {
 
 app.get('/api/my-whatsapp-posts', isAuthenticated, async (req, res) => {
     try {
-        const result = await pool.query(`SELECT id, title, description, image_filename, status, created_at FROM whatsapp_posts WHERE user_id = $1 ORDER BY created_at DESC`, [req.session.user_id]);
+        const result = await pool.query(`SELECT id, title, description, image_filename, status, created_at FROM whatsapp_posts WHERE user_id = $1 ORDER BY created_at DESC`, [req.user.user_id]);
         res.json(result.rows);
     } catch (err) { console.error('Get posts error:', err); res.status(500).json({ error: 'Failed to load posts' }); }
 });
 
 app.post('/api/generate-post-caption', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { topic, style } = req.body;
     if (!topic || !style) return res.status(400).json({ error: 'Topic and style are required' });
     try {
@@ -1013,7 +1021,7 @@ app.post('/api/generate-post-caption', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/submit-tiktok-handle', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { tiktok_handle } = req.body;
     if (!tiktok_handle || tiktok_handle.trim().length === 0) return res.status(400).json({ error: 'TikTok handle is required' });
     try {
@@ -1028,7 +1036,7 @@ app.post('/api/submit-tiktok-handle', isAuthenticated, async (req, res) => {
 
 app.get('/api/my-tiktok-submission', isAuthenticated, async (req, res) => {
     try {
-        const result = await pool.query('SELECT tiktok_handle, created_at FROM tiktok_submissions WHERE user_id = $1', [req.session.user_id]);
+        const result = await pool.query('SELECT tiktok_handle, created_at FROM tiktok_submissions WHERE user_id = $1', [req.user.user_id]);
         res.json(result.rows[0] || { tiktok_handle: null });
     } catch (err) { console.error('Get TikTok submission error:', err); res.status(500).json({ error: 'Failed to load TikTok submission' }); }
 });
@@ -1052,28 +1060,28 @@ app.get('/api/leaderboard', async (req, res) => {
 // ============================================================
 app.get('/api/notifications', isAuthenticated, async (req, res) => {
     try {
-        const result = await pool.query(`SELECT id, message, is_read, created_at FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 100`, [req.session.user_id]);
+        const result = await pool.query(`SELECT id, message, is_read, created_at FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 100`, [req.user.user_id]);
         res.json(result.rows);
     } catch (err) { console.error('Notifications error:', err); res.status(500).json({ error: 'Failed to load notifications' }); }
 });
 
 app.post('/api/notifications/:id/read', isAuthenticated, async (req, res) => {
     try {
-        await pool.query('UPDATE notifications SET is_read = true WHERE id = $1 AND user_id = $2', [parseInt(req.params.id), req.session.user_id]);
+        await pool.query('UPDATE notifications SET is_read = true WHERE id = $1 AND user_id = $2', [parseInt(req.params.id), req.user.user_id]);
         res.json({ message: 'Notification marked as read' });
     } catch (err) { console.error('Mark read error:', err); res.status(500).json({ error: 'Failed to update notification' }); }
 });
 
 app.get('/api/user-activities', isAuthenticated, async (req, res) => {
     try {
-        const result = await pool.query(`SELECT action, amount, TO_CHAR(created_at, 'DD Mon, HH:MI AM') as formatted_date, created_at FROM activity_feed WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50`, [req.session.user_id]);
+        const result = await pool.query(`SELECT action, amount, TO_CHAR(created_at, 'DD Mon, HH:MI AM') as formatted_date, created_at FROM activity_feed WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50`, [req.user.user_id]);
         res.json(result.rows);
     } catch (err) { console.error('Activities error:', err.message); res.status(500).json({ error: 'Failed to load activities' }); }
 });
 
 app.get('/api/user-referrals', isAuthenticated, async (req, res) => {
     try {
-        const result = await pool.query(`SELECT username, profile_picture, plan, created_at FROM users WHERE referrer_id = $1 ORDER BY created_at DESC`, [req.session.user_id]);
+        const result = await pool.query(`SELECT username, profile_picture, plan, created_at FROM users WHERE referrer_id = $1 ORDER BY created_at DESC`, [req.user.user_id]);
         res.json(result.rows);
     } catch (err) { console.error('Referrals error:', err); res.status(500).json({ error: 'Failed to load referrals' }); }
 });
@@ -1106,7 +1114,7 @@ app.post('/api/forgot-password', async (req, res) => {
 // 🎫 COUPON UPGRADE
 // ============================================================
 app.post('/api/apply-upgrade-coupon', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { coupon_code } = req.body;
     if (!coupon_code) return res.status(400).json({ error: 'Coupon code required' });
     let client;
@@ -1149,7 +1157,7 @@ app.post('/api/apply-upgrade-coupon', isAuthenticated, async (req, res) => {
 // 🎧 SUPPORT CHAT ENDPOINTS
 // ============================================================
 app.post('/api/support/create-ticket', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const { subject } = req.body;
     try {
         const existing = await pool.query(`SELECT id, status, vendor_id FROM support_tickets WHERE user_id = $1 AND status IN ('waiting', 'active') ORDER BY created_at DESC LIMIT 1`, [userId]);
@@ -1160,7 +1168,7 @@ app.post('/api/support/create-ticket', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/support/my-ticket', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const result = await pool.query(`SELECT t.id, t.subject, t.status, t.created_at, t.vendor_id, u.username as vendor_name, u.profile_picture as vendor_pic FROM support_tickets t LEFT JOIN users u ON t.vendor_id = u.id WHERE t.user_id = $1 AND t.status IN ('waiting', 'active') ORDER BY t.created_at DESC LIMIT 1`, [userId]);
         if (result.rows.length === 0) return res.json({ ticket: null });
@@ -1169,7 +1177,7 @@ app.get('/api/support/my-ticket', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/support/ticket/:ticketId/messages', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const ticketId = parseInt(req.params.ticketId);
     const afterId = parseInt(req.query.after) || 0;
     if (isNaN(ticketId)) return res.status(400).json({ error: 'Invalid ticket ID' });
@@ -1188,7 +1196,7 @@ app.get('/api/support/ticket/:ticketId/messages', isAuthenticated, async (req, r
 });
 
 app.post('/api/support/ticket/:ticketId/send', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const ticketId = parseInt(req.params.ticketId);
     const { message, message_type, file_url, file_name } = req.body;
     if (isNaN(ticketId)) return res.status(400).json({ error: 'Invalid ticket ID' });
@@ -1206,7 +1214,7 @@ app.post('/api/support/ticket/:ticketId/send', isAuthenticated, async (req, res)
 });
 
 app.post('/api/support/ticket/:ticketId/close', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const ticketId = parseInt(req.params.ticketId);
     try {
         const result = await pool.query(`UPDATE support_tickets SET status = 'closed', closed_at = CURRENT_TIMESTAMP WHERE id = $1 AND user_id = $2 AND status IN ('waiting', 'active') RETURNING id`, [ticketId, userId]);
@@ -1216,7 +1224,7 @@ app.post('/api/support/ticket/:ticketId/close', isAuthenticated, async (req, res
 });
 
 app.get('/api/vendor/tickets', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     try {
         const userCheck = await pool.query('SELECT is_vendor, vendor_active FROM users WHERE id = $1', [userId]);
         const user = userCheck.rows[0];
@@ -1237,7 +1245,7 @@ app.get('/api/vendor/tickets', isAuthenticated, async (req, res) => {
 });
 
 app.post('/api/vendor/ticket/:ticketId/assign', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const ticketId = parseInt(req.params.ticketId);
     try {
         const result = await pool.query(`UPDATE support_tickets SET vendor_id = $1, status = 'active', updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND status = 'waiting' RETURNING id, user_id`, [userId, ticketId]);
@@ -1248,7 +1256,7 @@ app.post('/api/vendor/ticket/:ticketId/assign', isAuthenticated, async (req, res
 });
 
 app.get('/api/vendor/ticket/:ticketId/messages', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const ticketId = parseInt(req.params.ticketId);
     const afterId = parseInt(req.query.after) || 0;
     if (isNaN(ticketId)) return res.status(400).json({ error: 'Invalid ticket ID' });
@@ -1271,7 +1279,7 @@ app.get('/api/vendor/ticket/:ticketId/messages', isAuthenticated, async (req, re
 });
 
 app.post('/api/vendor/ticket/:ticketId/send', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const ticketId = parseInt(req.params.ticketId);
     const { message, message_type, file_url, file_name } = req.body;
     if (isNaN(ticketId)) return res.status(400).json({ error: 'Invalid ticket ID' });
@@ -1294,7 +1302,7 @@ app.post('/api/vendor/ticket/:ticketId/send', isAuthenticated, async (req, res) 
 });
 
 app.post('/api/vendor/ticket/:ticketId/close', isAuthenticated, async (req, res) => {
-    const userId = req.session.user_id;
+    const userId = req.user.user_id;
     const ticketId = parseInt(req.params.ticketId);
     try {
         const result = await pool.query(`UPDATE support_tickets SET status = 'closed', closed_at = CURRENT_TIMESTAMP WHERE id = $1 AND vendor_id = $2 AND status IN ('waiting', 'active') RETURNING user_id`, [ticketId, userId]);
@@ -1383,7 +1391,7 @@ app.get('/api/admin/country-stats', isAdmin, async (req, res) => {
 });
 
 app.post('/api/admin/generate-coupon', isAdmin, async (req, res) => {
-    if (req.session.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can generate coupons' });
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can generate coupons' });
     const { plan, count } = req.body;
     if (!plan || !count || count < 1) return res.status(400).json({ error: 'Plan and count are required' });
     const planPrefixes = { 'YENLITE': 'LITE', 'YENPRO': 'PRO', 'YENVITE': 'VITE' };
@@ -1410,7 +1418,7 @@ app.get('/api/admin/get-withdrawal-settings', isAdmin, async (req, res) => {
 });
 
 app.post('/api/admin/update-active-country', isAdmin, async (req, res) => {
-    if (req.session.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change the active country' });
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change the active country' });
     const { country } = req.body;
     if (!country) return res.status(400).json({ error: 'Country code is required' });
     try {
@@ -1422,7 +1430,7 @@ app.post('/api/admin/update-active-country', isAdmin, async (req, res) => {
 });
 
 app.post('/api/admin/toggle-withdrawal', isAdmin, async (req, res) => {
-    if (req.session.role !== 'superadmin') return res.status(403).json({ error: 'Assistant cannot change site settings' });
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Assistant cannot change site settings' });
     const { wallet_type, enabled } = req.body;
     const columnMap = { 'activity': 'activity_withdrawal_enabled', 'referral': 'referral_withdrawal_enabled', 'tiktok': 'tiktok_withdrawal_enabled' };
     const column = columnMap[wallet_type];
@@ -1608,7 +1616,7 @@ app.get('/api/admin/search-user-by-coupon', isAdmin, async (req, res) => {
 });
 
 app.post('/api/admin/change-user-password', isAdmin, async (req, res) => {
-    if (req.session.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change user passwords' });
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change user passwords' });
     const { user_id, new_password } = req.body;
     if (!user_id || !new_password) return res.status(400).json({ error: 'User ID and new password are required' });
     if (new_password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
@@ -1675,7 +1683,7 @@ app.get('/api/admin/search-tiktok-user', isAdmin, async (req, res) => {
 });
 
 app.post('/api/admin/add-tiktok-bonus', isAdmin, async (req, res) => {
-    if (req.session.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can add bonuses' });
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can add bonuses' });
     const { user_id, amount } = req.body;
     if (!user_id || !amount || amount <= 0) return res.status(400).json({ error: 'User ID and amount are required' });
     try {
@@ -1973,7 +1981,7 @@ app.post('/api/assistant/reject-withdrawal/:id', isAdmin, async (req, res) => {
 });
 
 app.post('/api/assistant/change-user-password', isAdmin, async (req, res) => {
-    if (req.session.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change user passwords' });
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change user passwords' });
     const { user_id, new_password } = req.body;
     if (!user_id || !new_password) return res.status(400).json({ error: 'User ID and new password are required' });
     if (new_password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
@@ -2099,7 +2107,7 @@ app.get('/api/assistant/get-withdrawal-settings', isAdmin, async (req, res) => {
 });
 
 app.post('/api/assistant/toggle-withdrawal', isAdmin, async (req, res) => {
-    if (req.session.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change site settings' });
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change site settings' });
     const { wallet_type, enabled } = req.body;
     const columnMap = { 'activity': 'activity_withdrawal_enabled', 'referral': 'referral_withdrawal_enabled', 'tiktok': 'tiktok_withdrawal_enabled' };
     const column = columnMap[wallet_type];
@@ -2112,7 +2120,7 @@ app.post('/api/assistant/toggle-withdrawal', isAdmin, async (req, res) => {
 });
 
 app.post('/api/assistant/update-active-country', isAdmin, async (req, res) => {
-    if (req.session.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change the active country' });
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can change the active country' });
     const { country } = req.body;
     if (!country) return res.status(400).json({ error: 'Country code is required' });
     try {

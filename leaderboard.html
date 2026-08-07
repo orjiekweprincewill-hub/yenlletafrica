@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YenlletAfrica - Leaderboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--off-white);
+            color: var(--primary-dark);
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%; z-index: 1000;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+        }
+        header.scrolled { box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+
+        .nav-container {
+            max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+            display: flex; justify-content: space-between; align-items: center; height: 70px;
+        }
+
+        .logo {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: var(--white);
+            font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px;
+        }
+        .logo img { height: 35px; width: auto; border-radius: 8px; }
+        .logo span {
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; align-items: center; }
+        .nav-links a {
+            text-decoration: none; color: rgba(255,255,255,0.8);
+            font-weight: 500; font-size: 0.95rem; position: relative; transition: var(--transition);
+        }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            transition: var(--transition); border-radius: 2px;
+        }
+        .nav-links a:hover { color: var(--white); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links .btn-login {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+            color: var(--white) !important; padding: 0.6rem 1.5rem; border-radius: 50px;
+            font-weight: 600; box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3); transition: var(--transition);
+        }
+        .nav-links .btn-login::after { display: none; }
+        .nav-links .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4); }
+
+        /* Mobile Menu */
+        .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 1001; }
+        .menu-toggle span { display: block; width: 28px; height: 3px; background: var(--white); border-radius: 3px; transition: var(--transition); }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
+
+        .mobile-sidebar {
+            position: fixed; top: 0; right: -100%; width: 280px; height: 100vh;
+            background: linear-gradient(180deg, var(--primary-dark) 0%, #0d2b4e 100%);
+            z-index: 999; padding: 6rem 2rem 2rem;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -10px 0 40px rgba(0,0,0,0.3);
+        }
+        .mobile-sidebar.active { right: 0; }
+        .mobile-sidebar ul { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; }
+        .mobile-sidebar a { text-decoration: none; color: rgba(255,255,255,0.9); font-size: 1.1rem; font-weight: 500; display: block; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: var(--transition); }
+        .mobile-sidebar a:hover { color: var(--accent-light); padding-left: 10px; }
+        .mobile-sidebar .btn-login { background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%); color: var(--white); text-align: center; padding: 0.8rem; border-radius: 50px; margin-top: 1rem; border: none; }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: var(--transition); }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* Leaderboard Section */
+        .leaderboard {
+            min-height: 100vh; padding: 100px 2rem 60px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
+            position: relative; overflow: hidden;
+        }
+        .leaderboard::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
+
+        .leaderboard-content { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+
+        .leaderboard-header { text-align: center; margin-bottom: 3rem; opacity: 0; animation: fadeInUp 1s ease forwards; }
+        .leaderboard-header h1 { font-size: 3rem; font-weight: 800; color: var(--white); line-height: 1.1; margin-bottom: 1rem; }
+        .leaderboard-header h1 span {
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .leaderboard-header p { font-size: 1.1rem; color: rgba(255,255,255,0.8); max-width: 500px; margin: 0 auto; }
+
+        /* Loading State */
+        .loading-state { text-align: center; padding: 3rem; color: rgba(255,255,255,0.7); }
+        .loading-spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Error State */
+        .error-state { text-align: center; padding: 3rem; color: #ff6b6b; }
+        .error-state button {
+            margin-top: 1rem; padding: 0.6rem 1.5rem; background: var(--accent);
+            color: var(--white); border: none; border-radius: 50px; cursor: pointer;
+            font-weight: 600; transition: var(--transition);
+        }
+        .error-state button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,188,212,0.4); }
+
+        /* Leaderboard Table */
+        .leaderboard-table {
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(20px);
+            border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden; opacity: 0; animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        .table-header {
+            display: grid; grid-template-columns: 80px 1fr 150px 150px 120px;
+            padding: 1.2rem 2rem; background: rgba(255,255,255,0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600;
+            color: var(--accent-light); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .table-row {
+            display: grid; grid-template-columns: 80px 1fr 150px 150px 120px;
+            padding: 1.2rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition); align-items: center; opacity: 0; animation: fadeInUp 0.5s ease forwards;
+        }
+        .table-row:hover { background: rgba(255,255,255,0.05); }
+        .table-row:last-child { border-bottom: none; }
+
+        .rank { font-weight: 800; font-size: 1.2rem; color: var(--white); }
+        .rank.top-1 { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .rank.top-2 { color: #c0c0c0; }
+        .rank.top-3 { color: #cd7f32; }
+
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .user-avatar {
+            width: 45px; height: 45px; border-radius: 50%; overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: var(--white); font-size: 1.1rem; flex-shrink: 0;
+        }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-name { color: var(--white); font-weight: 600; font-size: 1rem; }
+        .user-plan { color: var(--gray); font-size: 0.85rem; }
+
+        .earnings, .referrals { color: rgba(255,255,255,0.9); font-weight: 500; }
+        .earnings { color: var(--accent-light); font-weight: 700; }
+
+        .plan-badge {
+            display: inline-block; padding: 0.3rem 0.9rem; border-radius: 50px;
+            font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+        }
+        .plan-yenvite {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,165,0,0.2) 100%);
+            color: #ffd700; border: 1px solid rgba(255,215,0,0.3);
+        }
+        .plan-yenpro {
+            background: linear-gradient(135deg, rgba(0,188,212,0.2) 0%, rgba(13,71,161,0.2) 100%);
+            color: var(--accent-light); border: 1px solid rgba(0,188,212,0.3);
+        }
+        .plan-yenlite {
+            background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Top 3 Highlight */
+        .table-row.top-3-row { background: rgba(255,215,0,0.03); }
+        .table-row.top-3-row:hover { background: rgba(255,215,0,0.06); }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 3rem; color: rgba(255,255,255,0.6); }
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 1rem; opacity: 0.5; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .menu-toggle { display: flex; }
+            .leaderboard-header h1 { font-size: 2rem; }
+            .table-header, .table-row {
+                grid-template-columns: 50px 1fr 100px;
+                padding: 1rem; gap: 0.5rem;
+            }
+            .table-header .referrals, .table-row .referrals,
+            .table-header .plan, .table-row .plan { display: none; }
+            .user-avatar { width: 36px; height: 36px; font-size: 0.9rem; }
+            .user-name { font-size: 0.9rem; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="IMG-20260414-WA0002.jpg" alt="YenlletAfrica Logo">
+                <span>YenlletAfrica</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="leaderboard.html">Leaderboard</a></li>
+                <li><a href="vendor.html">Vendor</a></li>
+            <li><a href="coupon-checker.html">Coupon Checker</a></li>
+                <li><a href="#" class="btn-login">Login</a></li>
+            </ul>
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Sidebar -->
+    <div class="overlay" onclick="toggleMenu()"></div>
+    <div class="mobile-sidebar">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="leaderboard.html">Leaderboard</a></li>
+            <li><a href="vendor.html">Vendor</a></li>
+            <li><a href="coupon-checker.html">Coupon Checker</a></li>
+            <li><a href="#" class="btn-login">Login</a></li>
+        </ul>
+    </div>
+
+    <!-- Leaderboard Section -->
+    <section class="leaderboard">
+        <div class="leaderboard-content">
+            <div class="leaderboard-header">
+                <h1>Top Earners <span>Leaderboard</span></h1>
+                <p>See who's leading the way in earnings and referrals across Africa</p>
+            </div>
+
+            <div class="leaderboard-table" id="leaderboardTable">
+                <div class="table-header">
+                    <div>Rank</div>
+                    <div>User</div>
+                    <div>Earnings</div>
+                    <div class="referrals">Referrals</div>
+                    <div class="plan">Plan</div>
+                </div>
+                <div id="leaderboardBody">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Loading top earners...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            document.querySelector('.menu-toggle').classList.toggle('active');
+            document.querySelector('.mobile-sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        });
+
+        // Get initials from username
+        function getInitials(username) {
+            return username.split(/[\s._]+/).map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        // Get avatar URL (use profile picture if available, otherwise initials)
+        function getAvatar(user, index) {
+            if (user.profile_picture) {
+                return `<img src="/uploads/${user.profile_picture}" alt="${user.username}" onerror="this.parentElement.innerHTML='${getInitials(user.username)}'">`;
+            }
+            return getInitials(user.username);
+        }
+
+        // Get rank class
+        function getRankClass(rank) {
+            if (rank === 1) return 'top-1';
+            if (rank === 2) return 'top-2';
+            if (rank === 3) return 'top-3';
+            return '';
+        }
+
+        // Get plan badge class
+        function getPlanClass(plan) {
+            const p = (plan || '').toUpperCase();
+            if (p === 'YENVITE') return 'plan-yenvite';
+            if (p === 'YENPRO') return 'plan-yenpro';
+            return 'plan-yenlite';
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            const num = parseFloat(amount) || 0;
+            return '¥' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Fetch and render leaderboard
+        async function loadLeaderboard() {
+            const body = document.getElementById('leaderboardBody');
+            try {
+                const response = await fetch('/api/leaderboard');
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+                const data = await response.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    body.innerHTML = `
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            <h3>No data yet</h3>
+                            <p>Be the first to earn and appear on the leaderboard!</p>
+                        </div>`;
+                    return;
+                }
+
+                const rows = data.map((user, index) => {
+                    const rank = index + 1;
+                    const rankClass = getRankClass(rank);
+                    const top3Class = rank <= 3 ? 'top-3-row' : '';
+                    const delay = (index * 0.05) + 's';
+
+                    return `
+                        <div class="table-row ${top3Class}" style="animation-delay: ${delay}">
+                            <div class="rank ${rankClass}">#${rank}</div>
+                            <div class="user-info">
+                                <div class="user-avatar">${getAvatar(user, index)}</div>
+                                <div>
+                                    <div class="user-name">${escapeHtml(user.username)}</div>
+                                    <div class="user-plan">${escapeHtml(user.plan || 'YENLITE')}</div>
+                                </div>
+                            </div>
+                            <div class="earnings">${formatCurrency(user.total_earnings)}</div>
+                            <div class="referrals">${parseInt(user.referral_count) || 0}</div>
+                            <div class="plan">
+                                <span class="plan-badge ${getPlanClass(user.plan)}">${escapeHtml((user.plan || 'YENLITE').toUpperCase())}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                body.innerHTML = rows;
+
+            } catch (err) {
+                console.error('Leaderboard error:', err);
+                body.innerHTML = `
+                    <div class="error-state">
+                        <p>⚠️ Failed to load leaderboard</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">${escapeHtml(err.message)}</p>
+                        <button onclick="loadLeaderboard()">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadLeaderboard);
+
+        // Auto-refresh every 60 seconds
+        setInterval(loadLeaderboard, 60000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0d47a1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YENLLET AFRICA">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230d47a1' width='180' height='180' rx='40'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>YA</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dashboard - YENLLET AFRICA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--off-white);
+            color: var(--primary-dark);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* ===== LOADING OVERLAY ===== */
+        #authLoader {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        #authLoader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loader-text {
+            color: var(--white);
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .loader-error {
+            color: #ff6b6b;
+            font-size: 13px;
+            text-align: center;
+            max-width: 300px;
+            padding: 0 20px;
+            display: none;
+        }
+
+        .loader-btn {
+            margin-top: 10px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            display: none;
+        }
+
+        /* ===== TOP HEADER ===== */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+            padding: 0 20px;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-header.scrolled {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            color: var(--white);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-icon:hover { color: var(--accent-light); }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo img {
+            height: 35px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dark-mode-toggle {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .dark-mode-toggle:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            transition: var(--transition);
+        }
+
+        .profile-pic:hover {
+            border-color: var(--accent-light);
+            transform: scale(1.05);
+        }
+
+        .username {
+            color: var(--white);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* ===== HERO BACKGROUND ===== */
+        .hero-bg {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
+            position: relative;
+            overflow: hidden;
+            padding-top: 90px;
+            padding-bottom: 100px;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== WALLET SECTION ===== */
+        .wallet-section {
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .wallet-slider {
+            display: flex;
+            transition: transform 0.3s ease;
+            touch-action: pan-y;
+        }
+
+        .wallet-card {
+            min-width: 100%;
+            padding: 25px;
+            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--white);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .wallet-card.activity {
+            background: linear-gradient(135deg, rgba(30, 60, 114, 0.9) 0%, rgba(42, 82, 152, 0.9) 100%);
+        }
+
+        .wallet-card.referral {
+            background: linear-gradient(135deg, rgba(67, 160, 71, 0.9) 0%, rgba(46, 125, 50, 0.9) 100%);
+        }
+
+        .wallet-type {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .wallet-balance {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 15px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wallet-balance span {
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .wallet-label {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-bottom: 15px;
+        }
+
+        .bank-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .bank-details { font-size: 13px; }
+
+        .account-number {
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 3px;
+        }
+
+        .chip-icon {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: var(--accent);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        /* ===== REFERRAL BOX ===== */
+        .referral-box {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        body.dark-mode .referral-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i { color: var(--accent-light); }
+
+        .referral-box p {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .referral-link-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .referral-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            font-size: 13px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+
+        .referral-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
+        }
+
+        .copy-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
+        }
+
+        .copy-btn:active { transform: scale(0.97); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.08);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+        }
+
+        .stat-box:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-3px);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent-light);
+        }
+
+        /* ===== SOCIAL LINKS ===== */
+        .social-section {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        #socialLinksContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .social-link-btn {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            color: white !important;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .social-link-btn:active { transform: scale(0.97); }
+
+        .social-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .social-link-btn i {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .whatsapp { background: #25D366; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
+        .telegram { background: #0088cc; box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3); }
+        .facebook { background: #1877F2; box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3); }
+        .instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .youtube { background: #FF0000; box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3); }
+        .twitter { background: #1DA1F2; box-shadow: 0 4px 12px rgba(29, 161, 242, 0.3); }
+        .tiktok { background: #000000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
+
+        /* ===== CONTENT SECTION ===== */
+        .content-section {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 80px;
+        }
+
+        .content-slider {
+            display: flex;
+            transition: transform 0.3s ease;
+        }
+
+        .content-panel {
+            min-width: 100%;
+            padding: 20px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+        }
+
+        .activity-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .activity-icon {
+            background: rgba(0, 188, 212, 0.2);
+            color: var(--accent-light);
+        }
+
+        .item-details { flex: 1; }
+
+        .item-title {
+            font-weight: 600;
+            color: var(--white);
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .item-subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .item-amount {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .item-amount.positive { color: #4caf50; }
+        .item-amount.negative { color: #f44336; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .swipe-hint {
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-size: 12px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1000;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.4);
+        }
+
+        .nav-item-bottom {
+            text-align: center;
+            text-decoration: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            font-weight: 500;
+            flex: 1;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav-item-bottom i {
+            font-size: 22px;
+            margin-bottom: 2px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-item-bottom.active {
+            color: var(--accent);
+            filter: drop-shadow(0 0 5px rgba(0, 188, 212, 0.4));
+        }
+
+        .nav-item-bottom:active i { transform: scale(0.85); }
+        .nav-item-bottom.active i { transform: translateY(-2px); }
+
+        /* ===== OVERLAY MENU ===== */
+        .overlay {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background: linear-gradient(180deg, var(--primary-dark) 0%, #0d2b4e 100%);
+            overflow-x: hidden;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 40px rgba(0,0,0,0.3);
+        }
+
+        .overlay-content {
+            position: relative;
+            width: 100%;
+            padding: 80px 30px 30px 30px;
+        }
+
+        .closebtn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: var(--white);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .closebtn:hover { color: var(--accent-light); }
+
+        .menu-list { list-style: none; }
+
+        .menu-list li { margin-bottom: 5px; }
+
+        .menu-list a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .menu-list a:hover {
+            color: var(--accent-light);
+            background: rgba(255,255,255,0.05);
+            padding-left: 20px;
+        }
+
+        .menu-list i {
+            font-size: 20px;
+            color: var(--accent-light);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 30px;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        /* ===== ALERT ===== */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: var(--white);
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+            color: var(--white);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 768px) {
+            .bottom-nav { display: none; }
+            .main-content { padding-bottom: 20px; }
+        }
+
+        @media (max-width: 480px) {
+            .logo span { font-size: 1.1rem; }
+            .wallet-balance { font-size: 28px; }
+            .referral-link-container { flex-direction: column; }
+            .copy-btn { width: 100%; }
+        }
+    </style>
+    <base target="_blank">
+<base target="_blank">
+</head>
+<body>
+    <!-- AUTH LOADING OVERLAY -->
+    <div id="authLoader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Verifying your session...</div>
+        <div class="loader-error" id="loaderError"></div>
+        <button class="loader-btn" id="loaderBtn" onclick="window.location.href='login.html'">Go to Login</button>
+    </div>
+
+    <div id="myNav" class="overlay">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="overlay-content">
+            <ul class="menu-list">
+                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li><a href="transfer.html"><i class="bi bi-transfer"></i> Transfer</a></li>
+                <li><a href="tiktok.html"><i class="bi bi-tiktok"></i> Tiktok</a></li>
+                <li><a href="whatsapp.html"><i class="bi bi-whatsapp"></i> Whatsapp</a></li>
+                <li><a href="task.html"><i class="bi bi-check-circle-fill"></i> Tasks</a></li>
+                <li><a href="video.html"><i class="bi bi-play-circle-fill"></i> Videos</a></li>
+                <li><a href="support.html"><i class="bi bi-headset"></i> Support</a></li>
+                <li><a href="chat.html"><i class="bi bi-chat-dots"></i> Chat & Earn</a></li>
+                <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
+                <li><a href="bank-setup.html"><i class="bi bi-bank"></i> Bank Setup</a></li>
+                <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
+            </ul>
+            <button class="logout-btn" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <div class="top-header" id="topHeader">
+        <div class="header-left">
+            <i class="bi bi-list menu-icon" onclick="openNav()"></i>
+            <a href="index.html" class="logo">
+                <img src="IMG-20260414-WA0002.jpg" alt="YenlletAfrica" onerror="this.style.display='none'">
+                <span>YenlletAfrica</span>
+            </a>
+        </div>
+        <div class="header-controls">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                <i class="bi bi-moon-stars-fill" id="darkModeIcon"></i>
+            </button>
+            <div class="header-profile">
+                <span class="username" id="usernameDisplay">...</span>
+                <img src="/uploads/default-avatar.png" alt="Profile" class="profile-pic" id="profilePic">
+            </div>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="hero-bg">
+        <div class="main-content">
+            <div class="wallet-section">
+                <div class="wallet-slider" id="walletSlider">
+                    <div class="wallet-card activity">
+                        <div class="wallet-type">Yencoin Wallet</div>
+                        <div class="wallet-balance">¥<span id="activityWallet">0</span></div>
+                        <div class="wallet-label">Earn from tasks and videos</div>
+                        <div class="bank-info">
+                            <div class="bank-details">
+                                <div>Account Number</div>
+                                <div class="account-number" id="accountNumber">Not Set</div>
+                            </div>
+                            <div class="chip-icon">
+                                <i class="bi bi-credit-card-2-front"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wallet-card referral">
+                        <div class="wallet-type">Referral Wallet</div>
+                        <div class="wallet-balance">¥<span id="referralWallet">0</span></div>
+                        <div class="wallet-label">Earn from referrals</div>
+                        <div class="bank-info">
+                            <div class="bank-details">
+                                <div>Bank Name</div>
+                                <div class="account-number" id="bankName">Not Set</div>
+                            </div>
+                            <div class="chip-icon">
+                                <i class="bi bi-bank"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dots">
+                    <div class="dot active" data-index="0"></div>
+                    <div class="dot" data-index="1"></div>
+                </div>
+            </div>
+
+            <div class="referral-box">
+                <div class="section-title">
+                    <i class="bi bi-share-fill"></i>
+                    Your Referral Link
+                </div>
+                <p>Share this link with friends and earn rewards!</p>
+                <div class="referral-link-container">
+                    <input type="text" class="referral-input" id="referralLink" readonly>
+                    <button class="copy-btn" onclick="copyReferralLink()">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Referrals</div>
+                        <div class="stat-value" id="totalReferrals">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Coupon Code</div>
+                        <div class="stat-value" id="couponCode" style="font-size: 16px;">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="social-section">
+                <div class="section-title">
+                    <i class="bi bi-people-fill"></i>
+                    Join Our Community
+                </div>
+                <p>Stay updated with latest tasks and earn more!</p>
+                <div id="socialLinksContainer">
+                    <!-- Social links will be loaded here -->
+                </div>
+            </div>
+
+            <div class="content-section">
+                <div class="content-slider" id="contentSlider">
+                    <div class="content-panel">
+                        <div class="section-title">
+                            <i class="bi bi-clock-history"></i>
+                            Recent Activities
+                        </div>
+                        <div id="activitiesContainer">
+                            <div class="empty-state">
+                                <i class="bi bi-hourglass-split"></i>
+                                <p>Loading activities...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="section-title">
+                            <i class="bi bi-people-fill"></i>
+                            My Referrals
+                        </div>
+                        <div id="referralsContainer">
+                            <div class="empty-state">
+                                <i class="bi bi-hourglass-split"></i>
+                                <p>Loading referrals...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swipe-hint">
+                    <i class="bi bi-chevron-left"></i>
+                    Swipe to switch view
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item-bottom active">
+            <i class="bi bi-house-door-fill"></i>
+            Home
+        </a>
+        <a href="withdraw.html" class="nav-item-bottom">
+            <i class="bi bi-cash-coin"></i>
+            Withdraw
+        </a>
+        <a href="bank-setup.html" class="nav-item-bottom">
+            <i class="bi bi-bank"></i>
+            Bank
+        </a>
+        <a href="profile.html" class="nav-item-bottom">
+            <i class="bi bi-person-circle"></i>
+            Profile
+        </a>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        // IMPORTANT: If your frontend and backend are on different domains/ports,
+        // you MUST update this to your actual API URL (e.g., 'https://api.yoursite.com')
+        // and your server MUST send proper CORS headers with Access-Control-Allow-Credentials: true
+        const API_URL = window.location.origin.includes('localhost') 
+            ? 'http://localhost:5000' 
+            : window.location.origin;
+
+        let userDarkMode = false;
+        let authRetryCount = 0;
+        const MAX_AUTH_RETRIES = 1;
+
+        // ============================================
+        // UI HELPERS
+        // ============================================
+        function showLoader() {
+            document.getElementById('authLoader').classList.remove('hidden');
+        }
+
+        function hideLoader() {
+            document.getElementById('authLoader').classList.add('hidden');
+        }
+
+        function showLoaderError(msg, showBtn = true) {
+            const errEl = document.getElementById('loaderError');
+            const btnEl = document.getElementById('loaderBtn');
+            const textEl = document.querySelector('.loader-text');
+            
+            errEl.textContent = msg;
+            errEl.style.display = 'block';
+            textEl.style.display = 'none';
+            
+            if (showBtn) {
+                btnEl.style.display = 'inline-block';
+            }
+        }
+
+        function openNav() {
+            document.getElementById("myNav").style.width = "80%";
+        }
+
+        function closeNav() {
+            document.getElementById("myNav").style.width = "0%";
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            userDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', userDarkMode);
+            const icon = document.getElementById('darkModeIcon');
+            icon.className = userDarkMode ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+
+            // Sync with server (non-blocking)
+            fetch(`${API_URL}/api/toggle-dark-mode`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ dark_mode: userDarkMode })
+            }).catch(err => console.log('Dark mode sync skipped:', err.message));
+        }
+
+        // Restore dark mode from localStorage immediately
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (savedDarkMode) {
+            document.body.classList.add('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) icon.className = 'bi bi-sun-fill';
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('topHeader');
+            if (window.scrollY > 10) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // ============================================
+        // SLIDERS
+        // ============================================
+        const walletSlider = document.getElementById('walletSlider');
+        const contentSlider = document.getElementById('contentSlider');
+        const dots = document.querySelectorAll('.dot');
+
+        let walletCurrentIndex = 0;
+        let contentCurrentIndex = 0;
+        let walletStartX = 0;
+        let contentStartX = 0;
+        let walletIsDragging = false;
+        let contentIsDragging = false;
+
+        walletSlider.addEventListener('touchstart', (e) => {
+            walletStartX = e.touches[0].clientX;
+            walletIsDragging = true;
+        }, { passive: true });
+
+        walletSlider.addEventListener('touchend', (e) => {
+            if (!walletIsDragging) return;
+            walletIsDragging = false;
+
+            const walletEndX = e.changedTouches[0].clientX;
+            const walletDiff = walletStartX - walletEndX;
+
+            if (Math.abs(walletDiff) > 50) {
+                if (walletDiff > 0 && walletCurrentIndex < 1) {
+                    walletCurrentIndex++;
+                } else if (walletDiff < 0 && walletCurrentIndex > 0) {
+                    walletCurrentIndex--;
+                }
+                updateWalletSlider();
+            }
+        }, { passive: true });
+
+        contentSlider.addEventListener('touchstart', (e) => {
+            contentStartX = e.touches[0].clientX;
+            contentIsDragging = true;
+        }, { passive: true });
+
+        contentSlider.addEventListener('touchend', (e) => {
+            if (!contentIsDragging) return;
+            contentIsDragging = false;
+
+            const contentEndX = e.changedTouches[0].clientX;
+            const contentDiff = contentStartX - contentEndX;
+
+            if (Math.abs(contentDiff) > 50) {
+                if (contentDiff > 0 && contentCurrentIndex < 1) {
+                    contentCurrentIndex++;
+                } else if (contentDiff < 0 && contentCurrentIndex > 0) {
+                    contentCurrentIndex--;
+                }
+                updateContentSlider();
+            }
+        }, { passive: true });
+
+        function updateWalletSlider() {
+            walletSlider.style.transform = `translateX(-${walletCurrentIndex * 100}%)`;
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === walletCurrentIndex);
+            });
+        }
+
+        function updateContentSlider() {
+            contentSlider.style.transform = `translateX(-${contentCurrentIndex * 100}%)`;
+        }
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                walletCurrentIndex = parseInt(dot.dataset.index);
+                updateWalletSlider();
+            });
+        });
+
+        // ============================================
+        // AUTHENTICATION (THE FIX)
+        // ============================================
+        async function checkAuth() {
+            showLoader();
+            
+            try {
+                console.log(`[Auth] Checking session at: ${API_URL}/api/profile`);
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+                const response = await fetch(`${API_URL}/api/profile`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                console.log(`[Auth] Response status: ${response.status}`);
+
+                // 401/403 = actually not authenticated
+                if (response.status === 401 || response.status === 403) {
+                    console.warn('[Auth] Session expired or invalid. Redirecting to login...');
+                    hideLoader();
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                // Other HTTP errors (500, 502, etc.) = server issue, NOT auth issue
+                if (!response.ok) {
+                    const errorText = await response.text().catch(() => 'Unknown error');
+                    console.error(`[Auth] Server error ${response.status}:`, errorText);
+                    
+                    if (authRetryCount < MAX_AUTH_RETRIES) {
+                        authRetryCount++;
+                        console.log(`[Auth] Retrying... (${authRetryCount}/${MAX_AUTH_RETRIES})`);
+                        await new Promise(r => setTimeout(r, 1500));
+                        return checkAuth();
+                    }
+                    
+                    showLoaderError(`Server error (${response.status}). Please try again later.`, false);
+                    return false;
+                }
+
+                const data = await response.json();
+                console.log('[Auth] User authenticated:', data.username);
+
+                // Admin redirect
+                if (data.username === 'admin') {
+                    hideLoader();
+                    window.location.href = 'admin.html';
+                    return false;
+                }
+
+                // Apply server dark mode preference if no local override exists
+                if (data.dark_mode !== undefined && localStorage.getItem('darkMode') === null) {
+                    if (data.dark_mode) {
+                        document.body.classList.add('dark-mode');
+                        const icon = document.getElementById('darkModeIcon');
+                        if (icon) icon.className = 'bi bi-sun-fill';
+                    }
+                }
+
+                // Load dashboard data safely
+                try {
+                    loadDashboard(data);
+                    hideLoader();
+                    return true;
+                } catch (renderError) {
+                    console.error('[Auth] Error rendering dashboard:', renderError);
+                    showLoaderError('Error loading dashboard data. Please refresh.', false);
+                    return false;
+                }
+
+            } catch (error) {
+                console.error('[Auth] Fetch error:', error.name, error.message);
+                
+                // Network/CORS error - don't immediately redirect!
+                if (error.name === 'TypeError' || error.name === 'AbortError') {
+                    if (authRetryCount < MAX_AUTH_RETRIES) {
+                        authRetryCount++;
+                        console.log(`[Auth] Network issue, retrying... (${authRetryCount}/${MAX_AUTH_RETRIES})`);
+                        await new Promise(r => setTimeout(r, 2000));
+                        return checkAuth();
+                    }
+                    
+                    showLoaderError(
+                        'Cannot connect to server. ' + 
+                        (window.location.origin.includes('localhost') 
+                            ? 'Make sure your backend is running on port 5000.' 
+                            : 'Check your internet connection.'),
+                        true
+                    );
+                    return false;
+                }
+
+                // Unexpected error
+                showLoaderError('Something went wrong. Please try again.', true);
+                return false;
+            }
+        }
+
+        // ============================================
+        // DASHBOARD DATA LOADING
+        // ============================================
+        function loadDashboard(data) {
+            // Safely set username (FIXED: element now exists in HTML)
+            const usernameEl = document.getElementById('usernameDisplay');
+            if (usernameEl && data.username) {
+                usernameEl.textContent = data.username;
+            }
+
+            // Profile picture
+            const profilePic = document.getElementById('profilePic');
+            if (profilePic && data.profile_picture) {
+                profilePic.src = `${API_URL}/uploads/${data.profile_picture}`;
+                profilePic.onerror = () => {
+                    profilePic.src = '/uploads/default-avatar.png';
+                };
+            }
+
+            // Wallets
+            safeSetText('activityWallet', (data.activity_wallet ?? 0).toLocaleString());
+            safeSetText('referralWallet', (data.referral_wallet ?? 0).toLocaleString());
+            safeSetText('totalReferrals', data.referral_count ?? 0);
+            safeSetText('couponCode', data.coupon_code || '-');
+
+            // Bank info
+            if (data.account_number) {
+                safeSetText('accountNumber', data.account_number);
+            }
+            if (data.bank_name) {
+                safeSetText('bankName', data.bank_name);
+            }
+
+            // Referral link
+            const referralLink = `${window.location.origin}/register.html?ref=${encodeURIComponent(data.username || '')}`;
+            const linkInput = document.getElementById('referralLink');
+            if (linkInput) linkInput.value = referralLink;
+
+            // Load secondary data
+            loadUserActivities();
+            loadUserReferrals();
+            loadSocialLinks();
+        }
+
+        function safeSetText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        async function loadUserActivities() {
+            const container = document.getElementById('activitiesContainer');
+            if (!container) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/user-activities`, {
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) throw new Error('Failed to load activities');
+
+                const activities = await response.json();
+
+                if (!activities || activities.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-inbox" style="font-size: 2rem; color: rgba(255,255,255,0.3);"></i>
+                            <p>No activities yet</p>
+                            <p style="font-size: 12px; color: rgba(255,255,255,0.3);">Complete tasks to start earning!</p>
+                        </div>`;
+                    return;
+                }
+
+                container.innerHTML = activities.map(activity => {
+                    const icon = getActivityIcon(activity.action);
+                    const timeAgo = getTimeAgo(activity.created_at);
+                    const isNegative = activity.action && (
+                        activity.action.toLowerCase().includes('withdrawal') || 
+                        activity.action.toLowerCase().includes('transfer')
+                    );
+
+                    return `
+                        <div class="activity-item">
+                            <div class="item-icon activity-icon">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-title">${formatAction(activity.action)}</div>
+                                <div class="item-subtitle">${timeAgo}</div>
+                            </div>
+                            ${activity.amount ? `
+                                <div class="item-amount ${isNegative ? 'negative' : 'positive'}">
+                                    ${isNegative ? '-' : '+'} ¥${parseFloat(activity.amount).toLocaleString()}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading activities:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <p>Failed to load activities</p>
+                    </div>`;
+            }
+        }
+
+        async function loadUserReferrals() {
+            const container = document.getElementById('referralsContainer');
+            if (!container) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/user-referrals`, {
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) throw new Error('Failed to load referrals');
+
+                const referrals = await response.json();
+
+                if (!referrals || referrals.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-person-plus"></i>
+                            <p>No referrals yet</p>
+                            <p style="font-size: 12px; margin-top: 5px;">Share your referral link to start earning!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = referrals.map(referral => {
+                    const timeAgo = getTimeAgo(referral.created_at);
+                    const profilePic = referral.profile_picture 
+                        ? `${API_URL}/uploads/${referral.profile_picture}` 
+                        : '/uploads/default-avatar.png';
+
+                    return `
+                        <div class="activity-item">
+                            <img src="${profilePic}" alt="${referral.username || 'User'}" 
+                                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid rgba(0,188,212,0.3);"
+                                 onerror="this.src='/uploads/default-avatar.png'">
+                            <div class="item-details">
+                                <div class="item-title">${referral.username || 'Unknown'}</div>
+                                <div class="item-subtitle">Joined ${timeAgo}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading referrals:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <p>Failed to load referrals</p>
+                    </div>
+                `;
+            }
+        }
+
+        function getActivityIcon(action) {
+            if (!action) return 'bi bi-dot';
+            const icons = {
+                'registered': 'bi bi-person-plus-fill',
+                'completed task': 'bi bi-check-circle-fill',
+                'watched video': 'bi bi-play-circle-fill',
+                'answered quiz correctly': 'bi bi-trophy-fill',
+                'earned referral bonus': 'bi bi-gift-fill',
+                'earned indirect referral': 'bi bi-cash-stack',
+                'read article': 'bi bi-newspaper',
+                'chat for 2 minutes': 'bi bi-chat-dots',
+                'withdrawal requested': 'bi bi-bank',
+                'transfer': 'bi bi-send-fill',
+                'welcome bonus': 'bi bi-gift-fill',
+                'referral bonus': 'bi bi-gift-fill',
+                'task completion': 'bi bi-check-circle-fill',
+                'video watch': 'bi bi-play-circle-fill',
+                'quiz reward': 'bi bi-trophy-fill',
+                'article read': 'bi bi-newspaper'
+            };
+            return icons[action.toLowerCase()] || 'bi bi-dot';
+        }
+
+        function formatAction(action) {
+            if (!action) return 'Unknown';
+            const formats = {
+                'registered': 'Account Created',
+                'completed task': 'Task Completed',
+                'watched video': 'Video Watched',
+                'answered quiz correctly': 'Quiz Bonus',
+                'earned referral bonus': 'Direct Referral',
+                'earned indirect referral': 'Indirect Referral',
+                'read article': 'Article Bonus',
+                'chat for 2 minutes': 'Chat Bonus',
+                'withdrawal requested': 'Withdrawal Requested',
+                'transfer': 'Funds Transferred',
+                'welcome bonus': 'Welcome Bonus',
+                'referral bonus': 'Referral Bonus',
+                'task completion': 'Task Completed',
+                'video watch': 'Video Watched',
+                'quiz reward': 'Quiz Completed',
+                'article read': 'Article Read'
+            };
+            return formats[action.toLowerCase()] || action.charAt(0).toUpperCase() + action.slice(1);
+        }
+
+        function getTimeAgo(dateString) {
+            if (!dateString) return 'Unknown';
+            const now = new Date();
+            const past = new Date(dateString);
+            const diffMs = now - past;
+            
+            if (isNaN(diffMs)) return 'Unknown';
+            
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+
+            return past.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
+        }
+
+        async function loadSocialLinks() {
+            const container = document.getElementById('socialLinksContainer');
+            if (!container) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/social-links`, {
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (!response.ok) throw new Error('Failed to load social links');
+                
+                const links = await response.json();
+
+                if (!links || links.length === 0) {
+                    container.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px; text-align: center;">No social links available yet.</p>';
+                    return;
+                }
+
+                container.innerHTML = links.map(link => {
+                    const platformClass = (link.platform || 'link').toLowerCase();
+                    const iconMap = {
+                        'whatsapp': 'bi bi-whatsapp',
+                        'telegram': 'bi bi-telegram',
+                        'facebook': 'bi bi-facebook',
+                        'instagram': 'bi bi-instagram',
+                        'youtube': 'bi bi-youtube',
+                        'twitter': 'bi bi-twitter',
+                        'tiktok': 'bi bi-tiktok'
+                    };
+                    const icon = iconMap[platformClass] || link.icon_class || 'bi bi-link-45deg';
+
+                    return `
+                        <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="social-link-btn ${platformClass}">
+                            <i class="${icon}"></i>
+                            <span>Join our ${link.platform}</span>
+                        </a>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading social links:', error);
+                container.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 12px;">Failed to load links.</p>';
+            }
+        }
+
+        function copyReferralLink() {
+            const linkInput = document.getElementById('referralLink');
+            if (!linkInput) return;
+            
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999);
+            
+            try {
+                navigator.clipboard.writeText(linkInput.value);
+                showAlert('✅ Referral link copied!', 'success');
+            } catch (err) {
+                document.execCommand('copy');
+                showAlert('✅ Referral link copied!', 'success');
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch(`${API_URL}/api/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+            } catch (e) {
+                console.log('Logout request failed, clearing locally anyway');
+            }
+            
+            localStorage.removeItem('darkMode');
+            window.location.href = 'login.html';
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            if (!alertContainer) return;
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertContainer.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('✅ Service Worker registered'))
+                    .catch(err => console.log('❌ Service Worker registration failed:', err));
+            });
+        }
+
+        // Start auth check when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkAuth);
+        } else {
+            checkAuth();
+        }
+    </script>
+</body>
+</html>

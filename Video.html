@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0d47a1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YENLLET">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Videos - YENLLET</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--off-white);
+            color: var(--primary-dark);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* ===== HEADER - Matching index.html exactly ===== */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+            padding: 0 20px;
+        }
+
+        .top-header.scrolled {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        /* Logo - Exact match from index.html */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-img {
+            height: 35px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .menu-icon:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .dark-mode-toggle {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .dark-mode-toggle:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-pic-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: var(--transition);
+        }
+
+        .profile-pic-small:hover {
+            border-color: var(--accent);
+        }
+
+        .username-header {
+            color: var(--white);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* ===== HERO SECTION with Logo Background ===== */
+        .hero-section {
+            min-height: 40vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 120px 2rem 60px;
+            margin-bottom: 40px;
+        }
+
+        /* Logo as watermark background */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            background-image: url('/uploads/default-avatar.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.08;
+            filter: blur(2px);
+            pointer-events: none;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--white);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .hero-content h1 span {
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.2s forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            padding: 0 20px 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* ===== VIDEO GRID ===== */
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .video-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(10, 22, 40, 0.08);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.03);
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .video-card:nth-child(1) { animation-delay: 0.1s; }
+        .video-card:nth-child(2) { animation-delay: 0.2s; }
+        .video-card:nth-child(3) { animation-delay: 0.3s; }
+        .video-card:nth-child(4) { animation-delay: 0.4s; }
+        .video-card:nth-child(5) { animation-delay: 0.5s; }
+        .video-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .video-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(10, 22, 40, 0.15);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('/uploads/default-avatar.png');
+            background-size: 80px;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.15;
+        }
+
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(0, 188, 212, 0.4);
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .video-info {
+            padding: 20px;
+        }
+
+        .video-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .video-description {
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .video-reward {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(0,188,212,0.1) 0%, rgba(13,71,161,0.1) 100%);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .video-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+        }
+
+        .video-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
+        }
+
+        .video-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .video-btn i {
+            font-size: 18px;
+        }
+
+        /* ===== NO VIDEOS STATE ===== */
+        .no-videos {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(10, 22, 40, 0.08);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .no-videos i {
+            font-size: 64px;
+            color: #ddd;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .no-videos h2 {
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .no-videos p {
+            color: #999;
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .nav-item-bottom {
+            text-align: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 11px;
+            font-weight: 500;
+            flex: 1;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 0;
+        }
+
+        .nav-item-bottom i {
+            display: block;
+            font-size: 22px;
+            margin-bottom: 2px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-item-bottom.active {
+            color: var(--primary);
+        }
+
+        .nav-item-bottom:active i {
+            transform: scale(0.85);
+        }
+
+        .nav-item-bottom.active i {
+            transform: translateY(-2px);
+        }
+
+        /* ===== SIDE MENU OVERLAY ===== */
+        .overlay {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.95);
+            overflow-x: hidden;
+            transition: 0.3s;
+        }
+
+        .overlay-content {
+            position: relative;
+            width: 100%;
+            padding: 60px 30px 30px 30px;
+        }
+
+        .closebtn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .closebtn:hover {
+            color: var(--accent);
+        }
+
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-list li {
+            margin-bottom: 15px;
+        }
+
+        .menu-list a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .menu-list a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-list i {
+            font-size: 20px;
+            color: var(--accent-light);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 30px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideInAlert 0.3s ease;
+            max-width: 300px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        @keyframes slideInAlert {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ===== DARK MODE ===== */
+        body.dark-mode {
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .top-header {
+            background: rgba(15, 20, 25, 0.98);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        body.dark-mode .hero-section {
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0d2b4e 100%);
+        }
+
+        body.dark-mode .page-title {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .page-subtitle {
+            color: #a0a0a0;
+        }
+
+        body.dark-mode .video-card {
+            background: linear-gradient(145deg, #2a2a3e 0%, #1e1e2f 100%);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        body.dark-mode .video-title {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .video-description {
+            color: #a0a0a0;
+        }
+
+        body.dark-mode .video-reward {
+            background: linear-gradient(135deg, rgba(0,188,212,0.15) 0%, rgba(13,71,161,0.15) 100%);
+            color: var(--accent-light);
+        }
+
+        body.dark-mode .video-btn {
+            background: linear-gradient(135deg, #667eea 0%, #5a6fd6 100%);
+        }
+
+        body.dark-mode .video-btn:hover {
+            background: linear-gradient(135deg, #5a6fd6 0%, #4a5fc6 100%);
+        }
+
+        body.dark-mode .video-btn:disabled {
+            background: #444;
+            color: #888;
+        }
+
+        body.dark-mode .no-videos {
+            background: linear-gradient(145deg, #2a2a3e 0%, #1e1e2f 100%);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        body.dark-mode .no-videos i {
+            color: #555;
+        }
+
+        body.dark-mode .no-videos h2 {
+            color: #a0a0a0;
+        }
+
+        body.dark-mode .no-videos p {
+            color: #666;
+        }
+
+        body.dark-mode .bottom-nav {
+            background: #1e1e2f;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.4);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        body.dark-mode .nav-item-bottom {
+            color: #a0a0a0;
+        }
+
+        body.dark-mode .nav-item-bottom.active {
+            color: #667eea;
+            filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.4));
+        }
+
+        body.dark-mode .overlay {
+            background-color: rgba(0,0,0,0.98);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 768px) {
+            .bottom-nav { display: none; }
+            .main-content { padding-bottom: 40px; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2rem; }
+            .hero-content p { font-size: 1rem; }
+            .hero-section::before { width: 250px; height: 250px; }
+            .videos-grid { grid-template-columns: 1fr; }
+            .nav-container { padding: 0 10px; }
+            .username-header { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 { font-size: 1.5rem; }
+            .logo { font-size: 1.1rem; }
+            .logo-img { height: 28px; }
+        }
+    </style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body>
+    <!-- Side Menu Overlay -->
+    <div id="myNav" class="overlay">
+        <a class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="overlay-content">
+            <ul class="menu-list">
+                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li><a href="quiz.html"><i class="bi bi-question-circle-fill"></i> Quiz</a></li>
+                <li><a href="task.html"><i class="bi bi-check-circle-fill"></i> Tasks</a></li>
+                <li><a href="video.html"><i class="bi bi-play-circle-fill"></i> Videos</a></li>
+                <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
+                <li><a href="bank-setup.html"><i class="bi bi-bank"></i> Bank Setup</a></li>
+                <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
+            </ul>
+            <button class="logout-btn" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Top Header -->
+    <header class="top-header" id="header">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo">
+                <img src="IMG-20260414-WA0002.jpg" alt="YenlletAfrica" class="logo-img">
+                <span>YenlletAfrica</span>
+            </a>
+            <div class="header-controls">
+                <i class="bi bi-list menu-icon" onclick="openNav()"></i>
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                    <i class="bi bi-moon-stars-fill" id="darkModeIcon"></i>
+                </button>
+            </div>
+            <div class="header-profile">
+                <img src="/uploads/default-avatar.png" alt="Profile" class="profile-pic-small" id="profilePic">
+                <div class="username-header" id="usernameDisplay">Loading...</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Hero Section with Logo Background -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Watch & <span>Earn</span></h1>
+            <p>Watch videos, stay engaged, and earn rewards with YenlletAfrica</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-title">
+            <i class="bi bi-play-circle-fill" style="color: var(--primary);"></i>
+            Available Videos
+        </div>
+        <div class="page-subtitle">Watch videos and earn Yen for each one!</div>
+
+        <div class="videos-grid" id="videosGrid"></div>
+
+        <div class="no-videos" id="noVideos" style="display: none;">
+            <i class="bi bi-play-circle-fill"></i>
+            <h2>No Videos Available</h2>
+            <p>Check back later for new video content.</p>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item-bottom">
+            <i class="bi bi-house-door-fill"></i> Home
+        </a>
+        <a href="task.html" class="nav-item-bottom">
+            <i class="bi bi-check-circle-fill"></i> Tasks
+        </a>
+        <a href="video.html" class="nav-item-bottom active">
+            <i class="bi bi-play-circle-fill"></i> Videos
+        </a>
+        <a href="withdraw.html" class="nav-item-bottom">
+            <i class="bi bi-cash-coin"></i> Withdraw
+        </a>
+        <a href="profile.html" class="nav-item-bottom">
+            <i class="bi bi-person-circle"></i> Profile
+        </a>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let userDarkMode = false;
+
+        function openNav() {
+            document.getElementById('myNav').style.width = '100%';
+        }
+
+        function closeNav() {
+            document.getElementById('myNav').style.width = '0';
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            userDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', userDarkMode);
+            const icon = document.getElementById('darkModeIcon');
+            icon.className = userDarkMode ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+
+            // Sync to server
+            fetch(`${API_URL}/api/toggle-dark-mode`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ dark_mode: userDarkMode })
+            }).catch(err => console.error('Dark mode sync error:', err));
+        }
+
+        // Apply saved dark mode immediately
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (savedDarkMode) {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                if (response.status === 401) { window.location.href = 'login.html'; return; }
+
+                const data = await response.json();
+                document.getElementById('usernameDisplay').textContent = data.username;
+                if (data.profile_picture) {
+                    document.getElementById('profilePic').src = `${API_URL}/uploads/${data.profile_picture}`;
+                }
+
+                // Sync dark mode from server (server wins over localStorage)
+                userDarkMode = data.dark_mode || localStorage.getItem('darkMode') === 'true';
+                if (userDarkMode) {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('darkModeIcon').className = 'bi bi-sun-fill';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    document.getElementById('darkModeIcon').className = 'bi bi-moon-stars-fill';
+                }
+                localStorage.setItem('darkMode', userDarkMode);
+
+                loadVideos();
+            } catch (error) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function loadVideos() {
+            const videosGrid = document.getElementById('videosGrid');
+            const noVideos = document.getElementById('noVideos');
+            try {
+                const response = await fetch(`${API_URL}/api/videos`, { credentials: 'include' });
+                const data = await response.json();
+
+                // FIX: Backend returns a flat array directly, not { videos: [...] }
+                const videos = Array.isArray(data) ? data : (data.videos || []);
+
+                if (videos.length === 0) {
+                    noVideos.style.display = 'block';
+                    videosGrid.style.display = 'none';
+                    return;
+                }
+
+                noVideos.style.display = 'none';
+                videosGrid.style.display = 'grid';
+                videosGrid.innerHTML = videos.map(video => `
+                    <div class="video-card" id="video-${video.id}">
+                        <div class="video-thumbnail">
+                            <div class="play-btn" onclick="watchVideo(${video.id}, '${escapeHtml(video.url)}')">
+                                <i class="bi bi-play-fill"></i>
+                            </div>
+                            <span class="video-duration">${video.duration || '0:30'}</span>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${escapeHtml(video.title)}</div>
+                            <div class="video-description">${escapeHtml(video.description || 'Watch this video and earn rewards instantly!')}</div>
+                            <div class="video-reward">
+                                <i class="bi bi-coin"></i> Reward: ¥${(video.reward || 0).toLocaleString()}
+                            </div>
+                            <button class="video-btn" id="btn-${video.id}" onclick="watchVideo(${video.id}, '${escapeHtml(video.url)}')">
+                                <i class="bi bi-play-fill"></i> Watch & Earn
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showAlert('⚠️ Failed to load videos', 'error');
+            }
+        }
+
+        function watchVideo(videoId, link) {
+            const btn = document.getElementById(`btn-${videoId}`);
+            try {
+                new URL(link);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Watching...`;
+                }
+                const videoWindow = window.open(link, '_blank');
+                if (!videoWindow) {
+                    showAlert('⚠️ Please allow pop-ups', 'error');
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+                showAlert('⏳ Watch the full video to earn rewards!', 'success');
+                setTimeout(() => completeVideo(videoId), 15000);
+            } catch (err) {
+                showAlert('❌ Invalid video link', 'error');
+            }
+        }
+
+        async function completeVideo(videoId) {
+            try {
+                const response = await fetch(`${API_URL}/api/complete-video/${videoId}`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showAlert(`✅ ¥${(data.reward || 0).toLocaleString()} earned!`, 'success');
+                    const card = document.getElementById(`video-${videoId}`);
+                    if (card) {
+                        card.style.animation = 'slideOut 0.3s ease forwards';
+                        setTimeout(() => {
+                            card.remove();
+                            if (document.querySelectorAll('.video-card').length === 0) {
+                                document.getElementById('noVideos').style.display = 'block';
+                                document.getElementById('videosGrid').style.display = 'none';
+                            }
+                        }, 300);
+                    }
+                } else {
+                    const btn = document.getElementById(`btn-${videoId}`);
+                    if (btn) { btn.disabled = false; btn.innerHTML = `<i class="bi bi-play-fill"></i> Try Again`; }
+                    showAlert(`❌ ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Network error!', 'error');
+            }
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            container.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 4000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function logout() {
+            try {
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+            } catch (error) {
+                console.warn("Logout error");
+            }
+            localStorage.removeItem('darkMode');
+            window.location.href = 'login.html';
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

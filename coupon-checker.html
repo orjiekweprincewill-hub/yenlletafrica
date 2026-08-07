@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a1628">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YENLLET">
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230a1628' width='180' height='180' rx='40'/><text x='50%' y='50%' font-size='90' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>TN</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <title>Check Coupon Code - YENLLET</title>
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --light-gray: #e2e8f0;
+            --success: #28a745;
+            --success-light: #d4edda;
+            --success-dark: #155724;
+            --danger: #dc3545;
+            --danger-light: #f8d7da;
+            --danger-dark: #721c24;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .checker-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Logo Section - YenlletAfrica Style */
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.3);
+        }
+
+        .logo-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .logo-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .logo-tagline {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 2px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .page-title h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 6px;
+        }
+
+        .page-title p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(0,188,212,0.08) 0%, rgba(13,71,161,0.08) 100%);
+            border-left: 4px solid var(--accent);
+            padding: 16px 18px;
+            margin: 25px 0;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .info-box::before {
+            content: '💡';
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .info-box p {
+            color: var(--primary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            padding-left: 30px;
+            font-weight: 500;
+        }
+
+        .info-box strong {
+            color: var(--primary-dark);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid var(--light-gray);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--off-white);
+            color: var(--primary-dark);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group input::placeholder {
+            color: var(--gray);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.1);
+        }
+
+        .form-group input:focus + .input-icon {
+            color: var(--accent);
+        }
+
+        .check-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .check-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transition);
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 188, 212, 0.4);
+        }
+
+        .check-btn:hover::after {
+            left: 100%;
+        }
+
+        .check-btn:disabled {
+            background: var(--light-gray);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-box {
+            margin-top: 28px;
+            padding: 24px;
+            border-radius: 16px;
+            display: none;
+            animation: fadeInUp 0.5s ease forwards;
+            text-align: center;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-valid {
+            background: linear-gradient(135deg, var(--success-light) 0%, #c3e6cb 100%);
+            border: 2px solid var(--success);
+        }
+
+        .result-invalid {
+            background: linear-gradient(135deg, var(--danger-light) 0%, #f5c6cb 100%);
+            border: 2px solid var(--danger);
+        }
+
+        .result-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.8rem;
+        }
+
+        .result-valid .result-icon {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .result-invalid .result-icon {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .result-box h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .result-valid h3 {
+            color: var(--success-dark);
+        }
+
+        .result-invalid h3 {
+            color: var(--danger-dark);
+        }
+
+        .result-box p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            font-weight: 500;
+        }
+
+        .result-valid p {
+            color: var(--success-dark);
+        }
+
+        .result-invalid p {
+            color: var(--danger-dark);
+        }
+
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .register-btn {
+            background: linear-gradient(135deg, var(--success) 0%, #218838 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        .back-btn {
+            background: var(--off-white);
+            color: var(--gray);
+            border: 2px solid var(--light-gray);
+        }
+
+        .back-btn:hover {
+            background: var(--light-gray);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 14px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        .links a:hover {
+            color: var(--accent);
+        }
+
+        .links a:hover::after {
+            width: 100%;
+        }
+
+        .bonus-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .checker-container {
+                padding: 28px 20px;
+                margin: 10px;
+            }
+
+            .logo-brand {
+                font-size: 1.3rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="checker-container">
+        <!-- YenlletAfrica Style Logo -->
+        <a href="index.html" class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span class="logo-brand">YenlletAfrica</span>
+                <span class="logo-tagline">Earn With Confidence</span>
+            </div>
+        </a>
+
+        <div class="page-title">
+            <h1>🎫 Check Coupon Code</h1>
+            <p>Verify your coupon code before registration</p>
+        </div>
+
+        <div class="info-box">
+            <p><strong>Tip:</strong> Enter the coupon code given to you to verify if it's valid and unused. This helps you confirm before attempting to register.</p>
+        </div>
+
+        <form id="checkForm">
+            <div class="form-group">
+                <label for="couponCode">Enter Coupon Code</label>
+                <div class="input-wrapper">
+                    <input type="text" id="couponCode" placeholder="e.g., VITETGLO0AZ0" required maxlength="20">
+                    <span class="input-icon">🎫</span>
+                </div>
+            </div>
+
+            <button type="submit" class="check-btn" id="checkBtn">Check Coupon Code</button>
+        </form>
+
+        <div class="result-box" id="resultBox">
+            <div class="result-icon" id="resultIcon"></div>
+            <h3 id="resultTitle"></h3>
+            <p id="resultMessage"></p>
+            <div id="bonusSection"></div>
+        </div>
+
+        <div class="links">
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        document.getElementById('checkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const couponCode = document.getElementById('couponCode').value.trim().toUpperCase();
+
+            if (!couponCode) {
+                return;
+            }
+
+            const checkBtn = document.getElementById('checkBtn');
+            checkBtn.disabled = true;
+            checkBtn.textContent = 'Checking...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/check-coupon`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ coupon_code: couponCode })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.valid) {
+                    showValidResult(couponCode);
+                } else {
+                    showInvalidResult(data.message || 'Invalid or already used coupon code');
+                }
+
+                checkBtn.disabled = false;
+                checkBtn.textContent = 'Check Coupon Code';
+            } catch (error) {
+                console.error('Error:', error);
+                showInvalidResult('Network error! Please try again.');
+                checkBtn.disabled = false;
+                checkBtn.textContent = 'Check Coupon Code';
+            }
+        });
+
+        function showValidResult(code) {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.className = 'result-box result-valid';
+            resultBox.style.display = 'block';
+
+            document.getElementById('resultIcon').innerHTML = '✅';
+            document.getElementById('resultTitle').textContent = 'Valid Coupon Code!';
+            document.getElementById('resultMessage').innerHTML = `Great! The coupon code "<strong>${code}</strong>" is valid and available. You can use this code to register.`;
+
+            document.getElementById('bonusSection').innerHTML = `
+                <div class="bonus-badge">₦2,500 Welcome Bonus</div>
+                <div class="action-buttons">
+                    <a href="register.html?coupon=${code}" class="action-btn register-btn">Register Now</a>
+                    <button onclick="resetChecker()" class="action-btn back-btn">Check Another</button>
+                </div>
+            `;
+        }
+
+        function showInvalidResult(message) {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.className = 'result-box result-invalid';
+            resultBox.style.display = 'block';
+
+            document.getElementById('resultIcon').innerHTML = '❌';
+            document.getElementById('resultTitle').textContent = 'Invalid Coupon Code';
+            document.getElementById('resultMessage').textContent = message + ' Please check the code or contact the person who gave it to you.';
+
+            document.getElementById('bonusSection').innerHTML = `
+                <div class="action-buttons" style="margin-top: 16px;">
+                    <button onclick="resetChecker()" class="action-btn back-btn" style="flex: none; padding: 12px 24px;">Try Again</button>
+                </div>
+            `;
+        }
+
+        function resetChecker() {
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('couponCode').value = '';
+            document.getElementById('couponCode').focus();
+        }
+    </script>
+
+    <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => {
+                    console.log('✅ Service Worker registered:', reg);
+                })
+                .catch(err => {
+                    console.log('❌ Service Worker registration failed:', err);
+                });
+        });
+    }
+
+    // Request install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        deferredPrompt = e;
+        console.log('✅ App can be installed');
+        const installBtn = document.getElementById('installBtn');
+        if (installBtn) {
+            installBtn.style.display = 'block';
+        }
+    });
+
+    function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('✅ User accepted the install prompt');
+                } else {
+                    console.log('❌ User dismissed the install prompt');
+                }
+                deferredPrompt = null;
+            });
+        }
+    }
+    </script>
+</body>
+</html>

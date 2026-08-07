@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--PWA Configuration-->
+    <link rel="manifest"
+    href="/manifest.json">
+    <meta name="theme-color"
+    content="#667eea">
+    <meta name="mobile-web-app-capabel" content="yes">
+    <meta name="apple-mobile-web-app-capabel" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YENLLET">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http:www.w3.org/2000/svg'  viewBox='0 0 180 180'><rect fill='%23667eea'width='180' height='180'
+        rx='40'/><text x='50%'y='50%' font-size='90' font-weight='bold' fill='white'
+        text-anchor='middle' dominant-baseline='central'
+        >TN</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Quiz Challenge - MAX Referral</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-pic-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        .username-header {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-bottom: 80px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .stat-card h3 {
+            font-size: 32px;
+            color: #1e3c72;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .quiz-number {
+            display: inline-block;
+            background: #1e3c72;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            margin-bottom: 20px;
+        }
+
+        .option-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-item:hover {
+            background: #e3f2fd;
+            border-color: #1e3c72;
+            transform: translateX(5px);
+        }
+
+        .option-item.selected {
+            background: #1e3c72;
+            color: white;
+            border-color: #1e3c72;
+        }
+
+        .option-letter {
+            width: 35px;
+            height: 35px;
+            background: #1e3c72;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .option-item.selected .option-letter {
+            background: white;
+            color: #1e3c72;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 15px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 14px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-button:hover:not(:disabled) {
+            background: #2a5298;
+        }
+
+        .submit-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .empty-message {
+            background: white;
+            padding: 60px 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .empty-message i {
+            font-size: 64px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-message h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-message p {
+            color: #666;
+        }
+
+        .result-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            margin: 20px;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .result-emoji {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .result-title.correct {
+            color: #27ae60;
+        }
+
+        .result-title.wrong {
+            color: #e74c3c;
+        }
+
+        .result-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .close-button {
+            padding: 12px 30px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-item-bottom {
+            text-align: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            flex: 1;
+            padding: 5px;
+        }
+
+        .nav-item-bottom i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        .nav-item-bottom.active {
+            color: #1e3c72;
+        }
+
+        .overlay {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.95);
+            overflow-x: hidden;
+            transition: 0.3s;
+        }
+
+        .overlay-content {
+            position: relative;
+            width: 100%;
+            padding: 60px 30px 30px 30px;
+        }
+
+        .closebtn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-list li {
+            margin-bottom: 15px;
+        }
+
+        .menu-list a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .menu-list a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-list i {
+            font-size: 20px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 30px;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-error {
+            background: #f44336;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Side Menu -->
+    <div id="myNav" class="overlay">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="overlay-content">
+            <ul class="menu-list">
+                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li><a href="quiz.html"><i class="bi bi-question-circle-fill"></i> Quiz</a></li>
+                <li><a href="task.html"><i class="bi bi-check-circle-fill"></i> Tasks</a></li>
+                <li><a href="video.html"><i class="bi bi-play-circle-fill"></i> Videos</a></li>
+                <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
+                <li><a href="bank-setup.html"><i class="bi bi-bank"></i> Bank Setup</a></li>
+                <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
+            </ul>
+            <button class="logout-btn" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Top Header -->
+    <div class="top-header">
+        <i class="bi bi-list menu-icon" onclick="openNav()"></i>
+        <div class="header-profile">
+            <img src="/uploads/default-avatar.png" alt="Profile" class="profile-pic-small" id="profilePic">
+            <div class="username-header" id="usernameDisplay">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-title">🧠 Quiz Challenge</div>
+        <div class="page-subtitle">Answer questions correctly and earn ¥5 per quiz!</div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3 id="availableCount">0</h3>
+                <p>Available Quizzes</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalEarned">¥0</h3>
+                <p>Total Earned</p>
+            </div>
+        </div>
+
+        <div id="quizList"></div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item-bottom">
+            <i class="bi bi-house-door-fill"></i>
+            Home
+        </a>
+        <a href="withdraw.html" class="nav-item-bottom">
+            <i class="bi bi-cash-coin"></i>
+            Withdraw
+        </a>
+        <a href="bank-setup.html" class="nav-item-bottom">
+            <i class="bi bi-bank"></i>
+            Bank
+        </a>
+        <a href="profile.html" class="nav-item-bottom">
+            <i class="bi bi-person-circle"></i>
+            Profile
+        </a>
+    </div>
+
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-box">
+            <div class="result-emoji" id="resultEmoji">🎉</div>
+            <div class="result-title" id="resultTitle">Correct!</div>
+            <div class="result-text" id="resultText">You earned ₦50</div>
+            <button class="close-button" onclick="closeResult()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let quizzes = [];
+        let answers = {};
+
+        function openNav() {
+            document.getElementById("myNav").style.width = "80%";
+        }
+
+        function closeNav() {
+            document.getElementById("myNav").style.width = "0%";
+        }
+
+        async function init() {
+            try {
+                const authRes = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                if (!authRes.ok) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const data = await authRes.json();
+                document.getElementById('usernameDisplay').textContent = data.username;
+                if (data.profile_picture) {
+                    document.getElementById('profilePic').src = `${API_URL}/uploads/${data.profile_picture}`;
+                }
+
+                await loadQuizzes();
+                await loadStats();
+            } catch (error) {
+                console.error('Init error:', error);
+                showError('Failed to load. Please refresh the page.');
+            }
+        }
+
+        async function loadQuizzes() {
+            try {
+                const response = await fetch(`${API_URL}/api/quizzes`, { credentials: 'include' });
+                
+                if (!response.ok) {
+                    showError('Quiz system not available.');
+                    return;
+                }
+
+                quizzes = await response.json();
+                document.getElementById('availableCount').textContent = quizzes.length;
+                displayQuizzes();
+            } catch (error) {
+                console.error('Load error:', error);
+                showError('Cannot load quizzes. Please try again later.');
+            }
+        }
+
+        function displayQuizzes() {
+            const container = document.getElementById('quizList');
+
+            if (quizzes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        <i class="bi bi-clipboard-check"></i>
+                        <h2>No Quizzes Available</h2>
+                        <p>Check back later for new challenges!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = quizzes.map((quiz, index) => `
+                <div class="quiz-container" id="quiz-${quiz.id}">
+                    <div class="quiz-number">Quiz ${index + 1}</div>
+                    <div class="question-text">${quiz.question}</div>
+                    <div class="options-list">
+                        <div class="option-item" onclick="selectAnswer(${quiz.id}, 'A', event)">
+                            <div class="option-letter">A</div>
+                            <div class="option-text">${quiz.option_a}</div>
+                        </div>
+                        <div class="option-item" onclick="selectAnswer(${quiz.id}, 'B', event)">
+                            <div class="option-letter">B</div>
+                            <div class="option-text">${quiz.option_b}</div>
+                        </div>
+                        <div class="option-item" onclick="selectAnswer(${quiz.id}, 'C', event)">
+                            <div class="option-letter">C</div>
+                            <div class="option-text">${quiz.option_c}</div>
+                        </div>
+                        <div class="option-item" onclick="selectAnswer(${quiz.id}, 'D', event)">
+                            <div class="option-letter">D</div>
+                            <div class="option-text">${quiz.option_d}</div>
+                        </div>
+                    </div>
+                    <button class="submit-button" id="btn-${quiz.id}" onclick="submitAnswer(${quiz.id})" disabled>
+                        <i class="bi bi-check-circle"></i> Submit Answer
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function selectAnswer(quizId, letter, event) {
+            const quizContainer = document.getElementById(`quiz-${quizId}`);
+            const options = quizContainer.querySelectorAll('.option-item');
+            
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            answers[quizId] = letter;
+            document.getElementById(`btn-${quizId}`).disabled = false;
+        }
+
+        async function submitAnswer(quizId) {
+            if (!answers[quizId]) return;
+
+            const btn = document.getElementById(`btn-${quizId}`);
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass"></i> Submitting...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/submit-quiz/${quizId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ answer: answers[quizId] })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResult(data.is_correct, data.reward, data.correct_answer);
+                    setTimeout(() => {
+                        loadQuizzes();
+                        loadStats();
+                    }, 2500);
+                } else {
+                    showAlert(data.error || 'Failed to submit', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check-circle"></i> Submit Answer';
+                }
+            } catch (error) {
+                console.error('Submit error:', error);
+                showAlert('Network error. Please try again.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle"></i> Submit Answer';
+            }
+        }
+
+        function showResult(isCorrect, reward, correctAnswer) {
+            const overlay = document.getElementById('resultOverlay');
+            const emoji = document.getElementById('resultEmoji');
+            const title = document.getElementById('resultTitle');
+            const text = document.getElementById('resultText');
+
+            if (isCorrect) {
+                emoji.textContent = '🎉';
+                title.textContent = 'Correct!';
+                title.className = 'result-title correct';
+                text.textContent = `You earned ¥${reward}`;
+            } else {
+                emoji.textContent = '❌';
+                title.textContent = 'Wrong Answer';
+                title.className = 'result-title wrong';
+                text.textContent = `The correct answer was: ${correctAnswer}`;
+            }
+
+            overlay.style.display = 'flex';
+        }
+
+        function closeResult() {
+            document.getElementById('resultOverlay').style.display = 'none';
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/api/quiz-history`, { credentials: 'include' });
+                if (response.ok) {
+                    const history = await response.json();
+                    const earned = history.filter(h => h.is_correct).length * 50;
+                    document.getElementById('totalEarned').textContent = `₦${earned.toLocaleString()}`;
+                }
+            } catch (error) {
+                console.error('Stats error:', error);
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('quizList').innerHTML = `
+                <div class="empty-message">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <h2>System Not Ready</h2>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertContainer.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        async function logout() {
+            try {
+                await fetch(`${API_URL}/api/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        init();
+    </script>
+
+    <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => {
+                    console.log('✅ Service Worker registered:', reg);
+                })
+                .catch(err => {
+                    console.log('❌ Service Worker registration failed:', err);
+                });
+        });
+    }
+
+    // Request install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        deferredPrompt = e;
+        console.log('✅ App can be installed');
+        // Show install button if you have one
+        const installBtn = document.getElementById('installBtn');
+        if (installBtn) {
+            installBtn.style.display = 'block';
+        }
+    });
+
+    function installApp() {
+        if (deferredPrompt) {
+deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('✅ User accepted the install prompt');
+                } else {
+                    console.log('❌ User dismissed the install prompt');
+                }
+                deferredPrompt = null;
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

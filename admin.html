@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d32f2f">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YENLLET Admin">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Panel - YENLLET</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; min-height: 100vh; }
+        .top-header { background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%); padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .admin-title { color: white; font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 12px; }
+        .logout-btn { background: white; color: #d32f2f; border: none; padding: 10px 24px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logout-btn:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        .main-content { padding: 25px; max-width: 1400px; margin: 0 auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 35px; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); text-align: center; border-top: 5px solid #d32f2f; transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+        .stat-icon { font-size: 48px; margin-bottom: 12px; }
+        .stat-value { font-size: 32px; font-weight: bold; color: #1e3c72; }
+        .stat-label { color: #666; font-size: 14px; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); margin-bottom: 25px; }
+        .section-title { font-size: 20px; font-weight: 600; color: #333; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; }
+        .tabs { display: flex; gap: 10px; border-bottom: 2px solid #e0e0e0; margin-bottom: 25px; flex-wrap: wrap; overflow-x: auto; }
+        .tab { padding: 12px 20px; background: none; border: none; color: #666; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.3s ease; }
+        .tab:hover { color: #d32f2f; }
+        .tab.active { color: #d32f2f; border-bottom-color: #d32f2f; }
+        .sub-tabs { display: flex; gap: 10px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .sub-tab { padding: 10px 15px; border: none; color: #666; font-weight: 600; border-bottom: 3px solid transparent; cursor: pointer; background: none; white-space: nowrap; transition: all 0.3s ease; }
+        .sub-tab:hover { color: #d32f2f; }
+        .sub-tab.active { color: #d32f2f; border-bottom-color: #d32f2f; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; transition: all 0.3s ease; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #d32f2f; box-shadow: 0 0 8px rgba(211, 47, 47, 0.1); }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3); }
+        .btn-success { background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3); }
+        .btn-danger { background: linear-gradient(135deg, #f44336 0%, #e53935 100%); color: white; }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3); }
+        .btn-sm { padding: 8px 16px; font-size: 12px; }
+        .toggle-switch { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 18px; background: #f8f9fa; border-radius: 10px; border: 1px solid #e0e0e0; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #4caf50; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .item-card { background: #f8f9fa; padding: 18px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #d32f2f; transition: all 0.3s ease; }
+        .item-card:hover { background: #f0f1f5; transform: translateX(5px); }
+        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .item-title { font-weight: 600; color: #333; font-size: 15px; }
+        .item-meta { font-size: 13px; color: #999; margin: 6px 0; }
+        .item-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+        .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .bg-primary { background: #d32f2f; color: white; }
+        .bg-success { background: #4caf50; color: white; }
+        .bg-info { background: #2196F3; color: white; }
+        .bg-warning { background: #ff9800; color: white; }
+        .bg-light { background: #f8f9fa; color: #333; }
+        .country-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .country-stat { background: linear-gradient(135deg, #f5f7fa 0%, #e8eef7 100%); padding: 20px; border-radius: 10px; text-align: center; border: 2px solid #e0e0e0; transition: all 0.3s ease; }
+        .country-stat:hover { border-color: #d32f2f; transform: translateY(-3px); }
+        .country-name { font-weight: 600; color: #333; margin-bottom: 8px; }
+        .country-count { font-size: 28px; font-weight: bold; color: #d32f2f; }
+        .alert { position: fixed; top: 20px; right: 20px; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2000; animation: slideInAlert 0.3s ease; }
+        .alert-success { background: #4caf50; color: white; }
+        .alert-error { background: #f44336; color: white; }
+        @keyframes slideInAlert { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .empty-state { text-align: center; padding: 50px 20px; color: #999; }
+        .empty-state i { font-size: 48px; margin-bottom: 15px; display: block; opacity: 0.5; }
+        .status-badge { display: inline-block; padding: 5px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .summary-card { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(30, 60, 114, 0.2); }
+        .summary-label { font-size: 13px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .summary-value { font-size: 28px; font-weight: bold; }
+        .utility-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        @media (max-width: 768px) { 
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .tab, .sub-tab { padding: 10px 15px; font-size: 12px; }
+            .main-content { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <div class="admin-title"><i class="bi bi-shield-lock-fill"></i> Admin Control Panel</div>
+        <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="main-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value">¥<span id="totalPayout">0</span></div>
+                <div class="stat-label">Total Payouts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✓</div>
+                <div class="stat-value" id="totalTasks">0</div>
+                <div class="stat-label">Tasks Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎬</div>
+                <div class="stat-value" id="totalVideos">0</div>
+                <div class="stat-label">Videos Watched</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="bi bi-geo-alt"></i> Users by Country</div>
+            <div class="country-stats" id="countryStats"></div>
+        </div>
+
+        <div class="section">
+            <div class="tabs" id="mainTabs">
+                <button class="tab active" onclick="switchTab('withdrawals', event)"><i class="bi bi-wallet2"></i> Withdrawals</button>
+                <button class="tab" onclick="switchTab('tiktok', event)"><i class="bi bi-music"></i> TikTok</button>
+                <button class="tab" onclick="switchTab('coupons', event)"><i class="bi bi-ticket-perforated"></i> Coupons</button>
+                <button class="tab" onclick="switchTab('content', event)"><i class="bi bi-file-earmark-text"></i> Content</button>
+                <button class="tab" onclick="switchTab('social', event)"><i class="bi bi-link-45deg"></i> Social</button>
+                <button class="tab" onclick="switchTab('vendors', event)"><i class="bi bi-headset"></i> Vendors</button>
+            </div>
+
+            <!-- WITHDRAWALS TAB -->
+            <div id="withdrawals-tab" class="tab-content active">
+                <div class="section-title"><i class="bi bi-wallet2"></i> Withdrawal Management</div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 25px; border: 2px solid #e0e0e0;">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600; color: #333;">
+                        <i class="bi bi-geo-alt-fill"></i> Set Active Withdrawal Country
+                    </label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <select id="activeCountrySelect" onchange="updateActiveCountry()" style="flex: 1; min-width: 200px; padding: 12px; border-radius: 8px; border: 2px solid #d0d0d0; font-weight: 500; cursor: pointer;">
+                            <option value="NG">🇳🇬 Nigeria (NG)</option>
+                            <option value="GH">🇬🇭 Ghana (GH)</option>
+                            <option value="CM">🇨🇲 Cameroon (CM)</option>
+                        </select>
+                        <span id="currentCountryBadge" style="background: #d32f2f; color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">
+                            Current: Nigeria 🇳🇬
+                        </span>
+                    </div>
+                    <small id="countryNote" style="display: block; margin-top: 12px; font-size: 13px; font-weight: 500; color: #4caf50;">
+                        🌍 You can change the active country at any time. Only users in the selected country will be able to withdraw.
+                    </small>
+                </div>
+
+                <div class="summary-card" id="withdrawalSummaryCard">
+                    <div class="summary-label"><i class="bi bi-hourglass-split"></i> Pending Payout Requests</div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px;">
+                        <div class="summary-value" id="totalPendingCount">0</div>
+                        <div style="font-size: 16px; opacity: 0.9;" id="totalPendingAmount">Calculating...</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">Enable/Disable Withdrawal Types</h3>
+
+                    <div class="toggle-switch">
+                        <span style="font-weight: 600; color: #333; flex: 1;"><i class="bi bi-briefcase"></i> Activity Wallet</span>
+                        <label class="switch">
+                            <input type="checkbox" id="activityToggle" onchange="toggleWithdrawal('activity')">
+                            <span class="slider"></span>
+                        </label>
+                        <span id="activityStatus" style="font-weight: 600; min-width: 80px; text-align: right;">Disabled</span>
+                    </div>
+
+                    <div class="toggle-switch">
+                        <span style="font-weight: 600; color: #333; flex: 1;"><i class="bi bi-people"></i> Referral Wallet</span>
+                        <label class="switch">
+                            <input type="checkbox" id="referralToggle" onchange="toggleWithdrawal('referral')">
+                            <span class="slider"></span>
+                        </label>
+                        <span id="referralStatus" style="font-weight: 600; min-width: 80px; text-align: right;">Disabled</span>
+                    </div>
+
+                    <div class="toggle-switch">
+                        <span style="font-weight: 600; color: #333; flex: 1;"><i class="bi bi-music"></i> TikTok Withdrawal</span>
+                        <label class="switch">
+                            <input type="checkbox" id="tiktokToggle" onchange="toggleWithdrawal('tiktok')">
+                            <span class="slider"></span>
+                        </label>
+                        <span id="tiktokStatus" style="font-weight: 600; min-width: 80px; text-align: right;">Disabled</span>
+                    </div>
+                </div>
+
+                <div class="utility-bar">
+                    <button class="btn btn-success" onclick="approveAllWithdrawals()"><i class="bi bi-check-all"></i> Approve All Pending</button>
+                    <button class="btn btn-danger" onclick="rejectAllWithdrawals()"><i class="bi bi-x-circle-fill"></i> Reject All Pending</button>
+                    <button class="btn btn-primary" onclick="downloadWithdrawalsPDF()"><i class="bi bi-file-earmark-pdf-fill"></i> Download Payout PDF</button>
+                </div>
+
+                <div id="withdrawalsList"></div>
+            </div>
+
+            <!-- TIKTOK TAB -->
+            <div id="tiktok-tab" class="tab-content">
+                <div class="section-title"><i class="bi bi-music"></i> TikTok Management</div>
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;"><i class="bi bi-search"></i> Search & Add TikTok Bonus</h3>
+                    <form id="tiktokSearchForm" onsubmit="searchTiktokUser(event)">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <input type="text" id="tiktokSearchInput" placeholder="Search username or TikTok handle..." required style="flex: 1; min-width: 250px; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
+                        </div>
+                    </form>
+                    <div id="tiktokSearchResult" style="margin-top: 20px;"></div>
+                </div>
+                <hr style="margin: 30px 0; border: 1px solid #e0e0e0;">
+                <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;"><i class="bi bi-list"></i> All TikTok Users</h3>
+                <div id="tiktokUsersList"></div>
+            </div>
+
+            <!-- COUPONS TAB -->
+            <div id="coupons-tab" class="tab-content">
+                <div class="section-title"><i class="bi bi-ticket-perforated"></i> Coupon Management</div>
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;"><i class="bi bi-plus-circle"></i> Generate New Coupon Code</h3>
+                    <form id="couponForm" onsubmit="generateCoupon(event)">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+                            <div class="form-group" style="flex: 1; min-width: 250px; margin-bottom: 0;">
+                                <label for="planSelect">Plan</label>
+                                <select id="planSelect" required style="margin: 0;">
+                                    <option value="YENLITE">LITE - ¥267 Welcome Bonus</option>
+                                    <option value="YENPRO">PRO - ¥748 Welcome Bonus</option>
+                                    <option value="YENVITE">VITE - ¥1200 Welcome Bonus</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Generate</button>
+                        </div>
+                    </form>
+                    <div id="generatedCoupon" style="margin-top: 20px;"></div>
+                </div>
+                <hr style="margin: 30px 0; border: 1px solid #e0e0e0;">
+                <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;"><i class="bi bi-search"></i> Search User by Coupon</h3>
+                <form id="searchCouponForm" onsubmit="searchUserByCoupon(event)">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="text" id="searchCouponInput" placeholder="Enter coupon code..." required style="flex: 1; min-width: 250px; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
+                    </div>
+                </form>
+                <div id="couponSearchResult" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- CONTENT TAB -->
+            <div id="content-tab" class="tab-content">
+                <div class="section-title"><i class="bi bi-file-earmark-text"></i> Content Management</div>
+                <div class="sub-tabs" id="contentSubTabs">
+                    <button class="sub-tab active" onclick="switchContentTab('tasks', event)"><i class="bi bi-list-check"></i> Tasks</button>
+                    <button class="sub-tab" onclick="switchContentTab('videos', event)"><i class="bi bi-play-circle"></i> Videos</button>
+                    <button class="sub-tab" onclick="switchContentTab('articles', event)"><i class="bi bi-newspaper"></i> Articles</button>
+                </div>
+
+                <div id="tasks-subtab" style="display: block;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;">Post New Task</h3>
+                    <form id="taskForm" onsubmit="postTask(event)">
+                        <div class="form-group"><label>Task Title</label><input type="text" id="taskTitle" required></div>
+                        <div class="form-group"><label>Description</label><textarea id="taskDescription" required></textarea></div>
+                        <div class="form-group"><label>Task Link</label><input type="url" id="taskLink" required></div>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Post Task</button>
+                    </form>
+                    <h3 style="font-size: 16px; margin-top: 30px; margin-bottom: 15px; color: #333;">Existing Tasks</h3>
+                    <div id="tasksList"></div>
+                </div>
+
+                <div id="videos-subtab" style="display: none;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;">Post New Video</h3>
+                    <form id="videoForm" onsubmit="postVideo(event)">
+                        <div class="form-group"><label>Video Title</label><input type="text" id="videoTitle" required></div>
+                        <div class="form-group"><label>YouTube URL</label><input type="url" id="videoUrl" required placeholder="https://www.youtube.com/watch?v=..."></div>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Post Video</button>
+                    </form>
+                    <h3 style="font-size: 16px; margin-top: 30px; margin-bottom: 15px; color: #333;">Existing Videos</h3>
+                    <div id="videosList"></div>
+                </div>
+
+                <div id="articles-subtab" style="display: none;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;">Post New Article</h3>
+                    <form id="articleForm" onsubmit="postArticle(event)">
+                        <div class="form-group"><label>Article Title</label><input type="text" id="articleTitle" required></div>
+                        <div class="form-group"><label>Content</label><textarea id="articleContent" required style="min-height: 150px;"></textarea></div>
+                        <div class="form-group"><label>Read Time (seconds)</label><input type="number" id="readTime" value="15" required min="5"></div>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Post Article</button>
+                    </form>
+                    <h3 style="font-size: 16px; margin-top: 30px; margin-bottom: 15px; color: #333;">Existing Articles</h3>
+                    <div id="articlesList"></div>
+                </div>
+            </div>
+
+            <!-- SOCIAL TAB -->
+            <div id="social-tab" class="tab-content">
+                <div class="section-title"><i class="bi bi-link-45deg"></i> Social Links Management</div>
+                <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;">Add New Social Link</h3>
+                <form id="socialForm" onsubmit="addSocialLink(event)">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Platform</label>
+                            <select id="socialPlatform" required>
+                                <option value="WhatsApp">WhatsApp</option>
+                                <option value="Telegram">Telegram</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="Instagram">Instagram</option>
+                                <option value="Twitter">Twitter</option>
+                                <option value="TikTok">TikTok</option>
+                                <option value="YouTube">YouTube</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>URL</label>
+                            <input type="url" id="socialUrl" required placeholder="https://...">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Link</button>
+                </form>
+                <h3 style="font-size: 16px; margin-top: 30px; margin-bottom: 15px; color: #333;">Current Social Links</h3>
+                <div id="socialLinksList"></div>
+            </div>
+
+            <!-- VENDORS TAB -->
+            <div id="vendors-tab" class="tab-content">
+                <div class="section-title"><i class="bi bi-headset"></i> Support Vendor Management</div>
+                
+                <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;"><i class="bi bi-search"></i> Search User to Make Vendor</h3>
+                <form id="vendorSearchForm" onsubmit="searchUserForVendor(event)">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="text" id="vendorSearchInput" placeholder="Enter username..." required style="flex: 1; min-width: 250px; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
+                    </div>
+                </form>
+                <div id="vendorSearchResult" style="margin-top: 20px;"></div>
+                
+                <hr style="margin: 30px 0; border: 1px solid #e0e0e0;">
+                
+                <h3 style="font-size: 16px; margin-bottom: 15px; color: #333;"><i class="bi bi-people"></i> Current Vendors</h3>
+                <div id="vendorsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '';
+        let currentPendingWithdrawals = [];
+        let currentSettings = {};
+
+        function escapeHtml(str) {
+            if (str == null) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        function formatNumber(num) {
+            const n = parseFloat(num);
+            return isNaN(n) ? '0' : n.toLocaleString();
+        }
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_URL}/api/check-session`, { credentials: 'include' });
+                if (!response.ok) { window.location.href = 'login.html'; return; }
+                const session = await response.json();
+
+                if (session.role === 'assistant') {
+                    window.location.href = 'Assistance.html';
+                    return;
+                }
+                if (!session.is_admin) { window.location.href = 'dashboard.html'; return; }
+
+                loadStats();
+                loadCountryStats();
+                loadWithdrawals();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        function switchTab(tabName, event) {
+            event.preventDefault();
+            document.querySelectorAll('#mainTabs .tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.closest('.tab').classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            loadTabData(tabName);
+        }
+
+        function switchContentTab(subTab, event) {
+            event.preventDefault();
+            document.querySelectorAll('#contentSubTabs .sub-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('[id$="-subtab"]').forEach(el => el.style.display = 'none');
+            event.target.closest('.sub-tab').classList.add('active');
+            document.getElementById(`${subTab}-subtab`).style.display = 'block';
+            loadContentTab(subTab);
+        }
+
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'withdrawals': loadWithdrawals(); break;
+                case 'tiktok': loadTiktokUsers(); break;
+                case 'coupons': break;
+                case 'content': loadContentTab('tasks'); break;
+                case 'social': loadSocialLinks(); break;
+                case 'vendors': loadVendors(); break;
+            }
+        }
+
+        function loadContentTab(subTab) {
+            switch(subTab) {
+                case 'tasks': loadTasks(); break;
+                case 'videos': loadVideos(); break;
+                case 'articles': loadArticles(); break;
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/stats`, { credentials: 'include' });
+                const stats = await response.json();
+                document.getElementById('totalUsers').textContent = stats.total_users || 0;
+                document.getElementById('totalPayout').textContent = formatNumber(stats.total_payout);
+                document.getElementById('totalTasks').textContent = stats.total_tasks || 0;
+                document.getElementById('totalVideos').textContent = stats.total_videos || 0;
+            } catch (error) {
+                console.error('Stats error:', error);
+            }
+        }
+
+        async function loadCountryStats() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/country-stats`, { credentials: 'include' });
+                const stats = await response.json();
+                const html = `
+                    <div class="country-stat"><div class="country-name">🇳🇬 Nigeria</div><div class="country-count">${stats.Nigeria || 0}</div></div>
+                    <div class="country-stat"><div class="country-name">🇬🇭 Ghana</div><div class="country-count">${stats.Ghana || 0}</div></div>
+                    <div class="country-stat"><div class="country-name">🇨🇲 Cameroon</div><div class="country-count">${stats.Cameroon || 0}</div></div>
+                    <div class="country-stat"><div class="country-name">📊 Total</div><div class="country-count">${stats.total || 0}</div></div>
+                `;
+                document.getElementById('countryStats').innerHTML = html;
+            } catch (error) {
+                console.error('Country stats error:', error);
+            }
+        }
+
+        const COUNTRY_MAP = {
+            'NG': 'Nigeria 🇳🇬',
+            'GH': 'Ghana 🇬🇭',
+            'CM': 'Cameroon 🇨🇲'
+        };
+
+        async function loadWithdrawals() {
+            try {
+                const settingsResponse = await fetch(`${API_URL}/api/admin/get-withdrawal-settings`, { credentials: 'include' });
+                const settings = await settingsResponse.json();
+                currentSettings = settings;
+
+                document.getElementById('activityToggle').checked = settings.activity_withdrawal_enabled;
+                document.getElementById('activityStatus').textContent = settings.activity_withdrawal_enabled ? '✅ Enabled' : '❌ Disabled';
+                document.getElementById('referralToggle').checked = settings.referral_withdrawal_enabled;
+                document.getElementById('referralStatus').textContent = settings.referral_withdrawal_enabled ? '✅ Enabled' : '❌ Disabled';
+                document.getElementById('tiktokToggle').checked = settings.tiktok_withdrawal_enabled;
+                document.getElementById('tiktokStatus').textContent = settings.tiktok_withdrawal_enabled ? '✅ Enabled' : '❌ Disabled';
+
+                const countrySelect = document.getElementById('activeCountrySelect');
+                if (settings.active_country) countrySelect.value = settings.active_country;
+                countrySelect.disabled = false;
+
+                const currentBadge = document.getElementById('currentCountryBadge');
+                const activeCountryName = COUNTRY_MAP[settings.active_country] || settings.active_country;
+                currentBadge.textContent = `Current: ${activeCountryName}`;
+
+                const response = await fetch(`${API_URL}/api/admin/withdrawal-requests`, { credentials: 'include' });
+                const withdrawals = await response.json();
+
+                currentPendingWithdrawals = withdrawals || [];
+                updateSummaryCard();
+
+                const container = document.getElementById('withdrawalsList');
+                if (!withdrawals || withdrawals.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No pending withdrawals</p></div>';
+                    return;
+                }
+
+                container.innerHTML = withdrawals.map(w => {
+                    const displayAmount = w.wallet_type === 'tiktok' ? `$${formatNumber(w.amount)}` : `¥${formatNumber(w.amount)}`;
+                    const friendlyCountry = COUNTRY_MAP[w.country] || escapeHtml(w.country) || 'Unknown';
+
+                    return `<div class="item-card">
+                        <div class="item-header">
+                            <span class="item-title"><i class="bi bi-person"></i> @${escapeHtml(w.username)}</span>
+                            <span class="badge bg-warning">${escapeHtml(w.wallet_type).toUpperCase()}</span>
+                        </div>
+                        <div class="item-meta"><i class="bi bi-bank"></i> ${escapeHtml(w.bank_name)} - ${escapeHtml(w.account_number)}</div>
+                        <div class="item-meta"><i class="bi bi-geo-alt"></i> ${friendlyCountry}</div>
+                        <div class="item-meta" style="font-weight: 700; color: #1e3c72; margin-top: 10px; font-size: 16px;">${displayAmount}</div>
+                        <div class="item-actions">
+                            <button class="btn btn-success btn-sm" onclick="approveWithdrawal(${w.id})" style="flex: 1;"><i class="bi bi-check-circle"></i> Approve</button>
+                            <button class="btn btn-danger btn-sm" onclick="rejectWithdrawal(${w.id})" style="flex: 1;"><i class="bi bi-x-circle"></i> Reject</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (error) {
+                console.error('Withdrawals error:', error);
+                showAlert('Failed to load withdrawals', 'error');
+            }
+        }
+
+        function updateSummaryCard() {
+            const totalCount = currentPendingWithdrawals.length;
+            document.getElementById('totalPendingCount').textContent = `${totalCount}`;
+
+            let yenTotal = 0;
+            let dollarTotal = 0;
+
+            currentPendingWithdrawals.forEach(w => {
+                const amt = parseFloat(w.amount) || 0;
+                if (w.wallet_type === 'tiktok') dollarTotal += amt;
+                else yenTotal += amt;
+            });
+
+            document.getElementById('totalPendingAmount').textContent = `¥${formatNumber(yenTotal)} | $${formatNumber(dollarTotal)}`;
+        }
+
+        function downloadWithdrawalsPDF() {
+            if (currentPendingWithdrawals.length === 0) {
+                showAlert('❌ No pending withdrawals to export', 'error');
+                return;
+            }
+
+            let yenTotal = 0;
+            let dollarTotal = 0;
+            const rows = currentPendingWithdrawals.map((w, i) => {
+                const amt = parseFloat(w.amount) || 0;
+                const isTiktok = w.wallet_type === 'tiktok';
+                const currency = isTiktok ? '$' : '¥';
+                if (isTiktok) dollarTotal += amt;
+                else yenTotal += amt;
+
+                const friendlyCountry = COUNTRY_MAP[w.country] || escapeHtml(w.country) || 'Unknown';
+                const amountStr = `${currency}${formatNumber(amt)}`;
+
+                return `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${i + 1}</td>
+                        <td style="padding: 12px 8px; font-size: 13px; color: #374151; font-weight: 600;">@${escapeHtml(w.username)}</td>
+                        <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${escapeHtml(w.wallet_type).toUpperCase()}</td>
+                        <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${escapeHtml(w.bank_name)}</td>
+                        <td style="padding: 12px 8px; font-size: 13px; color: #374151; font-family: monospace;">${escapeHtml(w.account_number)}</td>
+                        <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${friendlyCountry}</td>
+                        <td style="padding: 12px 8px; font-size: 13px; color: #1e3c72; font-weight: 700; text-align: right;">${amountStr}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const element = document.createElement('div');
+            element.style.padding = '30px';
+            element.style.fontFamily = "'Segoe UI', Arial, sans-serif";
+            element.style.background = '#ffffff';
+            element.style.color = '#1f2937';
+            element.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #d32f2f; padding-bottom: 20px;">
+                    <h1 style="font-size: 24px; color: #d32f2f; margin: 0 0 8px 0; font-weight: 800; letter-spacing: 1px;">TASKNEST</h1>
+                    <p style="font-size: 14px; color: #6b7280; margin: 0; font-weight: 500;">PENDING PAYOUT SHEET</p>
+                    <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">Generated: ${new Date().toLocaleString()}</p>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 25px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div>
+                        <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Total Orders</p>
+                        <p style="font-size: 20px; font-weight: 700; color: #1f2937; margin: 0;">${currentPendingWithdrawals.length}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Total Amount</p>
+                        <p style="font-size: 20px; font-weight: 700; color: #1e3c72; margin: 0;">¥${formatNumber(yenTotal)} <span style="font-size: 14px; color: #6b7280;">|</span> $${formatNumber(dollarTotal)}</p>
+                    </div>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background: #1e3c72; color: white;">
+                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">#</th>
+                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">User</th>
+                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Wallet</th>
+                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Bank Name</th>
+                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Account #</th>
+                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Country</th>
+                            <th style="padding: 12px 8px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                    </tbody>
+                    <tfoot>
+                        <tr style="background: #f3f4f6; border-top: 2px solid #1e3c72;">
+                            <td colspan="6" style="padding: 14px 8px; font-size: 13px; font-weight: 700; color: #1f2937; text-align: right;">TOTAL PAYOUT:</td>
+                            <td style="padding: 14px 8px; font-size: 14px; font-weight: 800; color: #1e3c72; text-align: right;">¥${formatNumber(yenTotal)} <span style="color: #9ca3af; font-weight: 400;">|</span> $${formatNumber(dollarTotal)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
+                    <p style="font-size: 11px; color: #9ca3af; margin: 0; line-height: 1.6;">
+                        This document is confidential and intended for administrative use only.<br>
+                        TASKNEST Admin System • ${new Date().getFullYear()}
+                    </p>
+                </div>
+            `;
+
+            const opt = {
+                margin: [15, 15, 15, 15],
+                filename: `TASKNEST_Payout_Sheet_${new Date().toISOString().slice(0,10)}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true, logging: false },
+                jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(element).save()
+                .then(() => showAlert('✅ PDF downloaded successfully', 'success'))
+                .catch(err => {
+                    console.error('PDF error:', err);
+                    showAlert('❌ PDF generation failed', 'error');
+                });
+        }
+
+        async function updateActiveCountry() {
+            const country = document.getElementById('activeCountrySelect').value;
+            const displayCountry = COUNTRY_MAP[country] || country;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/update-active-country`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ country })
+                });
+                if (response.ok) {
+                    document.getElementById('currentCountryBadge').textContent = `Current: ${displayCountry}`;
+                    showAlert(`🌍 Active country set to ${displayCountry}`, 'success');
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to update', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to update country', 'error');
+            }
+        }
+
+        async function toggleWithdrawal(type) {
+            const toggleEl = document.getElementById(`${type}Toggle`);
+            const statusEl = document.getElementById(`${type}Status`);
+            const enabled = toggleEl.checked;
+
+            statusEl.textContent = enabled ? '✅ Enabled' : '❌ Disabled';
+            toggleEl.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/toggle-withdrawal`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ wallet_type: type, enabled: enabled })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to update');
+
+                showAlert(`${type.charAt(0).toUpperCase() + type.slice(1)} withdrawal ${enabled ? 'enabled' : 'disabled'}`, 'success');
+
+            } catch (error) {
+                toggleEl.checked = !enabled;
+                statusEl.textContent = !enabled ? '✅ Enabled' : '❌ Disabled';
+                showAlert(error.message || 'Network error', 'error');
+            } finally {
+                toggleEl.disabled = false;
+            }
+        }
+
+        async function approveWithdrawal(id) {
+            if (!confirm('Mark this withdrawal as PAID?')) return;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/approve-withdrawal/${id}`, { method: 'POST', credentials: 'include' });
+                if (response.ok) {
+                    showAlert('✅ Withdrawal approved', 'success');
+                    loadWithdrawals();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to approve', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to approve', 'error');
+            }
+        }
+
+        async function rejectWithdrawal(id) {
+            const reason = prompt('Reason for rejection:');
+            if (reason === null) return;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/reject-withdrawal/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ reason: reason || 'Bank details mismatch' })
+                });
+                if (response.ok) {
+                    showAlert('❌ Withdrawal rejected and refunded', 'success');
+                    loadWithdrawals();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to reject', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to reject', 'error');
+            }
+        }
+
+        async function approveAllWithdrawals() {
+            if (currentPendingWithdrawals.length === 0) {
+                showAlert('❌ No pending withdrawals', 'error');
+                return;
+            }
+            if (!confirm(`Approve all ${currentPendingWithdrawals.length} pending requests?`)) return;
+
+            showAlert('⚙️ Processing...', 'success');
+            const promises = currentPendingWithdrawals.map(w =>
+                fetch(`${API_URL}/api/admin/approve-withdrawal/${w.id}`, { method: 'POST', credentials: 'include' })
+            );
+
+            try {
+                const results = await Promise.allSettled(promises);
+                const succeeded = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
+                const failed = results.length - succeeded;
+
+                if (failed === 0) showAlert(`✅ All ${succeeded} approved!`, 'success');
+                else showAlert(`⚠️ ${succeeded} approved, ${failed} failed`, 'error');
+
+                loadWithdrawals();
+            } catch (error) {
+                showAlert('Batch approval failed', 'error');
+                loadWithdrawals();
+            }
+        }
+
+        async function rejectAllWithdrawals() {
+            if (currentPendingWithdrawals.length === 0) {
+                showAlert('❌ No pending withdrawals', 'error');
+                return;
+            }
+            const reason = prompt('Rejection reason for all users:');
+            if (reason === null) return;
+            if (!confirm(`Reject all ${currentPendingWithdrawals.length} pending requests?`)) return;
+
+            showAlert('⚙️ Processing...', 'success');
+            const promises = currentPendingWithdrawals.map(w =>
+                fetch(`${API_URL}/api/admin/reject-withdrawal/${w.id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ reason: reason || 'Batch clearance' })
+                })
+            );
+
+            try {
+                const results = await Promise.allSettled(promises);
+                const succeeded = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
+                const failed = results.length - succeeded;
+
+                if (failed === 0) showAlert(`✅ All ${succeeded} rejected and refunded!`, 'success');
+                else showAlert(`⚠️ ${succeeded} rejected, ${failed} failed`, 'error');
+
+                loadWithdrawals();
+            } catch (error) {
+                showAlert('Batch rejection failed', 'error');
+                loadWithdrawals();
+            }
+        }
+
+        async function searchTiktokUser(e) {
+            e.preventDefault();
+            const search = document.getElementById('tiktokSearchInput').value.trim();
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/search-tiktok-user?search=${encodeURIComponent(search)}`, { credentials: 'include' });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showAlert(data.error || 'User not found', 'error');
+                    document.getElementById('tiktokSearchResult').innerHTML = '';
+                    return;
+                }
+
+                document.getElementById('tiktokSearchResult').innerHTML = `
+                    <div class="item-card" style="border-left-color: #ff0050;">
+                        <div class="item-header">
+                            <span class="item-title">@${escapeHtml(data.username)}</span>
+                            <span class="badge bg-info">@${escapeHtml(data.tiktok_handle)}</span>
+                        </div>
+                        <div class="item-meta">Current: $${formatNumber(data.tiktok_wallet)}</div>
+                        <form id="bonusForm" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <input type="number" id="bonusAmountInput" placeholder="Amount ($)" step="0.01" min="0.01" required style="flex: 1; min-width: 150px; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                                <button type="submit" class="btn btn-success"><i class="bi bi-plus-circle"></i> Add Bonus</button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                document.getElementById('bonusForm').addEventListener('submit', (ev) => addTiktokBonusToUser(ev, data.user_id));
+            } catch (error) {
+                showAlert('Search failed', 'error');
+            }
+        }
+
+        async function addTiktokBonusToUser(e, userId) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('bonusAmountInput').value);
+            if (isNaN(amount) || amount <= 0) {
+                showAlert('Invalid amount', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/add-tiktok-bonus`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ user_id: userId, amount: amount })
+                });
+
+                if (response.ok) {
+                    showAlert(`✅ $${formatNumber(amount)} added!`, 'success');
+                    document.getElementById('tiktokSearchForm').reset();
+                    document.getElementById('tiktokSearchResult').innerHTML = '';
+                    loadTiktokUsers();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to add bonus', 'error');
+                }
+            } catch (error) {
+                showAlert('Server error', 'error');
+            }
+        }
+
+        async function loadTiktokUsers() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/tiktok-users`, { credentials: 'include' });
+                const users = await response.json();
+                const container = document.getElementById('tiktokUsersList');
+                if (!users || users.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No TikTok users</p></div>';
+                    return;
+                }
+
+                container.innerHTML = users.map(user => `
+                    <div class="item-card" style="border-left-color: #ff0050;">
+                        <div class="item-header">
+                            <span class="item-title">@${escapeHtml(user.tiktok_handle)}</span>
+                            <span class="badge bg-light">${escapeHtml(user.username)}</span>
+                        </div>
+                        <div class="item-meta">Added: ${new Date(user.created_at).toLocaleDateString()}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showAlert('Failed to load TikTok users', 'error');
+            }
+        }
+
+        async function generateCoupon(e) {
+            e.preventDefault();
+            const plan = document.getElementById('planSelect').value;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/generate-coupon`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ plan, count: 1 })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    const code = data.coupons[0];
+                    document.getElementById('generatedCoupon').innerHTML = `
+                        <div style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); padding: 20px; border-radius: 10px; text-align: center; color: white;">
+                            <h3 style="margin-bottom: 15px;">✅ Generated Successfully</h3>
+                            <div id="couponCodeDisplay" style="font-size: 28px; font-weight: bold; margin: 15px 0; font-family: monospace; letter-spacing: 3px; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
+                                ${escapeHtml(code)}
+                            </div>
+                            <button id="copyCouponBtn" style="background: white; color: #4caf50; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                📋 Copy Code
+                            </button>
+                        </div>`;
+
+                    document.getElementById('copyCouponBtn').addEventListener('click', () => {
+                        navigator.clipboard.writeText(code).then(() => showAlert('Copied!', 'success'));
+                    });
+
+                    showAlert('✅ Coupon generated!', 'success');
+                } else {
+                    showAlert(data.error || 'Failed to generate', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to generate coupon', 'error');
+            }
+        }
+
+        async function searchUserByCoupon(e) {
+            e.preventDefault();
+            const coupon = document.getElementById('searchCouponInput').value.trim();
+            try {
+                const response = await fetch(`${API_URL}/api/admin/search-user-by-coupon?coupon=${encodeURIComponent(coupon)}`, { credentials: 'include' });
+                const data = await response.json();
+                if (!response.ok) {
+                    showAlert(data.error || 'Search failed', 'error');
+                    return;
+                }
+
+                if (!data.used) {
+                    showAlert('Coupon not used yet', 'error');
+                    return;
+                }
+
+                document.getElementById('couponSearchResult').innerHTML = `
+                    <div class="item-card">
+                        <div><strong>Username:</strong> ${escapeHtml(data.username)}</div>
+                        <div><strong>Email:</strong> ${escapeHtml(data.email)}</div>
+                        <div><strong>Plan:</strong> ${escapeHtml(data.coupon_plan)}</div>
+                        <div><strong>Status:</strong> ${data.is_banned ? '🚫 BANNED' : '✅ ACTIVE'}</div>
+                        <div><strong>Activity:</strong> ¥${formatNumber(data.activity_wallet)}</div>
+                        <div><strong>Referral:</strong> ¥${formatNumber(data.referral_wallet)}</div>
+                    </div>`;
+            } catch (error) {
+                showAlert('Search failed', 'error');
+            }
+        }
+
+        async function postTask(e) {
+            e.preventDefault();
+            try {
+                const response = await fetch(`${API_URL}/api/admin/post-task`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        title: document.getElementById('taskTitle').value,
+                        description: document.getElementById('taskDescription').value,
+                        link: document.getElementById('taskLink').value
+                    })
+                });
+                if (response.ok) {
+                    showAlert('✅ Task posted!', 'success');
+                    e.target.reset();
+                    loadTasks();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to post', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to post task', 'error');
+            }
+        }
+
+        async function loadTasks() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/tasks`, { credentials: 'include' });
+                const tasks = await response.json();
+                const container = document.getElementById('tasksList');
+                if (!tasks || tasks.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No tasks posted</p></div>';
+                    return;
+                }
+                container.innerHTML = tasks.map(t => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <span class="item-title">${escapeHtml(t.title)}</span>
+                            <span class="badge bg-success">${t.completion_count || 0} completed</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})"><i class="bi bi-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showAlert('Failed to load tasks', 'error');
+            }
+        }
+
+        async function deleteTask(id) {
+            if (!confirm('Delete this task?')) return;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/delete-task/${id}`, { method: 'DELETE', credentials: 'include' });
+                if (response.ok) {
+                    showAlert('✅ Task deleted', 'success');
+                    loadTasks();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to delete', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to delete', 'error');
+            }
+        }
+
+        async function postVideo(e) {
+            e.preventDefault();
+            try {
+                const response = await fetch(`${API_URL}/api/admin/post-video`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        title: document.getElementById('videoTitle').value,
+                        url: document.getElementById('videoUrl').value
+                    })
+                });
+                if (response.ok) {
+                    showAlert('✅ Video posted!', 'success');
+                    e.target.reset();
+                    loadVideos();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to post', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to post video', 'error');
+            }
+        }
+
+        async function loadVideos() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/videos`, { credentials: 'include' });
+                const videos = await response.json();
+                const container = document.getElementById('videosList');
+                if (!videos || videos.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No videos posted</p></div>';
+                    return;
+                }
+                container.innerHTML = videos.map(v => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <span class="item-title">${escapeHtml(v.title)}</span>
+                            <span class="badge bg-success">${v.completion_count || 0} views</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-danger btn-sm" onclick="deleteVideo(${v.id})"><i class="bi bi-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showAlert('Failed to load videos', 'error');
+            }
+        }
+
+        async function deleteVideo(id) {
+            if (!confirm('Delete this video?')) return;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/delete-video/${id}`, { method: 'DELETE', credentials: 'include' });
+                if (response.ok) {
+                    showAlert('✅ Video deleted', 'success');
+                    loadVideos();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to delete', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to delete', 'error');
+            }
+        }
+
+        async function postArticle(e) {
+            e.preventDefault();
+            try {
+                const response = await fetch(`${API_URL}/api/admin/post-article`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        title: document.getElementById('articleTitle').value,
+                        content: document.getElementById('articleContent').value,
+                        read_time: document.getElementById('readTime').value
+                    })
+                });
+                if (response.ok) {
+                    showAlert('✅ Article posted!', 'success');
+                    e.target.reset();
+                    loadArticles();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to post', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to post article', 'error');
+            }
+        }
+
+        async function loadArticles() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/articles`, { credentials: 'include' });
+                const articles = await response.json();
+                const container = document.getElementById('articlesList');
+                if (!articles || articles.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No articles posted</p></div>';
+                    return;
+                }
+                container.innerHTML = articles.map(a => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <span class="item-title">${escapeHtml(a.title)}</span>
+                            <span class="badge bg-success">${a.read_count || 0} reads</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-danger btn-sm" onclick="deleteArticle(${a.id})"><i class="bi bi-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showAlert('Failed to load articles', 'error');
+            }
+        }
+
+        async function deleteArticle(id) {
+            if (!confirm('Delete this article?')) return;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/delete-article/${id}`, { method: 'DELETE', credentials: 'include' });
+                if (response.ok) {
+                    showAlert('✅ Article deleted', 'success');
+                    loadArticles();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to delete', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to delete', 'error');
+            }
+        }
+
+        async function addSocialLink(e) {
+            e.preventDefault();
+            try {
+                const response = await fetch(`${API_URL}/api/admin/add-social-link`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        platform: document.getElementById('socialPlatform').value,
+                        url: document.getElementById('socialUrl').value
+                    })
+                });
+                if (response.ok) {
+                    showAlert('✅ Link added!', 'success');
+                    e.target.reset();
+                    loadSocialLinks();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to add', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to add link', 'error');
+            }
+        }
+
+        async function loadSocialLinks() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/social-links-stats`, { credentials: 'include' });
+                const links = await response.json();
+                const container = document.getElementById('socialLinksList');
+                if (!links || links.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No social links</p></div>';
+                    return;
+                }
+                container.innerHTML = links.map(l => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <span class="item-title"><i class="${escapeHtml(l.icon_class)}"></i> ${escapeHtml(l.platform)}</span>
+                        </div>
+                        <div class="item-meta"><a href="${escapeHtml(l.url)}" target="_blank" style="color: #d32f2f; text-decoration: none;">Visit →</a></div>
+                        <div class="item-actions">
+                            <button class="btn btn-danger btn-sm" onclick="deleteSocialLink(${l.id})"><i class="bi bi-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showAlert('Failed to load social links', 'error');
+            }
+        }
+
+        async function deleteSocialLink(id) {
+            if (!confirm('Delete this link?')) return;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/delete-social-link/${id}`, { method: 'DELETE', credentials: 'include' });
+                if (response.ok) {
+                    showAlert('✅ Link deleted', 'success');
+                    loadSocialLinks();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Failed to delete', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to delete', 'error');
+            }
+        }
+
+        // ===== VENDOR MANAGEMENT FUNCTIONS =====
+        async function searchUserForVendor(e) {
+            e.preventDefault();
+            const q = document.getElementById('vendorSearchInput').value.trim();
+            try {
+                const res = await fetch(`${API_URL}/api/admin/search-user-for-vendor?q=${encodeURIComponent(q)}`, { credentials: 'include' });
+                const users = await res.json();
+                if (!res.ok) {
+                    document.getElementById('vendorSearchResult').innerHTML = `<div class="item-card"><p>${escapeHtml(users.error || 'Not found')}</p></div>`;
+                    return;
+                }
+                if (users.length === 0) {
+                    document.getElementById('vendorSearchResult').innerHTML = '<div class="item-card"><p>No users found</p></div>';
+                    return;
+                }
+                document.getElementById('vendorSearchResult').innerHTML = users.map(u => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <span class="item-title">@${escapeHtml(u.username)}</span>
+                            ${u.is_vendor ? '<span class="badge bg-success">Already Vendor</span>' : '<span class="badge bg-light">Regular User</span>'}
+                        </div>
+                        <div class="item-meta">Email: ${escapeHtml(u.email)} | Plan: ${escapeHtml(u.plan)}</div>
+                        <div class="item-actions">
+                            ${u.is_vendor 
+                                ? `<button class="btn btn-danger btn-sm" onclick="removeVendor(${u.id})"><i class="bi bi-x-circle"></i> Remove Vendor</button>`
+                                : `<button class="btn btn-success btn-sm" onclick="makeVendor(${u.id})"><i class="bi bi-check-circle"></i> Make Vendor</button>`}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                showAlert('Search failed', 'error');
+            }
+        }
+
+        async function makeVendor(userId) {
+            if (!confirm('Make this user a support vendor?')) return;
+            try {
+                const res = await fetch(`${API_URL}/api/admin/make-vendor`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ user_id: userId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert(data.message, 'success');
+                    document.getElementById('vendorSearchForm').reset();
+                    document.getElementById('vendorSearchResult').innerHTML = '';
+                    loadVendors();
+                } else {
+                    showAlert(data.error || 'Failed', 'error');
+                }
+            } catch (err) { showAlert('Failed', 'error'); }
+        }
+
+        async function removeVendor(userId) {
+            if (!confirm('Remove vendor status from this user?')) return;
+            try {
+                const res = await fetch(`${API_URL}/api/admin/remove-vendor`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ user_id: userId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert(data.message, 'success');
+                    document.getElementById('vendorSearchForm').reset();
+                    document.getElementById('vendorSearchResult').innerHTML = '';
+                    loadVendors();
+                } else {
+                    showAlert(data.error || 'Failed', 'error');
+                }
+            } catch (err) { showAlert('Failed', 'error'); }
+        }
+
+        async function loadVendors() {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/vendors`, { credentials: 'include' });
+                const vendors = await res.json();
+                const container = document.getElementById('vendorsList');
+                if (!vendors || vendors.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-headset"></i><p>No vendors yet. Search above to add one.</p></div>';
+                    return;
+                }
+                container.innerHTML = vendors.map(v => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <span class="item-title">@${escapeHtml(v.username)}</span>
+                            <span class="badge ${v.vendor_active ? 'bg-success' : 'bg-warning'}">${v.vendor_active ? 'Active' : 'Inactive'}</span>
+                        </div>
+                        <div class="item-meta">Email: ${escapeHtml(v.email)}</div>
+                        <div class="item-meta">Total Handled: ${v.total_handled || 0} | Active Now: ${v.active_now || 0}</div>
+                        <div class="item-actions">
+                            <button class="btn btn-primary btn-sm" onclick="toggleVendorStatus(${v.id}, ${!v.vendor_active})">
+                                <i class="bi bi-power"></i> ${v.vendor_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="removeVendor(${v.id})">
+                                <i class="bi bi-x-circle"></i> Remove Vendor
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { showAlert('Failed to load vendors', 'error'); }
+        }
+
+        async function toggleVendorStatus(userId, active) {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/toggle-vendor-status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ user_id: userId, active })
+                });
+                if (res.ok) {
+                    showAlert(`Vendor ${active ? 'activated' : 'deactivated'}`, 'success');
+                    loadVendors();
+                }
+            } catch (err) { showAlert('Failed', 'error'); }
+        }
+
+        async function logout() {
+            try {
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+            } catch (error) {
+                console.warn("Logout network error");
+            } finally {
+                window.location.href = 'login.html';
+            }
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

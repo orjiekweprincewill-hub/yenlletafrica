@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#00bcd4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YENLLET">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Transfer Wallet - YenlletAfrica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--off-white); 
+            min-height: 100vh; 
+            color: #333; 
+            transition: background-color 0.3s, color 0.3s; 
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Logo watermark background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50%" y="50%" font-size="80" font-weight="800" font-family="Inter,sans-serif" fill="%230a1628" opacity="0.03" text-anchor="middle" dominant-baseline="middle">Y</text></svg>') center/contain no-repeat;
+            pointer-events: none;
+            z-index: 0;
+        }
+        /* ===== TOP HEADER ===== */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+            padding: 0 20px;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-header.scrolled {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            color: var(--white);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-icon:hover { color: var(--accent-light); }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo img {
+            height: 35px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dark-mode-toggle {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .dark-mode-toggle:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            transition: var(--transition);
+        }
+
+        .profile-pic:hover {
+            border-color: var(--accent-light);
+            transform: scale(1.05);
+        }
+
+        .username {
+            color: var(--white);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .main-content { 
+            padding: 20px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            margin-bottom: 80px; 
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: var(--primary-dark); 
+            margin-bottom: 20px; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .balance-card { 
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%); 
+            padding: 25px; 
+            border-radius: 20px; 
+            color: white; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2); 
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .balance-label { font-size: 14px; opacity: 0.9; margin-bottom: 10px; position: relative; z-index: 1; }
+        .balance-amount { font-size: 48px; font-weight: bold; position: relative; z-index: 1; }
+
+        .card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 40px rgba(10, 22, 40, 0.08); 
+            margin-bottom: 20px; 
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: var(--transition);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(10, 22, 40, 0.15);
+        }
+
+        .section-title { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: var(--primary-dark); 
+            margin-bottom: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+
+        .info-box { 
+            background: linear-gradient(145deg, #fff3cd 0%, #ffeaa7 100%); 
+            border-left: 4px solid #ffc107; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            font-size: 13px; 
+            color: #856404; 
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.1);
+        }
+        .info-box p { margin-bottom: 8px; }
+        .info-box p:last-child { margin-bottom: 0; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--primary-dark); font-weight: 600; font-size: 14px; }
+        .form-group input { 
+            width: 100%; 
+            padding: 14px 18px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            transition: var(--transition); 
+            font-family: 'Inter', sans-serif;
+            background: var(--off-white);
+        }
+        .form-group input:focus { 
+            outline: none; 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.1);
+        }
+
+        .transfer-btn { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 50px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.3);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        .transfer-btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 15px 40px rgba(0, 188, 212, 0.4); 
+        }
+        .transfer-btn:disabled { 
+            background: #ccc; 
+            cursor: not-allowed; 
+            transform: none;
+            box-shadow: none;
+        }
+
+        .history-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px; 
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); 
+            border-radius: 15px; 
+            margin-bottom: 10px; 
+            transition: var(--transition); 
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+        .history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(10, 22, 40, 0.1);
+        }
+        .history-details { flex: 1; }
+        .history-title { font-weight: 700; color: var(--primary-dark); font-size: 14px; margin-bottom: 3px; }
+        .history-date { font-size: 12px; color: var(--gray); }
+        .history-amount { font-weight: 700; font-size: 14px; }
+        .history-amount.sent { color: #e74c3c; }
+        .history-amount.received { color: #27ae60; }
+
+        .no-history { text-align: center; padding: 40px; color: var(--gray); }
+
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: rgba(255,255,255,0.95); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex; 
+            justify-content: space-around; 
+            padding: 10px 0; 
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1); 
+            z-index: 99; 
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        .nav-item-bottom { 
+            text-align: center; 
+            text-decoration: none; 
+            color: var(--gray); 
+            font-size: 12px; 
+            flex: 1; 
+            padding: 5px; 
+            transition: var(--transition); 
+            font-weight: 500;
+        }
+        .nav-item-bottom i { display: block; font-size: 20px; margin-bottom: 3px; }
+        .nav-item-bottom.active { 
+            color: var(--primary); 
+            font-weight: 600;
+        }
+
+        .alert { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            padding: 15px 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            z-index: 2000; 
+            animation: slideIn 0.3s ease; 
+            font-weight: 600;
+        }
+        .alert-success { background: #27ae60; color: white; }
+        .alert-error { background: #e74c3c; color: white; }
+
+        @keyframes slideIn { 
+            from { transform: translateX(400px); opacity: 0; } 
+            to { transform: translateX(0); opacity: 1; } 
+        }
+
+        .overlay { 
+            height: 100%; 
+            width: 0; 
+            position: fixed; 
+            z-index: 1000; 
+            top: 0; 
+            left: 0; 
+            background-color: rgba(0, 0, 0, 0.95); 
+            overflow-x: hidden; 
+            transition: 0.3s; 
+        }
+        .overlay-content { position: relative; width: 100%; padding: 60px 30px 30px 30px; }
+        .closebtn { position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; }
+        .menu-list { list-style: none; }
+        .menu-list li { margin-bottom: 15px; }
+        .menu-list a { 
+            color: white; 
+            text-decoration: none; 
+            font-size: 18px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            padding: 12px; 
+            border-radius: 12px; 
+            transition: var(--transition); 
+            font-weight: 500;
+        }
+        .menu-list a:hover { background: rgba(255, 255, 255, 0.1); }
+        .menu-list i { font-size: 20px; }
+        .logout-btn { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin-top: 30px; 
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            transition: var(--transition);
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        /* DARK MODE - YenlletAfrica Style */
+        body.dark-mode { 
+            background: #0a0e17; 
+            color: #e0e0e0; 
+        }
+        body.dark-mode::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50%" y="50%" font-size="80" font-weight="800" font-family="Inter,sans-serif" fill="%23ffffff" opacity="0.02" text-anchor="middle" dominant-baseline="middle">Y</text></svg>') center/contain no-repeat;
+        }
+        body.dark-mode .top-header { 
+            background: rgba(10, 22, 40, 0.98); 
+            border-bottom-color: rgba(255,255,255,0.05);
+        }
+        body.dark-mode .page-title { color: #e0e0e0; }
+        body.dark-mode .card { 
+            background: #1a1f2e; 
+            color: #e0e0e0; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3); 
+            border-color: rgba(255,255,255,0.05);
+        }
+        body.dark-mode .card:hover {
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+        body.dark-mode .section-title { color: #e0e0e0; }
+        body.dark-mode .info-box { 
+            background: linear-gradient(145deg, #3a2a0a 0%, #2a2000 100%); 
+            border-left-color: #ffc107; 
+            color: #ffb74d; 
+        }
+        body.dark-mode .form-group label { color: #e0e0e0; }
+        body.dark-mode .form-group input { 
+            background: #0a0e17; 
+            color: #e0e0e0; 
+            border-color: #2a3a4e; 
+        }
+        body.dark-mode .form-group input:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.15);
+        }
+        body.dark-mode .transfer-btn { 
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); 
+        }
+        body.dark-mode .transfer-btn:hover { 
+            background: linear-gradient(135deg, #00acc1 0%, #1565c0 100%); 
+        }
+        body.dark-mode .history-item { 
+            background: linear-gradient(145deg, #1a1f2e 0%, #151a28 100%); 
+            border-color: rgba(255,255,255,0.05);
+        }
+        body.dark-mode .history-item:hover { 
+            background: #1e2435; 
+        }
+        body.dark-mode .history-title { color: #e0e0e0; }
+        body.dark-mode .history-date { color: #8892b0; }
+        body.dark-mode .history-amount.sent { color: #ef9a9a; }
+        body.dark-mode .history-amount.received { color: #81c784; }
+        body.dark-mode .no-history { color: #666; }
+        body.dark-mode .no-history i { color: #555; }
+        body.dark-mode .bottom-nav { 
+            background: rgba(26, 31, 46, 0.95); 
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.4); 
+            border-top: 1px solid rgba(255,255,255,0.05); 
+        }
+        body.dark-mode .nav-item-bottom { color: #8892b0; }
+        body.dark-mode .nav-item-bottom.active { 
+            color: var(--accent); 
+            filter: drop-shadow(0 0 5px rgba(0, 188, 212, 0.4)); 
+        }
+        body.dark-mode .overlay { background-color: rgba(0,0,0,0.98); }
+        body.dark-mode .username-header { color: white; }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+    <div id="myNav" class="overlay">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="overlay-content">
+            <ul class="menu-list">
+                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li><a href="quiz.html"><i class="bi bi-question-circle-fill"></i> Quiz</a></li>
+                <li><a href="task.html"><i class="bi bi-check-circle-fill"></i> Tasks</a></li>
+                <li><a href="video.html"><i class="bi bi-play-circle-fill"></i> Videos</a></li>
+                <li><a href="chat.html"><i class="bi bi-chat-dots"></i> Chat & Earn</a></li>
+                <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
+                <li><a href="bank-setup.html"><i class="bi bi-bank"></i> Bank Setup</a></li>
+                <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
+            </ul>
+            <button class="logout-btn" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <div class="top-header" id="topHeader">
+        <div class="header-left">
+            <i class="bi bi-list menu-icon" onclick="openNav()"></i>
+            <a href="index.html" class="logo">
+                <img src="IMG-20260414-WA0002.jpg" alt="YenlletAfrica" onerror="this.style.display='none'">
+                <span>YenlletAfrica</span>
+            </a>
+        </div>
+        <div class="header-controls">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                <i class="bi bi-moon-stars-fill" id="darkModeIcon"></i>
+            </button>
+            <div class="header-profile">
+                <span class="username" id="usernameDisplay">...</span>
+                <img src="/uploads/default-avatar.png" alt="Profile" class="profile-pic" id="profilePic">
+            </div>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="main-content">
+        <div class="page-title"><i class="bi bi-arrow-left-right"></i> Transfer Activity Wallet</div>
+
+        <div class="balance-card">
+            <div class="balance-label">Activity Wallet Balance</div>
+            <div class="balance-amount">¥<span id="activityBalance">0</span></div>
+        </div>
+
+        <div class="card">
+            <div class="section-title"><i class="bi bi-send"></i> Send Money to User</div>
+            <div class="info-box">
+                <p><strong>⚠️ Important:</strong></p>
+                <p>• You must have at least ¥3,000 in your Activity Wallet to transfer</p>
+                <p>• You can only transfer Activity Wallet balance</p>
+                <p>• Enter exact username of recipient</p>
+                <p>• Transfer is instant and irreversible</p>
+            </div>
+            <form id="transferForm">
+                <div class="form-group">
+                    <label for="recipientUsername">Recipient Username *</label>
+                    <input type="text" id="recipientUsername" placeholder="Enter exact username" required>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount (¥) *</label>
+                    <input type="number" id="amount" placeholder="Enter amount in Yen" step="0.01" min="3000" required>
+                </div>
+                <button type="submit" class="transfer-btn" id="transferBtn"><i class="bi bi-send"></i> Transfer Now</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="section-title"><i class="bi bi-clock-history"></i> Transfer History</div>
+            <div id="historyContainer"></div>
+            <div class="no-history" id="noHistory" style="display: none;">
+                <i class="bi bi-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                <p>No transfer history yet</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item-bottom"><i class="bi bi-house-door-fill"></i> Home</a>
+        <a href="transfer.html" class="nav-item-bottom active"><i class="bi bi-arrow-left-right"></i> Transfer</a>
+        <a href="withdraw.html" class="nav-item-bottom"><i class="bi bi-cash-coin"></i> Withdraw</a>
+        <a href="profile.html" class="nav-item-bottom"><i class="bi bi-person-circle"></i> Profile</a>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let currentUserId = null;
+        let activityWallet = 0;
+        let userDarkMode = false;
+        const MIN_TRANSFER = 3000;
+
+        function openNav() { document.getElementById("myNav").style.width = "80%"; }
+        function closeNav() { document.getElementById("myNav").style.width = "0%"; }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            userDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', userDarkMode);
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) icon.className = userDarkMode ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+
+            fetch(`${API_URL}/api/toggle-dark-mode`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ dark_mode: userDarkMode })
+            }).catch(err => console.error('Dark mode sync error:', err));
+        }
+
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (savedDarkMode) { document.body.classList.add('dark-mode'); }
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                if (response.status === 401) { window.location.href = 'register.html'; return; }
+                const userProfile = await response.json();
+                currentUserId = userProfile.user_id;
+                activityWallet = parseFloat(userProfile.activity_wallet) || 0;
+                document.getElementById('usernameDisplay').textContent = userProfile.username;
+                document.getElementById('activityBalance').textContent = activityWallet.toLocaleString();
+                if (userProfile.profile_picture) {
+                    document.getElementById('profilePic').src = `${API_URL}/uploads/${userProfile.profile_picture}`;
+                }
+
+                userDarkMode = userProfile.dark_mode || localStorage.getItem('darkMode') === 'true';
+                if (userDarkMode) {
+                    document.body.classList.add('dark-mode');
+                    const icon = document.getElementById('darkModeIcon');
+                    if (icon) icon.className = 'bi bi-sun-fill';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    const icon = document.getElementById('darkModeIcon');
+                    if (icon) icon.className = 'bi bi-moon-stars-fill';
+                }
+                localStorage.setItem('darkMode', userDarkMode);
+
+                loadTransferHistory();
+            } catch (error) {
+                console.error('Error:', error);
+                window.location.href = 'register.html';
+            }
+        }
+
+        document.getElementById('transferForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const recipientUsername = document.getElementById('recipientUsername').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            if (!recipientUsername) { showAlert('Please enter recipient username', 'error'); return; }
+            if (!amount || amount <= 0) { showAlert('Please enter valid amount', 'error'); return; }
+            if (activityWallet < MIN_TRANSFER) { showAlert(`You need at least ¥${MIN_TRANSFER.toLocaleString()} in your Activity Wallet to transfer`, 'error'); return; }
+            if (amount > activityWallet) { showAlert('Insufficient balance', 'error'); return; }
+            if (amount < MIN_TRANSFER) { showAlert(`Minimum transfer is ¥${MIN_TRANSFER.toLocaleString()}`, 'error'); return; }
+
+            const transferBtn = document.getElementById('transferBtn');
+            transferBtn.disabled = true;
+            transferBtn.innerHTML = '<i class="bi bi-hourglass"></i> Processing...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/transfer-activity`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ recipient_username: recipientUsername, amount: amount })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    if (data.new_balance !== undefined) {
+                        activityWallet = parseFloat(data.new_balance);
+                        document.getElementById('activityBalance').textContent = activityWallet.toLocaleString();
+                    }
+                    showAlert(`✅ Transfer successful! ¥${amount.toLocaleString()} sent to @${recipientUsername}`, 'success');
+                    document.getElementById('transferForm').reset();
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showAlert(data.error || 'Transfer failed', 'error');
+                    transferBtn.disabled = false;
+                    transferBtn.innerHTML = '<i class="bi bi-send"></i> Transfer Now';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Network error! Please try again.', 'error');
+                transferBtn.disabled = false;
+                transferBtn.innerHTML = '<i class="bi bi-send"></i> Transfer Now';
+            }
+        });
+
+        async function loadTransferHistory() {
+            try {
+                const response = await fetch(`${API_URL}/api/transfer-history`, { credentials: 'include' });
+                const transfers = await response.json();
+                if (transfers.length === 0) {
+                    document.getElementById('noHistory').style.display = 'block';
+                    return;
+                }
+                const historyContainer = document.getElementById('historyContainer');
+                historyContainer.innerHTML = '';
+                transfers.forEach(transfer => {
+                    const date = new Date(transfer.created_at).toLocaleDateString();
+                    const isSent = transfer.sender_id === currentUserId;
+                    const otherUsername = isSent ? transfer.recipient_username : transfer.sender_username;
+                    const type = isSent ? 'sent' : 'received';
+                    const sign = isSent ? '-' : '+';
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-details">
+                            <div class="history-title">${isSent ? 'Sent to' : 'Received from'} @${otherUsername}</div>
+                            <div class="history-date">${date}</div>
+                        </div>
+                        <div class="history-amount ${type}">${sign}¥${parseFloat(transfer.amount).toLocaleString()}</div>`;
+                    historyContainer.appendChild(historyItem);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+                window.location.href = 'login.html';
+            } catch (error) { console.error('Error:', error); }
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertContainer.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

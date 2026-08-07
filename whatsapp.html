@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>WhatsApp - YENLLET</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-dark);
+            color: var(--white);
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Logo Background Watermark */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50%" x="50%" dominant-baseline="middle" text-anchor="middle" font-family="Inter" font-weight="800" font-size="14" fill="%23ffffff05">Y</text></svg>') center/contain no-repeat;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Animated gradient orbs for depth */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(0,188,212,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(13,71,161,0.1) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .top-header {
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .top-header.scrolled {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .back-btn {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            color: var(--accent-light);
+        }
+
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo img {
+            height: 35px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--white);
+        }
+
+        .username-header {
+            font-weight: 600;
+            font-size: 14px;
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            margin-right: 10px;
+        }
+
+        .dark-mode-toggle {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .dark-mode-toggle:hover {
+            background: rgba(0,188,212,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,188,212,0.3);
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-bottom: 100px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Logo Branding Section */
+        .brand-section {
+            text-align: center;
+            padding: 40px 20px 30px;
+            position: relative;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+
+        .brand-logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--white);
+            box-shadow: 0 8px 25px rgba(0,188,212,0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .brand-logo-text {
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-tagline {
+            color: var(--gray);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title i {
+            color: var(--accent);
+            font-size: 32px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tab:hover {
+            color: var(--white);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: rgba(0,188,212,0.2);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--accent);
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: rgba(10, 22, 40, 0.6);
+            color: var(--white);
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,188,212,0.1);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--gray);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .file-input-wrapper {
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(0,188,212,0.05);
+            transition: var(--transition);
+        }
+
+        .file-input-wrapper:hover {
+            background: rgba(0,188,212,0.1);
+            transform: translateY(-2px);
+        }
+
+        .file-input-wrapper input {
+            display: none;
+        }
+
+        .preview-image {
+            margin-top: 15px;
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0,188,212,0.3);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,188,212,0.4);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            width: 100%;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,212,255,0.3);
+        }
+
+        .btn-ai:hover {
+            box-shadow: 0 15px 40px rgba(0,212,255,0.4);
+        }
+
+        .ai-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .ai-restricted {
+            background: rgba(255,193,7,0.1);
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #ffc107;
+            font-size: 0.9rem;
+        }
+
+        .post-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            transition: var(--transition);
+            border-top: 4px solid var(--accent);
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border-color: rgba(0,188,212,0.2);
+        }
+
+        .post-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: var(--primary-dark);
+        }
+
+        .post-body {
+            padding: 20px;
+        }
+
+        .post-title {
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .post-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .post-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-share {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(0,188,212,0.3);
+        }
+
+        .btn-share:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,188,212,0.4);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status-pending {
+            background: rgba(255,193,7,0.15);
+            color: #ffc107;
+        }
+
+        .status-earned {
+            background: rgba(0,188,212,0.15);
+            color: var(--accent-light);
+        }
+
+        .ai-section {
+            background: linear-gradient(135deg, rgba(0,212,255,0.1) 0%, rgba(0,153,255,0.1) 100%);
+            padding: 25px;
+            border-radius: 16px;
+            border-left: 4px solid #00d4ff;
+            margin-bottom: 20px;
+        }
+
+        .ai-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00d4ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0,188,212,0.3);
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,188,212,0.4);
+        }
+
+        .generated-caption {
+            background: rgba(10, 22, 40, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border-left: 3px solid var(--accent);
+            line-height: 1.7;
+            color: var(--white);
+            font-size: 0.95rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            z-index: 2000;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #ff9800 0%, #e65100 100%);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-item {
+            text-align: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 11px;
+            font-weight: 500;
+            flex: 1;
+            padding: 5px;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover {
+            color: var(--white);
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+        }
+
+        .nav-item.active i {
+            filter: drop-shadow(0 0 8px rgba(0,188,212,0.5));
+        }
+
+        .reward-info {
+            background: rgba(0,188,212,0.1);
+            border-left: 4px solid var(--accent);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+            color: var(--accent-light);
+            font-weight: 500;
+        }
+
+        .daily-limit-notice {
+            background: rgba(244,67,54,0.1);
+            border-left: 4px solid #f44336;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+            color: #ff5252;
+            font-weight: 500;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--primary-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .brand-logo-text {
+                font-size: 1.4rem;
+            }
+            .page-title {
+                font-size: 22px;
+            }
+            .main-content {
+                padding: 15px;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="top-header">
+        <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i></a>
+        <div class="header-controls">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                <i class="bi bi-moon-stars-fill" id="darkModeIcon"></i>
+            </button>
+        </div>
+        <div class="header-profile">
+            <div class="username-header" id="usernameDisplay">Loading...</div>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="main-content">
+        <!-- Brand Section matching index.html -->
+        <div class="brand-section">
+            <div class="brand-logo">
+                <a href="index.html" class="logo">
+                <img src="IMG-20260414-WA0002.jpg" alt="YenlletAfrica" onerror="this.style.display='none'">
+                   <span class="brand-logo-text">YenlletAfrica</span>
+            </a>
+                
+            </div>
+            <div class="brand-tagline">Earn With Confidence</div>
+        </div>
+
+        <div class="page-title"><i class="bi bi-whatsapp"></i> WhatsApp Sharing</div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('create')"><i class="bi bi-plus-circle"></i> Create</button>
+            <button class="tab" onclick="switchTab('ai')"><i class="bi bi-sparkles"></i> YenAI</button>
+            <button class="tab" onclick="switchTab('posts')"><i class="bi bi-check-circle"></i> My Posts</button>
+        </div>
+
+        <!-- Create Tab -->
+        <div id="create-tab" class="tab-content active">
+            <div class="card">
+                <div class="section-title"><i class="bi bi-pencil-square"></i> Create New Post</div>
+                <div id="dailyLimitWarning"></div>
+                <form id="createPostForm" onsubmit="createPost(event)">
+                    <div class="form-group">
+                        <label>Post Title</label>
+                        <input type="text" id="postTitle" placeholder="e.g., Amazing opportunity" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="postDescription" placeholder="What is this post about?" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Image</label>
+                        <div class="file-input-wrapper" onclick="document.getElementById('postImage').click()">
+                            <i class="bi bi-cloud-upload" style="font-size: 40px; color: var(--accent); margin-bottom: 10px;"></i>
+                            <p style="color: var(--white); font-weight: 600; margin-bottom: 5px;"><strong>Click to upload</strong></p>
+                            <p style="font-size: 12px; color: var(--gray);">JPG, PNG, GIF up to 5MB</p>
+                            <input type="file" id="postImage" accept="image/*" onchange="previewImage(event)">
+                            <img id="imagePreview" class="preview-image" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="reward-info">
+                        <i class="bi bi-star-fill"></i> Earn ¥<span id="createReward">190</span> when you share to WhatsApp
+                    </div>
+
+                    <button type="submit" class="btn-primary"><i class="bi bi-plus-circle"></i> Create Post</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- YenAI Tab -->
+        <div id="ai-tab" class="tab-content">
+            <div class="card">
+                <div class="section-title"><i class="bi bi-sparkles"></i> YenAI Caption Generator <span class="ai-badge">PRO+</span></div>
+                <div id="aiRestrictionMessage"></div>
+                <div id="aiPanel" style="display: none;">
+                    <div class="ai-section">
+                        <div class="ai-title"><i class="bi bi-robot"></i> Generate Perfect Captions</div>
+                        
+                        <div class="form-group">
+                            <label>What's your post about?</label>
+                            <input type="text" id="aiTopic" placeholder="e.g., Online business, Fitness, Education" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tone/Style</label>
+                            <select id="aiStyle" required>
+                                <option value="">Choose style...</option>
+                                <option value="professional">Professional</option>
+                                <option value="casual">Casual & Friendly</option>
+                                <option value="funny">Funny & Engaging</option>
+                            </select>
+                        </div>
+
+                        <button class="btn-primary btn-ai" type="button" onclick="generateCaption()"><i class="bi bi-sparkles"></i> Generate Caption</button>
+
+                        <div id="captionResult"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Posts Tab -->
+        <div id="posts-tab" class="tab-content">
+            <div id="postsContainer"></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item"><i class="bi bi-house-door-fill"></i> Home</a>
+        <a href="whatsapp.html" class="nav-item active"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+        <a href="market.html" class="nav-item"><i class="bi bi-shop"></i> Market</a>
+        <a href="profile.html" class="nav-item"><i class="bi bi-person-circle"></i> Profile</a>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let userProfile = null;
+        let userDarkMode = false;
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            userDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', userDarkMode);
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) icon.className = userDarkMode ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+
+            fetch(`${API_URL}/api/toggle-dark-mode`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ dark_mode: userDarkMode })
+            }).catch(err => console.error('Dark mode sync error:', err));
+        }
+
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (savedDarkMode) { document.body.classList.add('dark-mode'); }
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                if (response.status === 401) {
+                    window.location.href = 'register.html';
+                    return;
+                }
+                userProfile = await response.json();
+                document.getElementById('usernameDisplay').textContent = userProfile.username;
+
+                userDarkMode = userProfile.dark_mode || localStorage.getItem('darkMode') === 'true';
+                if (userDarkMode) {
+                    document.body.classList.add('dark-mode');
+                    const icon = document.getElementById('darkModeIcon');
+                    if (icon) icon.className = 'bi bi-sun-fill';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    const icon = document.getElementById('darkModeIcon');
+                    if (icon) icon.className = 'bi bi-moon-stars-fill';
+                }
+                localStorage.setItem('darkMode', userDarkMode);
+
+                checkYenAIAccess();
+                updateRewardDisplay();
+                checkDailyLimit();
+            } catch (error) {
+                window.location.href = 'register.html';
+            }
+        }
+
+        function updateRewardDisplay() {
+            const rewards = {
+                'YENLITE': 190,
+                'YENPRO': 240,
+                'YENVITE': 200
+            };
+            const reward = rewards[userProfile.plan] || 190;
+            document.getElementById('createReward').textContent = reward;
+        }
+
+        function checkYenAIAccess() {
+            const aiPanel = document.getElementById('aiPanel');
+            const restrictionMsg = document.getElementById('aiRestrictionMessage');
+
+            if (userProfile.plan === 'YENLITE') {
+                aiPanel.style.display = 'none';
+                restrictionMsg.innerHTML = `
+                    <div class="ai-restricted">
+                        <i class="bi bi-lock-fill"></i> <strong>YenAI is only for YENPRO & YENVITE users!</strong><br>
+                        Upgrade your plan to unlock AI-powered caption generation.
+                    </div>
+                `;
+            } else {
+                aiPanel.style.display = 'block';
+                restrictionMsg.innerHTML = '';
+            }
+        }
+
+        async function checkDailyLimit() {
+            try {
+                const response = await fetch(`${API_URL}/api/check-whatsapp-daily-limit`, { credentials: 'include' });
+                const data = await response.json();
+
+                const warningDiv = document.getElementById('dailyLimitWarning');
+                const createBtn = document.getElementById('createPostForm').querySelector('button');
+
+                if (data.limit_reached) {
+                    warningDiv.innerHTML = `
+                        <div class="daily-limit-notice">
+                            <i class="bi bi-exclamation-circle-fill"></i> You've already posted once today! Return tomorrow to post again.
+                        </div>
+                    `;
+                    createBtn.disabled = true;
+                    document.getElementById('createPostForm').style.opacity = '0.6';
+                } else {
+                    warningDiv.innerHTML = '';
+                    createBtn.disabled = false;
+                    document.getElementById('createPostForm').style.opacity = '1';
+                }
+            } catch (error) {
+                console.error('Error checking daily limit:', error);
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.target.closest('.tab').classList.add('active');
+            if (tabName === 'posts') loadPosts();
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file && file.size < 5 * 1024 * 1024) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else if (file) {
+                showAlert('❌ File too large. Max 5MB', 'error');
+            }
+        }
+
+        async function createPost(e) {
+            e.preventDefault();
+            const title = document.getElementById('postTitle').value;
+            const description = document.getElementById('postDescription').value;
+            const imageFile = document.getElementById('postImage').files[0];
+
+            if (!imageFile) {
+                showAlert('❌ Please upload an image', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('image', imageFile);
+
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass"></i> Creating...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/create-whatsapp-post`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const reward = data.reward || 190;
+                    
+                    showAlert(`✅ Post created! Ready to share on WhatsApp.`, 'success');
+                    document.getElementById('createPostForm').reset();
+                    document.getElementById('imagePreview').style.display = 'none';
+                    
+                    setTimeout(() => {
+                        loadPosts();
+                        switchTab('posts');
+                    }, 500);
+                } else {
+                    const data = await response.json();
+                    showAlert(`❌ ${data.error || 'Failed to create post'}`, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Network error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-plus-circle"></i> Create Post';
+            }
+        }
+
+        async function sharePostToWhatsApp(title, postId) {
+            const text = `Check this out! ${title}\n\n🚀 via YENLLET App`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            
+            window.open(whatsappUrl, '_blank');
+            
+            setTimeout(() => {
+                markPostAsShared(postId);
+            }, 500);
+        }
+
+        async function markPostAsShared(postId) {
+            try {
+                const response = await fetch(`${API_URL}/api/mark-whatsapp-shared`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ post_id: postId })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    const reward = data.reward || 190;
+                    showAlert(`🎉 Post shared! You earned ¥${reward}!`, 'success');
+                    checkDailyLimit();
+                    loadPosts();
+                } else {
+                    showAlert(`ℹ️ ${data.error || 'Post marked as shared'}`, 'success');
+                    loadPosts();
+                }
+            } catch (error) {
+                console.error('Error marking post as shared:', error);
+            }
+        }
+
+        async function generateCaption() {
+            const topic = document.getElementById('aiTopic').value;
+            const style = document.getElementById('aiStyle').value;
+
+            if (!topic || !style) {
+                showAlert('❌ Fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/generate-post-caption`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ topic, style })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('captionResult').innerHTML = `
+                        <div class="generated-caption">
+                            <strong>✨ Your Caption:</strong><br><br>
+                            ${data.caption}
+                            <br><br>
+                            <button class="copy-btn" onclick="copyCaption(\`${data.caption.replace(/`/g, '\\`')}\`)">
+                                <i class="bi bi-files"></i> Copy Caption
+                            </button>
+                        </div>
+                    `;
+                    showAlert('✅ Caption generated!', 'success');
+                } else {
+                    showAlert(data.error || 'Failed to generate', 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Error generating caption', 'error');
+            }
+        }
+
+        function copyCaption(caption) {
+            navigator.clipboard.writeText(caption);
+            showAlert('✅ Caption copied to clipboard!', 'success');
+        }
+
+        async function loadPosts() {
+            try {
+                const response = await fetch(`${API_URL}/api/my-whatsapp-posts`, { credentials: 'include' });
+                const posts = await response.json();
+                const container = document.getElementById('postsContainer');
+
+                if (!posts || posts.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No posts yet</p></div>';
+                    return;
+                }
+
+                container.innerHTML = posts.map(post => {
+                    const statusClass = `status-${post.status === 'earned' ? 'earned' : 'pending'}`;
+                    const statusText = post.status === 'earned' ? 'Earned ✅' : '⏳ Pending';
+
+                    return `
+                    <div class="post-card">
+                        ${post.image_filename ? `<img src="${API_URL}/uploads/whatsapp/${post.image_filename}" class="post-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%230a1628%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 font-size=%2220%22 fill=%22%238892b0%22%3EImage Not Found%3C/text%3E%3C/svg%3E';">` : ''}
+                        <div class="post-body">
+                            <div class="post-title">${post.title}</div>
+                            <div class="post-description">${post.description}</div>
+                            <div class="status-badge ${statusClass}">
+                                ${statusText}
+                            </div>
+                            ${post.status === 'earned' ? '<div class="reward-info"><i class="bi bi-star-fill"></i> ¥190 earned!</div>' : ''}
+                        </div>
+                        <div class="post-actions">
+                            <button class="btn-share" onclick="sharePostToWhatsApp('${post.title.replace(/'/g, "\\'")}', ${post.id})">
+                                <i class="bi bi-whatsapp"></i> Share & Earn
+                            </button>
+                        </div>
+                    </div>
+                `}).join('');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function showAlert(message, type) {
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.textContent = message;
+            document.getElementById('alertContainer').appendChild(div);
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.top-header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        checkAuth();
+    </script>
+</body>
+</html>

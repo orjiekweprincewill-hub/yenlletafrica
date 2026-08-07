@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YENLLET">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Profile - YenlletAfrica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-dark);
+            color: var(--white);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo img {
+            height: 35px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-icon:hover {
+            color: var(--accent-light);
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-pic-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
+        }
+
+        .username-header {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Background with logo watermark */
+        .page-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
+            overflow: hidden;
+        }
+
+        .page-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .logo-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30vw;
+            font-weight: 900;
+            color: rgba(255,255,255,0.02);
+            z-index: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            letter-spacing: -0.02em;
+            user-select: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 100px 20px 120px;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .page-title span {
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Profile Cards */
+        .profile-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(10, 22, 40, 0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 20px;
+            transition: var(--transition);
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .profile-card:nth-child(2) { animation-delay: 0.1s; }
+        .profile-card:nth-child(3) { animation-delay: 0.2s; }
+        .profile-card:nth-child(4) { animation-delay: 0.3s; }
+        .profile-card:nth-child(5) { animation-delay: 0.4s; }
+        .profile-card:nth-child(6) { animation-delay: 0.5s; }
+        .profile-card:nth-child(7) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(0, 188, 212, 0.15);
+            border-color: rgba(0, 188, 212, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--accent);
+            font-size: 1.1em;
+        }
+
+        /* Profile Picture */
+        .profile-pic-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--accent);
+            margin: 0 auto 20px;
+            display: block;
+            box-shadow: 0 0 30px rgba(0, 188, 212, 0.3);
+            transition: var(--transition);
+        }
+
+        .profile-pic-large:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(0, 188, 212, 0.5);
+        }
+
+        .file-input-wrapper {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
+        }
+
+        .file-input-wrapper input[type=file] { display: none; }
+
+        .file-name {
+            color: var(--gray);
+            font-size: 13px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
+        }
+
+        .upload-btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Info Display */
+        .info-display {
+            background: rgba(10, 22, 40, 0.5);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .info-display p {
+            color: var(--gray);
+            margin-bottom: 12px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .info-display p:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-display strong {
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .info-badge {
+            background: rgba(0, 188, 212, 0.15);
+            color: var(--accent-light);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(0, 188, 212, 0.3);
+        }
+
+        .info-badge.plan-lite {
+            background: rgba(67, 160, 71, 0.15);
+            color: #81c784;
+            border-color: rgba(67, 160, 71, 0.3);
+        }
+
+        .info-badge.plan-pro {
+            background: rgba(239, 108, 0, 0.15);
+            color: #ffb74d;
+            border-color: rgba(239, 108, 0, 0.3);
+        }
+
+        .info-badge.plan-vite {
+            background: rgba(106, 27, 154, 0.15);
+            color: #ce93d8;
+            border-color: rgba(106, 27, 154, 0.3);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--white);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(10, 22, 40, 0.5);
+            color: var(--white);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            font-size: 14px;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: var(--gray);
+        }
+
+        .form-group small {
+            color: var(--gray);
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
+        }
+
+        /* Toggle Row */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(10, 22, 40, 0.5);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            color: var(--white);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-label i {
+            color: var(--accent);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255,0.2);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* Wallet Grid */
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .wallet-box {
+            background: linear-gradient(135deg, rgba(0,188,212,0.2) 0%, rgba(13,71,161,0.3) 100%);
+            padding: 18px;
+            border-radius: 16px;
+            color: white;
+            text-align: center;
+            border: 1px solid rgba(0, 188, 212, 0.2);
+            transition: var(--transition);
+        }
+
+        .wallet-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.2);
+        }
+
+        .wallet-box.referral {
+            background: linear-gradient(135deg, rgba(67,160,71,0.2) 0%, rgba(46,125,50,0.3) 100%);
+            border-color: rgba(67, 160, 71, 0.2);
+        }
+
+        .wallet-box.tiktok {
+            background: linear-gradient(135deg, rgba(255,0,80,0.2) 0%, rgba(0,242,234,0.2) 100%);
+            border-color: rgba(255, 0, 80, 0.2);
+        }
+
+        .wallet-box.coupon {
+            background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.3) 100%);
+            border-color: rgba(102, 126, 234, 0.2);
+        }
+
+        .wallet-box-label {
+            font-size: 11px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .wallet-box-value {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+            z-index: 99;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-item-bottom {
+            text-align: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 11px;
+            font-weight: 500;
+            flex: 1;
+            padding: 5px;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-item-bottom i {
+            display: block;
+            font-size: 22px;
+            margin-bottom: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-item-bottom.active {
+            color: var(--accent);
+        }
+
+        .nav-item-bottom:active i { transform: scale(0.85); }
+        .nav-item-bottom.active i { transform: translateY(-2px); }
+
+        /* Overlay Menu */
+        .overlay {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: rgba(10, 22, 40, 0.98);
+            backdrop-filter: blur(20px);
+            overflow-x: hidden;
+            transition: 0.3s;
+        }
+
+        .overlay-content {
+            position: relative;
+            width: 100%;
+            padding: 80px 30px 30px 30px;
+        }
+
+        .closebtn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .closebtn:hover {
+            color: var(--accent);
+        }
+
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-list li { margin-bottom: 8px; }
+
+        .menu-list a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .menu-list a:hover {
+            background: rgba(0, 188, 212, 0.1);
+            color: var(--accent);
+            padding-left: 20px;
+        }
+
+        .menu-list i {
+            font-size: 20px;
+            color: var(--accent);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 30px;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        /* Alerts */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+        }
+
+        .alert-error {
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Link styling */
+        a {
+            color: var(--accent-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .bottom-nav { display: none; }
+            .main-content { padding-bottom: 40px; }
+        }
+
+        @media (max-width: 480px) {
+            .page-title { font-size: 2rem; }
+            .wallet-grid { gap: 8px; }
+            .wallet-box { padding: 14px; }
+            .wallet-box-value { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-bg"></div>
+    <div class="logo-watermark">YENLLET</div>
+
+    <div id="myNav" class="overlay">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="overlay-content">
+            <ul class="menu-list">
+                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li><a href="quiz.html"><i class="bi bi-question-circle-fill"></i> Quiz</a></li>
+                <li><a href="task.html"><i class="bi bi-check-circle-fill"></i> Tasks</a></li>
+                <li><a href="video.html"><i class="bi bi-play-circle-fill"></i> Videos</a></li>
+                <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
+                <li><a href="bank-setup.html"><i class="bi bi-bank"></i> Bank Setup</a></li>
+                <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
+            </ul>
+            <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="top-header">
+        <i class="bi bi-list menu-icon" onclick="openNav()"></i>
+        <a href="dashboard.html" class="logo">
+            <img src="/uploads/logo.png" alt="YenlletAfrica" onerror="this.style.display='none'">
+            <span>YenlletAfrica</span>
+        </a>
+        <div class="header-profile">
+            <img src="/uploads/default-avatar.png" alt="Profile" class="profile-pic-small" id="profilePicSmall">
+            <div class="username-header" id="usernameDisplay">Loading...</div>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="main-content">
+        <div class="page-title">My <span>Profile</span></div>
+
+        <!-- Profile Picture -->
+        <div class="profile-card">
+            <div class="section-title"><i class="bi bi-camera-fill"></i> Profile Picture</div>
+            <img src="/uploads/default-avatar.png" alt="Profile" class="profile-pic-large" id="profilePicLarge">
+            <div class="file-input-wrapper">
+                <label for="profilePictureInput" class="file-input-label"><i class="bi bi-upload"></i> Choose Photo</label>
+                <input type="file" id="profilePictureInput" accept="image/*">
+            </div>
+            <p class="file-name" id="fileName">No file chosen</p>
+            <button class="upload-btn" id="uploadBtn" onclick="uploadProfilePicture()" disabled>Upload Picture</button>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="profile-card">
+            <div class="section-title"><i class="bi bi-person-fill"></i> Personal Information</div>
+            <div class="info-display">
+                <p><strong>Username</strong> <span id="infoUsername">-</span></p>
+                <p><strong>Email</strong> <span id="infoEmail">-</span></p>
+                <p><strong>Phone</strong> <span id="infoPhone">-</span></p>
+                <p><strong>Country</strong> <span id="infoCountry">-</span></p>
+                <p><strong>Plan</strong> <span id="infoPlan" class="info-badge">-</span></p>
+                <p><strong>Member Since</strong> <span id="infoDate">-</span></p>
+                <p><strong>Referrals</strong> <span id="infoReferrals">-</span></p>
+                <p><strong>Total Referral Earnings</strong> <span id="infoEarnings">-</span></p>
+            </div>
+        </div>
+
+        <!-- Wallets -->
+        <div class="profile-card">
+            <div class="section-title"><i class="bi bi-wallet2"></i> My Wallets</div>
+            <div class="wallet-grid">
+                <div class="wallet-box">
+                    <div class="wallet-box-label">Activity</div>
+                    <div class="wallet-box-value">&yen;<span id="walletActivity">0</span></div>
+                </div>
+                <div class="wallet-box referral">
+                    <div class="wallet-box-label">Referral</div>
+                    <div class="wallet-box-value">&yen;<span id="walletReferral">0</span></div>
+                </div>
+                <div class="wallet-box tiktok">
+                    <div class="wallet-box-label">TikTok</div>
+                    <div class="wallet-box-value">$<span id="walletTiktok">0</span></div>
+                </div>
+                <div class="wallet-box coupon">
+                    <div class="wallet-box-label">Coupon</div>
+                    <div class="wallet-box-value" style="font-size:14px;"><span id="walletCoupon">-</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Info -->
+        <div class="profile-card">
+            <div class="section-title"><i class="bi bi-bank"></i> Bank Details</div>
+            <div class="info-display">
+                <p><strong>Bank Name</strong> <span id="infoBank">-</span></p>
+                <p><strong>Account Number</strong> <span id="infoAccount">-</span></p>
+                <p><strong>Withdrawal PIN</strong> <span id="infoPin" class="info-badge">Not Set</span></p>
+            </div>
+            <p style="font-size:13px; color:var(--gray); margin-top:10px;">
+                <i class="bi bi-pencil-square"></i> <a href="bank-setup.html" style="color:var(--accent-light); font-weight:600;">Update bank details</a>
+            </p>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <div class="profile-card">
+            <div class="section-title"><i class="bi bi-moon-fill"></i> Appearance</div>
+            <div class="toggle-row">
+                <div class="toggle-label"><i class="bi bi-moon-stars"></i> Dark Mode</div>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <p style="font-size:12px; color:var(--gray);">Turn this ON to make every page dark like a master light switch.</p>
+        </div>
+
+        <!-- Change Password -->
+        <div class="profile-card">
+            <div class="section-title"><i class="bi bi-shield-lock-fill"></i> Change Password</div>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="oldPassword">Current Password</label>
+                    <input type="password" id="oldPassword" placeholder="Enter current password" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" placeholder="Min 6 characters" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Re-enter new password" required minlength="6">
+                </div>
+                <button type="submit" class="save-btn"><i class="bi bi-check-circle"></i> Update Password</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item-bottom"><i class="bi bi-house-door-fill"></i> Home</a>
+        <a href="withdraw.html" class="nav-item-bottom"><i class="bi bi-cash-coin"></i> Withdraw</a>
+        <a href="bank-setup.html" class="nav-item-bottom"><i class="bi bi-bank"></i> Bank</a>
+        <a href="profile.html" class="nav-item-bottom active"><i class="bi bi-person-circle"></i> Profile</a>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let selectedFile = null;
+        let userData = null;
+
+        function openNav() { document.getElementById("myNav").style.width = "80%"; }
+        function closeNav() { document.getElementById("myNav").style.width = "0%"; }
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                if (response.status === 401) { window.location.href = 'register.html'; return; }
+                userData = await response.json();
+
+                document.getElementById('usernameDisplay').textContent = userData.username;
+                document.getElementById('infoUsername').textContent = userData.username;
+                document.getElementById('infoEmail').textContent = userData.email || 'Not set';
+                document.getElementById('infoPhone').textContent = userData.phone_number || 'Not set';
+                document.getElementById('infoCountry').textContent = userData.country || 'Not set';
+                document.getElementById('infoPlan').textContent = userData.plan || 'YENLITE';
+                document.getElementById('infoPlan').className = 'info-badge plan-' + (userData.plan ? userData.plan.toLowerCase() : 'lite');
+                document.getElementById('infoDate').textContent = userData.created_at ? new Date(userData.created_at).toLocaleDateString() : '-';
+                document.getElementById('infoReferrals').textContent = (userData.referral_count || 0).toLocaleString();
+                document.getElementById('infoEarnings').textContent = '&yen;' + (userData.total_referral_earnings || 0).toLocaleString();
+                document.getElementById('walletActivity').textContent = (userData.activity_wallet || 0).toLocaleString();
+                document.getElementById('walletReferral').textContent = (userData.referral_wallet || 0).toLocaleString();
+                document.getElementById('walletTiktok').textContent = (userData.tiktok_wallet || 0).toLocaleString();
+                document.getElementById('walletCoupon').textContent = userData.coupon_code || '-';
+                document.getElementById('infoBank').textContent = userData.bank_name || 'Not set';
+                document.getElementById('infoAccount').textContent = userData.account_number || 'Not set';
+                document.getElementById('infoPin').textContent = userData.withdrawal_pin_set ? '&#9989; Set' : 'Not Set';
+                document.getElementById('infoPin').className = userData.withdrawal_pin_set ? 'info-badge plan-lite' : 'info-badge';
+
+                if (userData.profile_picture) {
+                    const cacheBuster = new Date().getTime();
+                    const picUrl = `${API_URL}/uploads/${userData.profile_picture}?t=${cacheBuster}`;
+                    const smallPic = document.getElementById('profilePicSmall');
+                    const largePic = document.getElementById('profilePicLarge');
+                    if (smallPic) smallPic.src = picUrl;
+                    if (largePic) largePic.src = picUrl;
+                }
+
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.checked = userData.dark_mode || false;
+                if (userData.dark_mode) document.body.classList.add('dark-mode');
+            } catch (error) {
+                console.error('Error:', error);
+                window.location.href = 'register.html';
+            }
+        }
+
+        async function toggleDarkMode() {
+            const isDark = document.getElementById('darkModeToggle').checked;
+            document.body.classList.toggle('dark-mode', isDark);
+            try {
+                await fetch(`${API_URL}/api/toggle-dark-mode`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ dark_mode: isDark })
+                });
+                showAlert(isDark ? '&#127769; Dark mode ON' : '&#9728;&#65039; Dark mode OFF', 'success');
+            } catch (e) {
+                showAlert('Failed to save dark mode preference', 'error');
+            }
+        }
+
+        document.getElementById('profilePictureInput').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                document.getElementById('fileName').textContent = selectedFile.name;
+                document.getElementById('uploadBtn').disabled = false;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const largePic = document.getElementById('profilePicLarge');
+                    if (largePic) largePic.src = e.target.result;
+                };
+                reader.readAsDataURL(selectedFile);
+            }
+        });
+
+        async function uploadProfilePicture() {
+            if (!selectedFile) { showAlert('Please select a file first', 'error'); return; }
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+            const formData = new FormData();
+            formData.append('profile_picture', selectedFile);
+            try {
+                const response = await fetch(`${API_URL}/api/upload-profile-picture`, {
+                    method: 'POST', credentials: 'include', body: formData
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showAlert('&#9989; Profile picture uploaded successfully!', 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showAlert(data.error || 'Failed to upload picture', 'error');
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = 'Upload Picture';
+                }
+            } catch (error) {
+                showAlert('Network error! Please try again.', 'error');
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Upload Picture';
+            }
+        }
+
+        document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const oldPass = document.getElementById('oldPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            if (newPass !== confirmPass) { showAlert('New passwords do not match', 'error'); return; }
+            if (newPass.length < 6) { showAlert('Password must be at least 6 characters', 'error'); return; }
+            try {
+                const res = await fetch(`${API_URL}/api/change-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ old_password: oldPass, new_password: newPass })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('&#9989; Password changed successfully', 'success');
+                    e.target.reset();
+                } else {
+                    showAlert(data.error || 'Failed to change password', 'error');
+                }
+            } catch (err) {
+                showAlert('Network error', 'error');
+            }
+        });
+
+        async function logout() {
+            try {
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+                window.location.href = 'login.html';
+            } catch (error) { console.error('Error:', error); }
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            if (!alertContainer) return;
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            alertContainer.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>
