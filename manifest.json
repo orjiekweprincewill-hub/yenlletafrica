@@ -1,0 +1,35 @@
+{
+  "name": "YENLLET - Earn Money",
+  "short_name": "YENLLET",
+  "description": "Earn through tasks, videos, quizzes and referrals. Join now!",
+  "start_url": "/splash.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "IMG-20260414-WA0002.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Withdraw Money",
+      "short_name": "Withdraw",
+      "description": "Check and request withdrawals",
+      "url": "/withdraw.html",
+      "icons": [
+        {
+          "src": "IMG-20260414-WA0002.jpg",
+          "sizes": "96x96",
+          "type": "image/jpeg"
+        }
+      ]
+    }
+  ]
+}

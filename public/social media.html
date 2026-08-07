@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Social Media - YENLLET</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-pic-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        .username-header {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-bottom: 100px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .social-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .social-details {
+            flex: 1;
+        }
+
+        .social-platform {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .social-handle {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .social-status {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-verified {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .platform-icon {
+            font-size: 20px;
+        }
+
+        .instagram {
+            color: #E1306C;
+        }
+
+        .twitter {
+            color: #1DA1F2;
+        }
+
+        .facebook {
+            color: #1877F2;
+        }
+
+        .tiktok {
+            color: #000;
+        }
+
+        .youtube {
+            color: #FF0000;
+        }
+
+        .twitch {
+            color: #9146FF;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .alert-error {
+            background: #f44336;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-item-bottom {
+            text-align: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            flex: 1;
+            padding: 5px;
+        }
+
+        .nav-item-bottom i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        .nav-item-bottom.active {
+            color: #667eea;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #0d47a1;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .platform-option {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .platform-option:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .platform-option.selected {
+            border-color: #667eea;
+            background: #e8ebf8;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .platform-option i {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <a href="dashboard.html" style="color: white; text-decoration: none;">
+            <i class="bi bi-arrow-left" style="font-size: 24px;"></i>
+        </a>
+        <div class="header-profile">
+            <img src="/uploads/default-avatar.png" alt="Profile" class="profile-pic-small" id="profilePic">
+            <div class="username-header" id="usernameDisplay">Loading...</div>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="main-content">
+        <div class="page-title">Social Media Handles</div>
+        <div class="page-subtitle">Connect your social media accounts to earn rewards</div>
+
+        <div class="info-box">
+            <i class="bi bi-info-circle"></i> Submit your social media handles and get verified to earn bonus rewards!
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <i class="bi bi-plus-circle"></i>
+                Add Social Media Handle
+            </div>
+
+            <form id="socialForm" onsubmit="addSocialHandle(event)">
+                <div class="form-group">
+                    <label>Select Platform</label>
+                    <select id="platform" required onchange="updatePlatformDisplay()">
+                        <option value="">-- Choose Platform --</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="twitter">Twitter / X</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="twitch">Twitch</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="handle" id="handleLabel">Username / Handle</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span id="handlePrefix" style="color: #667eea; font-weight: 600; display: none;">@</span>
+                        <input type="text" id="handle" placeholder="Enter your username" required>
+                    </div>
+                    <small style="color: #999; margin-top: 5px; display: block;">Without @ or # symbols</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Add Handle
+                </button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <i class="bi bi-check-circle"></i>
+                Your Social Media Handles
+            </div>
+
+            <div id="handlesContainer"></div>
+            <div class="empty-state" id="noHandles" style="display: none;">
+                <i class="bi bi-inbox"></i>
+                <p>No social media handles added yet</p>
+                <p style="font-size: 12px; color: #999;">Add your first handle above to get started</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item-bottom">
+            <i class="bi bi-house-door-fill"></i>
+            Home
+        </a>
+        <a href="social.html" class="nav-item-bottom active">
+            <i class="bi bi-share-2"></i>
+            Social
+        </a>
+        <a href="whatsapp.html" class="nav-item-bottom">
+            <i class="bi bi-whatsapp"></i>
+            WhatsApp
+        </a>
+        <a href="profile.html" class="nav-item-bottom">
+            <i class="bi bi-person-circle"></i>
+            Profile
+        </a>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let userProfile = null;
+
+        function updatePlatformDisplay() {
+            const platform = document.getElementById('platform').value;
+            const handlePrefix = document.getElementById('handlePrefix');
+            const handleLabel = document.getElementById('handleLabel');
+            
+            if (['instagram', 'twitter', 'tiktok'].includes(platform)) {
+                handlePrefix.style.display = 'inline';
+                handleLabel.textContent = platform.charAt(0).toUpperCase() + platform.slice(1) + ' Handle';
+            } else {
+                handlePrefix.style.display = 'none';
+                handleLabel.textContent = platform === '' ? 'Username / Handle' : platform.charAt(0).toUpperCase() + platform.slice(1) + ' Handle';
+            }
+        }
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_URL}/api/profile`, {
+                    credentials: 'include'
+                });
+
+                if (response.status === 401) {
+                    window.location.href = 'register.html';
+                    return;
+                }
+
+                userProfile = await response.json();
+                document.getElementById('usernameDisplay').textContent = userProfile.username;
+                if (userProfile.profile_picture) {
+                    document.getElementById('profilePic').src = `${API_URL}/uploads/${userProfile.profile_picture}`;
+                }
+
+                loadSocialHandles();
+            } catch (error) {
+                console.error('Error:', error);
+                window.location.href = 'register.html';
+            }
+        }
+
+        async function addSocialHandle(e) {
+            e.preventDefault();
+            
+            const platform = document.getElementById('platform').value;
+            const handle = document.getElementById('handle').value.trim();
+
+            if (!platform) {
+                showAlert('Please select a platform', 'error');
+                return;
+            }
+
+            if (!handle) {
+                showAlert('Please enter a handle', 'error');
+                return;
+            }
+
+            const submitBtn = event.target.querySelector('button');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass"></i> Adding...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/add-social-handle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ platform, handle })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('✅ Social handle added! Waiting for verification.', 'success');
+                    document.getElementById('socialForm').reset();
+                    updatePlatformDisplay();
+                    loadSocialHandles();
+                } else {
+                    showAlert(data.error || 'Failed to add handle', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-plus-circle"></i> Add Handle';
+            }
+        }
+
+        async function loadSocialHandles() {
+            try {
+                const response = await fetch(`${API_URL}/api/my-social-handles`, {
+                    credentials: 'include'
+                });
+
+                const handles = await response.json();
+
+                if (!handles || handles.length === 0) {
+                    document.getElementById('noHandles').style.display = 'block';
+                    document.getElementById('handlesContainer').innerHTML = '';
+                    return;
+                }
+
+                document.getElementById('noHandles').style.display = 'none';
+                const container = document.getElementById('handlesContainer');
+                container.innerHTML = '';
+
+                handles.forEach(h => {
+                    const platformIcon = getPlatformIcon(h.platform);
+                    const statusClass = h.verified ? 'status-verified' : 'status-pending';
+                    const statusText = h.verified ? 'VERIFIED ✓' : 'PENDING';
+
+                    const item = document.createElement('div');
+                    item.className = 'social-item';
+                    item.innerHTML = `
+                        <div class="social-details">
+                            <div class="social-platform">
+                                <span class="platform-icon ${h.platform}">${platformIcon}</span>
+                                ${h.platform.charAt(0).toUpperCase() + h.platform.slice(1)}
+                            </div>
+                            <div class="social-handle">@${h.handle}</div>
+                            <div class="social-status">
+                                Added ${new Date(h.created_at).toLocaleDateString()}
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Error loading handles:', error);
+            }
+        }
+
+        function getPlatformIcon(platform) {
+            const icons = {
+                instagram: '<i class="bi bi-instagram"></i>',
+                twitter: '<i class="bi bi-twitter"></i>',
+                facebook: '<i class="bi bi-facebook"></i>',
+                tiktok: '<i class="bi bi-tiktok"></i>',
+                youtube: '<i class="bi bi-youtube"></i>',
+                twitch: '<i class="bi bi-twitch"></i>',
+                other: '<i class="bi bi-share2"></i>'
+            };
+            return icons[platform] || icons.other;
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertContainer.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        checkAuth();
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('✅ Service Worker registered'))
+                    .catch(err => console.log('❌ Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>

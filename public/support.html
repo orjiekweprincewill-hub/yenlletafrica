@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Support - YENLLET AFRICA</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--off-white); color: var(--primary-dark); min-height: 100vh; }
+        
+        .top-header { 
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0 20px; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { color: var(--white); font-size: 24px; text-decoration: none; transition: var(--transition); }
+        .back-btn:hover { color: var(--accent-light); }
+        .header-title { color: var(--white); font-weight: 700; font-size: 18px; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .vendor-badge { background: linear-gradient(135deg, #ff9800, #ff5722); color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: none; }
+        
+        .container { padding: 90px 15px 30px; max-width: 1200px; margin: 0 auto; }
+        
+        /* USER VIEW */
+        .user-chat-wrapper { max-width: 600px; margin: 0 auto; }
+        .user-chat-box { background: white; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow: hidden; }
+        .chat-header { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; padding: 20px; display: flex; align-items: center; gap: 12px; }
+        .chat-avatar { width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .chat-header-info h3 { font-size: 16px; margin-bottom: 3px; }
+        .chat-header-info p { font-size: 12px; opacity: 0.8; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .status-waiting { background: var(--warning); }
+        .status-active { background: var(--success); }
+        
+        .messages-area { height: 50vh; min-height: 350px; overflow-y: auto; padding: 20px; background: #f8f9fa; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 75%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.4; word-wrap: break-word; animation: msgIn 0.2s ease; }
+        @keyframes msgIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .message-user { align-self: flex-end; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border-bottom-right-radius: 4px; }
+        .message-vendor { align-self: flex-start; background: white; color: var(--primary-dark); border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .message-time { font-size: 10px; opacity: 0.7; margin-top: 4px; }
+        .message-file img { max-width: 100%; border-radius: 8px; }
+        
+        .input-area { padding: 15px; background: white; border-top: 1px solid #e0e0e0; display: flex; gap: 10px; align-items: center; }
+        .input-area input[type="text"] { flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 24px; font-size: 14px; font-family: inherit; transition: var(--transition); }
+        .input-area input[type="text"]:focus { outline: none; border-color: var(--accent); }
+        .send-btn { background: linear-gradient(135deg, var(--accent), var(--primary-light)); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+        .send-btn:hover { transform: scale(1.05); }
+        .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .empty-chat { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: var(--gray); }
+        .empty-chat i { font-size: 60px; margin-bottom: 15px; opacity: 0.3; }
+        
+        .start-ticket-btn { background: linear-gradient(135deg, var(--accent), var(--primary-light)); color: white; border: none; padding: 14px 30px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 15px; transition: var(--transition); }
+        .start-ticket-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,188,212,0.4); }
+        
+        /* VENDOR VIEW */
+        .vendor-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; height: calc(100vh - 130px); }
+        .tickets-panel { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
+        .tickets-panel-header { padding: 18px; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; }
+        .tickets-panel-header h3 { font-size: 15px; margin-bottom: 5px; }
+        .tickets-panel-header p { font-size: 12px; opacity: 0.8; }
+        .tickets-list { flex: 1; overflow-y: auto; }
+        .ticket-item { padding: 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: var(--transition); display: flex; gap: 10px; }
+        .ticket-item:hover { background: #f8f9fa; }
+        .ticket-item.active { background: linear-gradient(135deg, rgba(0,188,212,0.1), rgba(13,71,161,0.05)); border-left: 3px solid var(--accent); }
+        .ticket-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; flex-shrink: 0; }
+        .ticket-info { flex: 1; min-width: 0; }
+        .ticket-info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+        .ticket-username { font-weight: 600; font-size: 13px; color: var(--primary-dark); }
+        .ticket-time { font-size: 11px; color: var(--gray); }
+        .ticket-last-msg { font-size: 12px; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ticket-badge { background: var(--danger); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: 5px; }
+        .ticket-status-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+        .tag-waiting { background: #fff3cd; color: #856404; }
+        .tag-active { background: #d4edda; color: #155724; }
+        
+        .chat-panel { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
+        .chat-panel-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .chat-panel-header h3 { font-size: 15px; color: var(--primary-dark); }
+        .close-ticket-btn { background: var(--danger); color: white; border: none; padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 600; }
+        
+        .vendor-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--gray); text-align: center; }
+        .vendor-empty i { font-size: 70px; opacity: 0.2; margin-bottom: 15px; }
+        
+        .loader { position: fixed; inset: 0; background: var(--primary-dark); display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 20px; }
+        .loader.hidden { display: none; }
+        .spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-text { color: white; font-size: 14px; opacity: 0.8; }
+        
+        .alert { position: fixed; top: 90px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; z-index: 2000; animation: slideIn 0.3s ease; font-weight: 600; font-size: 14px; }
+        .alert-success { background: var(--success); }
+        .alert-error { background: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(400px); } to { transform: translateX(0); } }
+        
+        @media (max-width: 768px) {
+            .vendor-layout { grid-template-columns: 1fr; height: auto; }
+            .tickets-panel { height: 250px; }
+            .chat-panel { height: 60vh; }
+            .messages-area { height: 40vh; min-height: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <div class="loader-text">Loading support...</div>
+    </div>
+
+    <div class="top-header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i></a>
+            <span class="header-title">Support Center</span>
+        </div>
+        <div class="header-right">
+            <span class="vendor-badge" id="vendorBadge"><i class="bi bi-headset"></i> Vendor Mode</span>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="container">
+        <!-- USER VIEW -->
+        <div id="userView" style="display: none;">
+            <div class="user-chat-wrapper">
+                <div class="user-chat-box">
+                    <div class="chat-header">
+                        <div class="chat-avatar"><i class="bi bi-headset"></i></div>
+                        <div class="chat-header-info">
+                            <h3 id="vendorName">YENLLET Support</h3>
+                            <p id="supportStatus"><span class="status-dot status-waiting"></span> Waiting for vendor...</p>
+                        </div>
+                    </div>
+                    <div class="messages-area" id="userMessages">
+                        <div class="empty-chat" id="userEmptyChat">
+                            <i class="bi bi-chat-dots"></i>
+                            <h3 style="margin-bottom: 8px;">Need Help?</h3>
+                            <p style="font-size: 13px;">Start a conversation with our support team</p>
+                            <button class="start-ticket-btn" onclick="createUserTicket()">
+                                <i class="bi bi-chat-text"></i> Start Chat
+                            </button>
+                        </div>
+                    </div>
+                    <div class="input-area" id="userInputArea" style="display: none;">
+                        <input type="text" id="userMessageInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter')sendUserMessage()">
+                        <button class="send-btn" onclick="sendUserMessage()"><i class="bi bi-send"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VENDOR VIEW -->
+        <div id="vendorView" style="display: none;">
+            <div class="vendor-layout">
+                <div class="tickets-panel">
+                    <div class="tickets-panel-header">
+                        <h3><i class="bi bi-inbox"></i> Support Queue</h3>
+                        <p id="ticketsCount">Loading tickets...</p>
+                    </div>
+                    <div class="tickets-list" id="ticketsList">
+                        <div style="padding: 30px; text-align: center; color: var(--gray); font-size: 13px;">Loading...</div>
+                    </div>
+                </div>
+                <div class="chat-panel">
+                    <div id="vendorChatArea" style="display: none; flex-direction: column; height: 100%;">
+                        <div class="chat-panel-header">
+                            <div>
+                                <h3 id="activeTicketUser">Select a ticket</h3>
+                                <small id="activeTicketSubject" style="color: var(--gray);"></small>
+                            </div>
+                            <button class="close-ticket-btn" onclick="vendorCloseTicket()"><i class="bi bi-x-circle"></i> Close Ticket</button>
+                        </div>
+                        <div class="messages-area" id="vendorMessages" style="height: auto; flex: 1;"></div>
+                        <div class="input-area">
+                            <input type="text" id="vendorMessageInput" placeholder="Type your reply..." onkeypress="if(event.key==='Enter')sendVendorMessage()">
+                            <button class="send-btn" onclick="sendVendorMessage()"><i class="bi bi-send"></i></button>
+                        </div>
+                    </div>
+                    <div id="vendorEmpty" class="vendor-empty">
+                        <i class="bi bi-chat-square-text"></i>
+                        <h3>No ticket selected</h3>
+                        <p style="font-size: 13px; margin-top: 5px;">Click a ticket on the left to start chatting</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin.includes('localhost') ? 'http://localhost:5000' : window.location.origin;
+        let currentUser = null;
+        let isVendor = false;
+        let activeTicketId = null;
+        let lastMessageId = 0;
+        let vendorLastMessageId = 0;
+        let userPollTimer = null;
+        let vendorTicketsTimer = null;
+        let vendorMessagesTimer = null;
+
+        async function checkAuth() {
+            try {
+                const res = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                if (!res.ok) { window.location.href = 'login.html'; return; }
+                const data = await res.json();
+                currentUser = data;
+                isVendor = data.is_vendor === true;
+                
+                document.getElementById('loader').classList.add('hidden');
+                
+                if (isVendor) {
+                    document.getElementById('vendorBadge').style.display = 'inline-block';
+                    document.getElementById('vendorView').style.display = 'block';
+                    document.getElementById('userView').style.display = 'none';
+                    loadVendorTickets();
+                    vendorTicketsTimer = setInterval(loadVendorTickets, 5000);
+                } else {
+                    document.getElementById('userView').style.display = 'block';
+                    document.getElementById('vendorView').style.display = 'none';
+                    loadUserTicket();
+                    userPollTimer = setInterval(loadUserTicket, 5000);
+                }
+            } catch (err) {
+                console.error('Auth error:', err);
+                window.location.href = 'login.html';
+            }
+        }
+
+        // ============ USER FUNCTIONS ============
+        async function loadUserTicket() {
+            try {
+                const res = await fetch(`${API_URL}/api/support/my-ticket`, { credentials: 'include' });
+                const data = await res.json();
+                if (!data.ticket) {
+                    document.getElementById('userEmptyChat').style.display = 'flex';
+                    document.getElementById('userInputArea').style.display = 'none';
+                    document.getElementById('userMessages').innerHTML = `
+                        <div class="empty-chat" id="userEmptyChat">
+                            <i class="bi bi-chat-dots"></i>
+                            <h3 style="margin-bottom: 8px;">Need Help?</h3>
+                            <p style="font-size: 13px;">Start a conversation with our support team</p>
+                            <button class="start-ticket-btn" onclick="createUserTicket()">
+                                <i class="bi bi-chat-text"></i> Start Chat
+                            </button>
+                        </div>`;
+                    activeTicketId = null;
+                    return;
+                }
+                activeTicketId = data.ticket.id;
+                document.getElementById('userEmptyChat').style.display = 'none';
+                document.getElementById('userInputArea').style.display = 'flex';
+                
+                const statusEl = document.getElementById('supportStatus');
+                if (data.ticket.status === 'waiting') {
+                    statusEl.innerHTML = '<span class="status-dot status-waiting"></span> Waiting for vendor...';
+                    document.getElementById('vendorName').textContent = 'YENLLET Support';
+                } else {
+                    statusEl.innerHTML = '<span class="status-dot status-active"></span> Vendor online';
+                    document.getElementById('vendorName').textContent = data.ticket.vendor_name || 'Support Agent';
+                }
+                await loadUserMessages();
+            } catch (err) {
+                console.error('Load ticket error:', err);
+            }
+        }
+
+        async function createUserTicket() {
+            try {
+                const res = await fetch(`${API_URL}/api/support/create-ticket`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ subject: 'General Support' })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('Support chat started! A vendor will respond soon.', 'success');
+                    loadUserTicket();
+                } else {
+                    showAlert(data.error || 'Failed to start chat', 'error');
+                }
+            } catch (err) {
+                showAlert('Network error', 'error');
+            }
+        }
+
+        async function loadUserMessages() {
+            if (!activeTicketId) return;
+            try {
+                const res = await fetch(`${API_URL}/api/support/ticket/${activeTicketId}/messages?after=${lastMessageId}`, { credentials: 'include' });
+                const messages = await res.json();
+                const container = document.getElementById('userMessages');
+                if (messages.length > 0) {
+                    if (lastMessageId === 0) container.innerHTML = '';
+                    messages.forEach(msg => {
+                        lastMessageId = Math.max(lastMessageId, msg.id);
+                        const div = document.createElement('div');
+                        div.className = `message ${msg.sender_type === 'user' ? 'message-user' : 'message-vendor'}`;
+                        const time = new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                        let content = escapeHtml(msg.message || '');
+                        if (msg.message_type === 'image' && msg.file_url) {
+                            content = `<div class="message-file"><img src="${API_URL}${msg.file_url}" alt="image"></div>` + content;
+                        }
+                        div.innerHTML = content + `<div class="message-time">${time}</div>`;
+                        container.appendChild(div);
+                    });
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch (err) { console.error('Load messages error:', err); }
+        }
+
+        async function sendUserMessage() {
+            const input = document.getElementById('userMessageInput');
+            const msg = input.value.trim();
+            if (!msg || !activeTicketId) return;
+            input.value = '';
+            try {
+                await fetch(`${API_URL}/api/support/ticket/${activeTicketId}/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ message: msg })
+                });
+                loadUserMessages();
+            } catch (err) {
+                showAlert('Failed to send', 'error');
+            }
+        }
+
+        // ============ VENDOR FUNCTIONS ============
+        async function loadVendorTickets() {
+            try {
+                const res = await fetch(`${API_URL}/api/vendor/tickets`, { credentials: 'include' });
+                if (!res.ok) { 
+                    if (res.status === 403) { 
+                        isVendor = false; 
+                        location.reload(); 
+                        return; 
+                    }
+                    return; 
+                }
+                const tickets = await res.json();
+                const container = document.getElementById('ticketsList');
+                document.getElementById('ticketsCount').textContent = `${tickets.length} active ticket(s)`;
+                
+                if (tickets.length === 0) {
+                    container.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--gray); font-size: 13px;"><i class="bi bi-check-circle" style="font-size: 30px; display: block; margin-bottom: 10px;"></i>No pending tickets 🎉</div>';
+                    return;
+                }
+                container.innerHTML = tickets.map(t => {
+                    const initials = (t.username || '?').charAt(0).toUpperCase();
+                    const time = t.last_message_time ? new Date(t.last_message_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : new Date(t.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                    return `<div class="ticket-item ${t.id === activeTicketId ? 'active' : ''}" onclick="selectTicket(${t.id})">
+                        <div class="ticket-avatar">${escapeHtml(initials)}</div>
+                        <div class="ticket-info">
+                            <div class="ticket-info-top">
+                                <span class="ticket-username">${escapeHtml(t.username)} ${t.unread_count > 0 ? `<span class="ticket-badge">${t.unread_count}</span>` : ''}</span>
+                                <span class="ticket-time">${time}</span>
+                            </div>
+                            <div class="ticket-last-msg">${t.status === 'waiting' ? '<span class="ticket-status-tag tag-waiting">Waiting</span> ' : '<span class="ticket-status-tag tag-active">Active</span> '}${escapeHtml((t.last_message || t.subject || '').substring(0, 35))}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (err) { console.error('Vendor tickets error:', err); }
+        }
+
+        async function selectTicket(ticketId) {
+            // Assign if waiting
+            try {
+                await fetch(`${API_URL}/api/vendor/ticket/${ticketId}/assign`, { method: 'POST', credentials: 'include' });
+            } catch (e) {}
+            
+            activeTicketId = ticketId;
+            vendorLastMessageId = 0;
+            document.getElementById('vendorEmpty').style.display = 'none';
+            document.getElementById('vendorChatArea').style.display = 'flex';
+            document.getElementById('vendorMessages').innerHTML = '';
+            loadVendorMessages();
+            loadVendorTickets();
+            if (vendorMessagesTimer) clearInterval(vendorMessagesTimer);
+            vendorMessagesTimer = setInterval(loadVendorMessages, 3000);
+        }
+
+        async function loadVendorMessages() {
+            if (!activeTicketId) return;
+            try {
+                const res = await fetch(`${API_URL}/api/vendor/ticket/${activeTicketId}/messages?after=${vendorLastMessageId}`, { credentials: 'include' });
+                if (res.status === 403) { 
+                    showAlert('Ticket taken by another vendor', 'error');
+                    activeTicketId = null;
+                    document.getElementById('vendorChatArea').style.display = 'none';
+                    document.getElementById('vendorEmpty').style.display = 'flex';
+                    return;
+                }
+                const messages = await res.json();
+                const container = document.getElementById('vendorMessages');
+                if (messages.length > 0) {
+                    if (vendorLastMessageId === 0) container.innerHTML = '';
+                    messages.forEach(msg => {
+                        vendorLastMessageId = Math.max(vendorLastMessageId, msg.id);
+                        const div = document.createElement('div');
+                        div.className = `message ${msg.sender_type === 'vendor' ? 'message-user' : 'message-vendor'}`;
+                        const time = new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                        let content = escapeHtml(msg.message || '');
+                        if (msg.message_type === 'image' && msg.file_url) {
+                            content = `<div class="message-file"><img src="${API_URL}${msg.file_url}" alt="img"></div>` + content;
+                        }
+                        div.innerHTML = content + `<div class="message-time">${time}</div>`;
+                        container.appendChild(div);
+                    });
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch (err) { console.error('Vendor messages error:', err); }
+        }
+
+        async function sendVendorMessage() {
+            const input = document.getElementById('vendorMessageInput');
+            const msg = input.value.trim();
+            if (!msg || !activeTicketId) return;
+            input.value = '';
+            try {
+                await fetch(`${API_URL}/api/vendor/ticket/${activeTicketId}/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ message: msg })
+                });
+                loadVendorMessages();
+                loadVendorTickets();
+            } catch (err) { showAlert('Failed to send', 'error'); }
+        }
+
+        async function vendorCloseTicket() {
+            if (!activeTicketId) return;
+            if (!confirm('Close this support ticket?')) return;
+            try {
+                await fetch(`${API_URL}/api/vendor/ticket/${activeTicketId}/close`, { method: 'POST', credentials: 'include' });
+                showAlert('Ticket closed', 'success');
+                activeTicketId = null;
+                document.getElementById('vendorChatArea').style.display = 'none';
+                document.getElementById('vendorEmpty').style.display = 'flex';
+                if (vendorMessagesTimer) clearInterval(vendorMessagesTimer);
+                loadVendorTickets();
+            } catch (err) { showAlert('Failed to close', 'error'); }
+        }
+
+        // ============ HELPERS ============
+        function escapeHtml(str) {
+            if (str == null) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        function showAlert(msg, type) {
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.textContent = msg;
+            document.getElementById('alertContainer').appendChild(div);
+            setTimeout(() => div.remove(), 4000);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (userPollTimer) clearInterval(userPollTimer);
+            if (vendorTicketsTimer) clearInterval(vendorTicketsTimer);
+            if (vendorMessagesTimer) clearInterval(vendorMessagesTimer);
+        });
+
+        checkAuth();
+    </script>
+</body>
+</html>

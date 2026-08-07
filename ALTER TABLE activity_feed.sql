@@ -1,0 +1,2 @@
+ALTER TABLE activity_feed 
+ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
