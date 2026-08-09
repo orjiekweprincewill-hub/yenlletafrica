@@ -1356,7 +1356,7 @@
 
         async function init() {
             try {
-                const res = await fetch(`${API}/api/check-session`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/check-session`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
 
                 if (!data.authenticated || (!data.is_admin && data.role !== 'assistant')) {
@@ -1419,7 +1419,7 @@
         // ── Stats ──
         async function loadStats() {
             try {
-                const res = await fetch(`${API}/api/assistant/stats`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const d = await res.json();
                 if (!res.ok) return;
                 document.getElementById('st-total').textContent = (d.total_users || 0).toLocaleString();
@@ -1431,7 +1431,7 @@
 
         async function loadCountryStats() {
             try {
-                const res = await fetch(`${API}/api/assistant/country-stats`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/country-stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const d = await res.json();
                 if (!res.ok) return;
                 document.getElementById('st-ng').textContent = (d.Nigeria || 0).toLocaleString();
@@ -1443,7 +1443,7 @@
         // ── Withdrawals ──
         async function loadWithdrawals() {
             try {
-                const res = await fetch(`${API}/api/assistant/withdrawal-requests`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/withdrawal-requests`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
                 const allBody = document.getElementById('all-withdrawals');
                 const recentBody = document.getElementById('recent-withdrawals');
@@ -1497,7 +1497,7 @@
             btn.disabled = true;
             btn.innerHTML = '<div class="spin"></div> Processing...';
             try {
-                const res = await fetch(`${API}/api/assistant/approve-withdrawal/${id}`, { method: 'POST', credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/approve-withdrawal/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const d = await res.json();
                 if (res.ok) {
                     toast('✅ Withdrawal approved successfully');
@@ -1648,7 +1648,7 @@
 
         async function loadTasks() {
             try {
-                const res = await fetch(`${API}/api/assistant/tasks`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/tasks`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
                 const tbody = document.getElementById('tasks-table');
                 if (!res.ok || !data.length) {
@@ -1670,7 +1670,7 @@
         async function deleteTask(id) {
             if (!confirm('Delete this task?')) return;
             try {
-                const res = await fetch(`${API}/api/assistant/delete-task/${id}`, { method: 'DELETE', credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/delete-task/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (res.ok) { toast('Task deleted'); loadTasks(); }
                 else { const d = await res.json(); toast(d.error || 'Failed', 'error'); }
             } catch (e) { toast('Network error', 'error'); }
@@ -1703,7 +1703,7 @@
 
         async function loadVideos() {
             try {
-                const res = await fetch(`${API}/api/assistant/videos`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/videos`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
                 const tbody = document.getElementById('videos-table');
                 if (!res.ok || !data.length) {
@@ -1725,7 +1725,7 @@
         async function deleteVideo(id) {
             if (!confirm('Delete this video?')) return;
             try {
-                const res = await fetch(`${API}/api/assistant/delete-video/${id}`, { method: 'DELETE', credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/delete-video/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (res.ok) { toast('Video deleted'); loadVideos(); }
                 else { const d = await res.json(); toast(d.error || 'Failed', 'error'); }
             } catch (e) { toast('Network error', 'error'); }
@@ -1765,7 +1765,7 @@
 
         async function loadQuizzes() {
             try {
-                const res = await fetch(`${API}/api/assistant/quizzes`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/quizzes`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
                 const tbody = document.getElementById('quizzes-table');
                 if (!res.ok || !data.length) {
@@ -1787,7 +1787,7 @@
         async function deleteQuiz(id) {
             if (!confirm('Delete this quiz?')) return;
             try {
-                const res = await fetch(`${API}/api/assistant/delete-quiz/${id}`, { method: 'DELETE', credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/delete-quiz/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (res.ok) { toast('Quiz deleted'); loadQuizzes(); }
                 else { const d = await res.json(); toast(d.error || 'Failed', 'error'); }
             } catch (e) { toast('Network error', 'error'); }
@@ -1822,7 +1822,7 @@
 
         async function loadArticles() {
             try {
-                const res = await fetch(`${API}/api/assistant/articles`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/articles`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
                 const tbody = document.getElementById('articles-table');
                 if (!res.ok || !data.length) {
@@ -1844,7 +1844,7 @@
         async function deleteArticle(id) {
             if (!confirm('Delete this article?')) return;
             try {
-                const res = await fetch(`${API}/api/assistant/delete-article/${id}`, { method: 'DELETE', credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/delete-article/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (res.ok) { toast('Article deleted'); loadArticles(); }
                 else { const d = await res.json(); toast(d.error || 'Failed', 'error'); }
             } catch (e) { toast('Network error', 'error'); }
@@ -1859,7 +1859,7 @@
             btn.disabled = true;
             btn.innerHTML = '<div class="spin"></div>';
             try {
-                const res = await fetch(`${API}/api/assistant/search-user?q=${encodeURIComponent(q)}&type=${type}`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/search-user?q=${encodeURIComponent(q)}&type=${type}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const d = await res.json();
                 if (res.ok && d.user_id) {
                     currentUserId = d.user_id;
@@ -1951,7 +1951,7 @@
             const search = document.getElementById('tiktokSearch').value.trim();
             if (!search) { toast('Enter search term', 'warn'); return; }
             try {
-                const res = await fetch(`${API}/api/assistant/search-tiktok-user?search=${encodeURIComponent(search)}`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/search-tiktok-user?search=${encodeURIComponent(search)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const d = await res.json();
                 if (res.ok) {
                     currentTikTokUserId = d.user_id;
@@ -1988,7 +1988,7 @@
 
         async function loadTikTokUsers() {
             try {
-                const res = await fetch(`${API}/api/assistant/tiktok-users`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/tiktok-users`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
                 const tbody = document.getElementById('tiktok-table');
                 if (!res.ok || !data.length) {
@@ -2028,7 +2028,7 @@
 
         async function loadSocialLinks() {
             try {
-                const res = await fetch(`${API}/api/assistant/social-links`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/social-links`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
                 const tbody = document.getElementById('social-table');
                 if (!res.ok || !data.length) {
@@ -2048,7 +2048,7 @@
         async function deleteSocialLink(id) {
             if (!confirm('Delete this link?')) return;
             try {
-                const res = await fetch(`${API}/api/assistant/delete-social-link/${id}`, { method: 'DELETE', credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/delete-social-link/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (res.ok) { toast('Link deleted'); loadSocialLinks(); }
                 else { const d = await res.json(); toast(d.error || 'Failed', 'error'); }
             } catch (e) { toast('Network error', 'error'); }
@@ -2057,7 +2057,7 @@
         // ── Settings ──
         async function loadSettings() {
             try {
-                const res = await fetch(`${API}/api/assistant/get-withdrawal-settings`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/assistant/get-withdrawal-settings`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const d = await res.json();
                 if (!res.ok) return;
                 document.getElementById('toggle-activity').checked = d.activity_withdrawal_enabled;
@@ -2101,7 +2101,7 @@
         }
 
         async function logout() {
-            await fetch(`${API}/api/logout`, { method: 'POST', credentials: 'include' });
+            await fetch(`${API}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             window.location.href = 'admin-login.html';
         }
 

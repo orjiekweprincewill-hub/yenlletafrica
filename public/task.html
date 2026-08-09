@@ -658,7 +658,7 @@
 
         async function checkAuth() {
             try {
-                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.status === 401) { window.location.href = 'login.html'; return; }
 
                 const data = await response.json();
@@ -688,7 +688,7 @@
             const tasksGrid = document.getElementById('tasksGrid');
             const noTasks = document.getElementById('noTasks');
             try {
-                const response = await fetch(`${API_URL}/api/tasks`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/tasks`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await response.json();
                 const tasks = data.normal_tasks || [];
 
@@ -740,7 +740,7 @@
             try {
                 const response = await fetch(`${API_URL}/api/complete-task/${taskId}`, {
                     method: 'POST',
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
                 const data = await response.json();
                 if (response.ok) {
@@ -783,7 +783,7 @@
 
         async function logout() {
             try {
-                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             } catch (error) {
                 console.warn("Logout error");
             }

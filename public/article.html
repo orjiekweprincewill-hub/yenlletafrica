@@ -385,7 +385,7 @@
         async function loadArticles() {
             try {
                 const response = await fetch(`${API_URL}/api/articles`, {
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
                 if (!response.ok) {
@@ -449,7 +449,7 @@
         async function openArticle(articleId) {
             try {
                 const response = await fetch(`${API_URL}/api/articles/${articleId}`, {
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
                 if (!response.ok) {
@@ -507,7 +507,7 @@
             try {
                 const response = await fetch(`${API_URL}/api/complete-article/${currentArticle.id}`, {
                     method: 'POST',
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
                 const data = await response.json();

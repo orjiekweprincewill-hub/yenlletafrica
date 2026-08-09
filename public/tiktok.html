@@ -638,7 +638,7 @@
         async function loadProfile() {
             try {
                 const response = await fetch(`${API_URL}/api/profile`, {
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
                 if (response.ok) {
                     const data = await response.json();
@@ -653,7 +653,7 @@
         async function loadTikTokSubmission() {
             try {
                 const response = await fetch(`${API_URL}/api/my-tiktok-submission`, {
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
                 if (response.ok) {
                     const data = await response.json();

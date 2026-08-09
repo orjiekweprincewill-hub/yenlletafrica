@@ -698,7 +698,7 @@
 
         async function checkAuth() {
             try {
-                const res = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (res.status === 401) { window.location.href = 'login.html'; return false; }
                 const data = await res.json();
                 currentUserId = data.user_id;
@@ -742,7 +742,7 @@
 
         /* ================= USERS LIST ================= */
         async function loadUsers() {
-            const result = await safeFetch(`${API_URL}/api/all-users`, { credentials: 'include' });
+            const result = await safeFetch(`${API_URL}/api/all-users`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             if (result.ok && Array.isArray(result.data)) displayUsers(result.data);
         }
 
@@ -1339,7 +1339,7 @@
 
         /* ================= LOAD MESSAGES ================= */
         async function loadMessages(partnerId) {
-            const result = await safeFetch(`${API_URL}/api/chat-messages/${partnerId}`, { credentials: 'include' });
+            const result = await safeFetch(`${API_URL}/api/chat-messages/${partnerId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             const container = document.getElementById('messagesContainer');
             if (!container) return [];
             container.innerHTML = '';
@@ -1358,7 +1358,7 @@
         }
 
         async function loadNewMessages(partnerId) {
-            const result = await safeFetch(`${API_URL}/api/chat-messages/${partnerId}?after=${chatState.maxRenderedId}`, { credentials: 'include' });
+            const result = await safeFetch(`${API_URL}/api/chat-messages/${partnerId}?after=${chatState.maxRenderedId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             if (!result.ok) {
                 if (result.status === 429) console.warn('Poll rate limited');
                 return;
@@ -1441,7 +1441,7 @@
 
         async function markMessagesAsRead(partnerId) {
             try {
-                await fetch(`${API_URL}/api/mark-messages-read/${partnerId}`, { method: 'POST', credentials: 'include' });
+                await fetch(`${API_URL}/api/mark-messages-read/${partnerId}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             } catch (e) {}
         }
 
@@ -1461,7 +1461,7 @@
 
         async function logout() {
             try {
-                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             } catch (error) {
                 console.warn("Logout error");
             }

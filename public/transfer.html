@@ -609,7 +609,7 @@
 
         async function checkAuth() {
             try {
-                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.status === 401) { window.location.href = 'register.html'; return; }
                 const userProfile = await response.json();
                 currentUserId = userProfile.user_id;
@@ -685,7 +685,7 @@
 
         async function loadTransferHistory() {
             try {
-                const response = await fetch(`${API_URL}/api/transfer-history`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/transfer-history`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const transfers = await response.json();
                 if (transfers.length === 0) {
                     document.getElementById('noHistory').style.display = 'block';
@@ -716,7 +716,7 @@
 
         async function logout() {
             try {
-                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 window.location.href = 'login.html';
             } catch (error) { console.error('Error:', error); }
         }

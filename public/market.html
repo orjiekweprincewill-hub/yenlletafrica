@@ -249,7 +249,7 @@
         
         async function checkAuth() {
             try {
-                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.status === 401) {
                     window.location.href = 'login.html';
                     return;
@@ -263,7 +263,7 @@
 
         async function loadProducts() {
             try {
-                const response = await fetch(`${API_URL}/api/marketplace-products`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/marketplace-products`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 allProducts = await response.json();
                 displayProducts(allProducts);
             } catch (error) {
@@ -334,7 +334,7 @@
 
         async function loadSellerProducts(sellerId) {
             try {
-                const response = await fetch(`${API_URL}/api/seller-products/${sellerId}`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/seller-products/${sellerId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await response.json();
                 
                 document.getElementById('sellerName').textContent = data.seller.username;
@@ -550,7 +550,7 @@
             try {
                 const response = await fetch(`${API_URL}/api/delete-marketplace-product/${productId}`, {
                     method: 'DELETE',
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
                 if (response.ok) {
                     showAlert('✅ Product deleted', 'success');

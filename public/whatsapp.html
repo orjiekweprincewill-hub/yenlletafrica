@@ -882,7 +882,7 @@
 
         async function checkAuth() {
             try {
-                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.status === 401) {
                     window.location.href = 'register.html';
                     return;
@@ -940,7 +940,7 @@
 
         async function checkDailyLimit() {
             try {
-                const response = await fetch(`${API_URL}/api/check-whatsapp-daily-limit`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/check-whatsapp-daily-limit`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await response.json();
 
                 const warningDiv = document.getElementById('dailyLimitWarning');
@@ -1118,7 +1118,7 @@
 
         async function loadPosts() {
             try {
-                const response = await fetch(`${API_URL}/api/my-whatsapp-posts`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/my-whatsapp-posts`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const posts = await response.json();
                 const container = document.getElementById('postsContainer');
 

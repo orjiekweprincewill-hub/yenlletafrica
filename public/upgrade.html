@@ -451,7 +451,7 @@
 
         async function init() {
             try {
-                const res = await fetch(`${API}/api/check-session`, { credentials: 'include' });
+                const res = await fetch(`${API}/api/check-session`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
                 if (!data.authenticated) {
                     window.location.href = 'login.html';
@@ -459,7 +459,7 @@
                 }
 
                 // Load profile to show current plan
-                const profileRes = await fetch(`${API}/api/profile`, { credentials: 'include' });
+                const profileRes = await fetch(`${API}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const profile = await profileRes.json();
                 if (profile.plan) {
                     const badge = document.getElementById('currentPlanBadge');
@@ -517,7 +517,7 @@
     <script>
     (async function(){
       try {
-        const r = await fetch('http://localhost:5000/api/profile', { credentials: 'include' });
+        const r = await fetch('http://localhost:5000/api/profile', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
         if(r.ok){ const d = await r.json(); if(d.dark_mode) document.body.classList.add('dark-mode'); }
       } catch(e){}
     })();

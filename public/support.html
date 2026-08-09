@@ -218,7 +218,7 @@
 
         async function checkAuth() {
             try {
-                const res = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (!res.ok) { window.location.href = 'login.html'; return; }
                 const data = await res.json();
                 currentUser = data;
@@ -247,7 +247,7 @@
         // ============ USER FUNCTIONS ============
         async function loadUserTicket() {
             try {
-                const res = await fetch(`${API_URL}/api/support/my-ticket`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/api/support/my-ticket`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
                 if (!data.ticket) {
                     document.getElementById('userEmptyChat').style.display = 'flex';
@@ -305,7 +305,7 @@
         async function loadUserMessages() {
             if (!activeTicketId) return;
             try {
-                const res = await fetch(`${API_URL}/api/support/ticket/${activeTicketId}/messages?after=${lastMessageId}`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/api/support/ticket/${activeTicketId}/messages?after=${lastMessageId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const messages = await res.json();
                 const container = document.getElementById('userMessages');
                 if (messages.length > 0) {
@@ -348,7 +348,7 @@
         // ============ VENDOR FUNCTIONS ============
         async function loadVendorTickets() {
             try {
-                const res = await fetch(`${API_URL}/api/vendor/tickets`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/api/vendor/tickets`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (!res.ok) { 
                     if (res.status === 403) { 
                         isVendor = false; 
@@ -385,7 +385,7 @@
         async function selectTicket(ticketId) {
             // Assign if waiting
             try {
-                await fetch(`${API_URL}/api/vendor/ticket/${ticketId}/assign`, { method: 'POST', credentials: 'include' });
+                await fetch(`${API_URL}/api/vendor/ticket/${ticketId}/assign`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             } catch (e) {}
             
             activeTicketId = ticketId;
@@ -402,7 +402,7 @@
         async function loadVendorMessages() {
             if (!activeTicketId) return;
             try {
-                const res = await fetch(`${API_URL}/api/vendor/ticket/${activeTicketId}/messages?after=${vendorLastMessageId}`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/api/vendor/ticket/${activeTicketId}/messages?after=${vendorLastMessageId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (res.status === 403) { 
                     showAlert('Ticket taken by another vendor', 'error');
                     activeTicketId = null;
@@ -452,7 +452,7 @@
             if (!activeTicketId) return;
             if (!confirm('Close this support ticket?')) return;
             try {
-                await fetch(`${API_URL}/api/vendor/ticket/${activeTicketId}/close`, { method: 'POST', credentials: 'include' });
+                await fetch(`${API_URL}/api/vendor/ticket/${activeTicketId}/close`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 showAlert('Ticket closed', 'success');
                 activeTicketId = null;
                 document.getElementById('vendorChatArea').style.display = 'none';

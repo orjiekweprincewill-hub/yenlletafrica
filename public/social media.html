@@ -457,7 +457,7 @@
         async function checkAuth() {
             try {
                 const response = await fetch(`${API_URL}/api/profile`, {
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
                 if (response.status === 401) {
@@ -527,7 +527,7 @@
         async function loadSocialHandles() {
             try {
                 const response = await fetch(`${API_URL}/api/my-social-handles`, {
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
                 const handles = await response.json();

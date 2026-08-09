@@ -868,7 +868,7 @@
 
         async function checkAuth() {
             try {
-                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.status === 401) { window.location.href = 'register.html'; return; }
                 userData = await response.json();
 
@@ -994,7 +994,7 @@
 
         async function logout() {
             try {
-                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 window.location.href = 'login.html';
             } catch (error) { console.error('Error:', error); }
         }

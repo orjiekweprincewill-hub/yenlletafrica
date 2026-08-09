@@ -519,7 +519,7 @@
 
         async function init() {
             try {
-                const authRes = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                const authRes = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (!authRes.ok) {
                     window.location.href = 'login.html';
                     return;
@@ -541,7 +541,7 @@
 
         async function loadQuizzes() {
             try {
-                const response = await fetch(`${API_URL}/api/quizzes`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/quizzes`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 
                 if (!response.ok) {
                     showError('Quiz system not available.');
@@ -674,7 +674,7 @@
 
         async function loadStats() {
             try {
-                const response = await fetch(`${API_URL}/api/quiz-history`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/quiz-history`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.ok) {
                     const history = await response.json();
                     const earned = history.filter(h => h.is_correct).length * 50;
@@ -711,7 +711,7 @@
             try {
                 await fetch(`${API_URL}/api/logout`, {
                     method: 'POST',
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
                 window.location.href = 'login.html';
             } catch (error) {

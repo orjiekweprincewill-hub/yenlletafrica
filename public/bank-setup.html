@@ -680,7 +680,7 @@
         // Check session on load
         async function checkSession() {
             try {
-                const res = await fetch(`${API_BASE}/api/check-session`, { credentials: 'include' });
+                const res = await fetch(`${API_BASE}/api/check-session`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 console.log('Session check status:', res.status);
                 if (!res.ok) {
                     const errData = await res.json().catch(() => ({}));
@@ -702,7 +702,7 @@
         async function fetchBankDetails() {
             try {
                 console.log('Fetching bank details from /api/bank-details...');
-                const res = await fetch(`${API_BASE}/api/bank-details`, { credentials: 'include' });
+                const res = await fetch(`${API_BASE}/api/bank-details`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 console.log('Bank details response status:', res.status);
 
                 if (res.status === 401) {

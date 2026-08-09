@@ -700,7 +700,7 @@
 
             try {
                 const response = await fetch(`${API_URL}/api/withdrawal-receipt/${withdrawalId}`, {
-                    credentials: 'include'
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
                 if (!response.ok) {

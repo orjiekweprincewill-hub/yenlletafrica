@@ -451,7 +451,7 @@
 
         async function checkAuth() {
             try {
-                const response = await fetch(`${API_URL}/api/profile`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.status === 401) {
                     window.location.href = 'register.html';
                     return;
@@ -481,7 +481,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         async function loadCourses() {
             try {
-                const response = await fetch(`${API_URL}/api/courses`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/courses`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const courses = await response.json();
 
                 if (!courses || courses.length === 0) {

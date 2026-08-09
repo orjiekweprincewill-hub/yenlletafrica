@@ -377,7 +377,7 @@
 
         async function checkAuth() {
             try {
-                const response = await fetch(`${API_URL}/api/check-session`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/check-session`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (!response.ok) { window.location.href = 'login.html'; return; }
                 const session = await response.json();
 
@@ -435,7 +435,7 @@
 
         async function loadStats() {
             try {
-                const response = await fetch(`${API_URL}/api/admin/stats`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const stats = await response.json();
                 document.getElementById('totalUsers').textContent = stats.total_users || 0;
                 document.getElementById('totalPayout').textContent = formatNumber(stats.total_payout);
@@ -448,7 +448,7 @@
 
         async function loadCountryStats() {
             try {
-                const response = await fetch(`${API_URL}/api/admin/country-stats`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/country-stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const stats = await response.json();
                 const html = `
                     <div class="country-stat"><div class="country-name">🇳🇬 Nigeria</div><div class="country-count">${stats.Nigeria || 0}</div></div>
@@ -470,7 +470,7 @@
 
         async function loadWithdrawals() {
             try {
-                const settingsResponse = await fetch(`${API_URL}/api/admin/get-withdrawal-settings`, { credentials: 'include' });
+                const settingsResponse = await fetch(`${API_URL}/api/admin/get-withdrawal-settings`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const settings = await settingsResponse.json();
                 currentSettings = settings;
 
@@ -489,7 +489,7 @@
                 const activeCountryName = COUNTRY_MAP[settings.active_country] || settings.active_country;
                 currentBadge.textContent = `Current: ${activeCountryName}`;
 
-                const response = await fetch(`${API_URL}/api/admin/withdrawal-requests`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/withdrawal-requests`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const withdrawals = await response.json();
 
                 currentPendingWithdrawals = withdrawals || [];
@@ -697,7 +697,7 @@
         async function approveWithdrawal(id) {
             if (!confirm('Mark this withdrawal as PAID?')) return;
             try {
-                const response = await fetch(`${API_URL}/api/admin/approve-withdrawal/${id}`, { method: 'POST', credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/approve-withdrawal/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.ok) {
                     showAlert('✅ Withdrawal approved', 'success');
                     loadWithdrawals();
@@ -741,7 +741,7 @@
 
             showAlert('⚙️ Processing...', 'success');
             const promises = currentPendingWithdrawals.map(w =>
-                fetch(`${API_URL}/api/admin/approve-withdrawal/${w.id}`, { method: 'POST', credentials: 'include' })
+                fetch(`${API_URL}/api/admin/approve-withdrawal/${w.id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } })
             );
 
             try {
@@ -798,7 +798,7 @@
             const search = document.getElementById('tiktokSearchInput').value.trim();
 
             try {
-                const response = await fetch(`${API_URL}/api/admin/search-tiktok-user?search=${encodeURIComponent(search)}`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/search-tiktok-user?search=${encodeURIComponent(search)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -861,7 +861,7 @@
 
         async function loadTiktokUsers() {
             try {
-                const response = await fetch(`${API_URL}/api/admin/tiktok-users`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/tiktok-users`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const users = await response.json();
                 const container = document.getElementById('tiktokUsersList');
                 if (!users || users.length === 0) {
@@ -924,7 +924,7 @@
             e.preventDefault();
             const coupon = document.getElementById('searchCouponInput').value.trim();
             try {
-                const response = await fetch(`${API_URL}/api/admin/search-user-by-coupon?coupon=${encodeURIComponent(coupon)}`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/search-user-by-coupon?coupon=${encodeURIComponent(coupon)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await response.json();
                 if (!response.ok) {
                     showAlert(data.error || 'Search failed', 'error');
@@ -978,7 +978,7 @@
 
         async function loadTasks() {
             try {
-                const response = await fetch(`${API_URL}/api/admin/tasks`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/tasks`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const tasks = await response.json();
                 const container = document.getElementById('tasksList');
                 if (!tasks || tasks.length === 0) {
@@ -1004,7 +1004,7 @@
         async function deleteTask(id) {
             if (!confirm('Delete this task?')) return;
             try {
-                const response = await fetch(`${API_URL}/api/admin/delete-task/${id}`, { method: 'DELETE', credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/delete-task/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.ok) {
                     showAlert('✅ Task deleted', 'success');
                     loadTasks();
@@ -1044,7 +1044,7 @@
 
         async function loadVideos() {
             try {
-                const response = await fetch(`${API_URL}/api/admin/videos`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/videos`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const videos = await response.json();
                 const container = document.getElementById('videosList');
                 if (!videos || videos.length === 0) {
@@ -1070,7 +1070,7 @@
         async function deleteVideo(id) {
             if (!confirm('Delete this video?')) return;
             try {
-                const response = await fetch(`${API_URL}/api/admin/delete-video/${id}`, { method: 'DELETE', credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/delete-video/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.ok) {
                     showAlert('✅ Video deleted', 'success');
                     loadVideos();
@@ -1111,7 +1111,7 @@
 
         async function loadArticles() {
             try {
-                const response = await fetch(`${API_URL}/api/admin/articles`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/articles`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const articles = await response.json();
                 const container = document.getElementById('articlesList');
                 if (!articles || articles.length === 0) {
@@ -1137,7 +1137,7 @@
         async function deleteArticle(id) {
             if (!confirm('Delete this article?')) return;
             try {
-                const response = await fetch(`${API_URL}/api/admin/delete-article/${id}`, { method: 'DELETE', credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/delete-article/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.ok) {
                     showAlert('✅ Article deleted', 'success');
                     loadArticles();
@@ -1177,7 +1177,7 @@
 
         async function loadSocialLinks() {
             try {
-                const response = await fetch(`${API_URL}/api/admin/social-links-stats`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/social-links-stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const links = await response.json();
                 const container = document.getElementById('socialLinksList');
                 if (!links || links.length === 0) {
@@ -1203,7 +1203,7 @@
         async function deleteSocialLink(id) {
             if (!confirm('Delete this link?')) return;
             try {
-                const response = await fetch(`${API_URL}/api/admin/delete-social-link/${id}`, { method: 'DELETE', credentials: 'include' });
+                const response = await fetch(`${API_URL}/api/admin/delete-social-link/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.ok) {
                     showAlert('✅ Link deleted', 'success');
                     loadSocialLinks();
@@ -1221,7 +1221,7 @@
             e.preventDefault();
             const q = document.getElementById('vendorSearchInput').value.trim();
             try {
-                const res = await fetch(`${API_URL}/api/admin/search-user-for-vendor?q=${encodeURIComponent(q)}`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/api/admin/search-user-for-vendor?q=${encodeURIComponent(q)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const users = await res.json();
                 if (!res.ok) {
                     document.getElementById('vendorSearchResult').innerHTML = `<div class="item-card"><p>${escapeHtml(users.error || 'Not found')}</p></div>`;
@@ -1294,7 +1294,7 @@
 
         async function loadVendors() {
             try {
-                const res = await fetch(`${API_URL}/api/admin/vendors`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/api/admin/vendors`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const vendors = await res.json();
                 const container = document.getElementById('vendorsList');
                 if (!vendors || vendors.length === 0) {
@@ -1339,7 +1339,7 @@
 
         async function logout() {
             try {
-                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             } catch (error) {
                 console.warn("Logout network error");
             } finally {
