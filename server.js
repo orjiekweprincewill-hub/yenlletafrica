@@ -196,18 +196,25 @@ app.use((req, res, next) => {
 // ============================================================
 // 🔧 UTILITIES & JWT AUTH MIDDLEWARE
 // ============================================================
-function hashPassword(password) { return crypto.createHash('sha256').update(password).digest('hex'); }
-function hashPin(pin) { return crypto.createHash('sha256').update(pin.toString()).digest('hex'); }
+function hashPassword(password) {
+    return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+function hashPin(pin) {
+    return crypto.createHash('sha256').update(pin.toString()).digest('hex');
+}
 
 function isAuthenticated(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
-    if (!token) return res.status(401).json({ error: 'Authentication required' });
+    if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded; // Attach user payload { user_id, username, role } to request
+        req.user = decoded; // { user_id, username, role }
         next();
     } catch (err) {
         return res.status(403).json({ error: 'Invalid or expired token' });
@@ -215,25 +222,34 @@ function isAuthenticated(req, res, next) {
 }
 
 const isAdmin = (req, res, next) => {
-    if (req.user && (req.user.role === 'superadmin' || req.user.role === 'assistant')) return next();
-    res.status(403).json({ error: 'Admin access required' });
-};
-    if (req.user && (req.user.role === 'superadmin' || req.user.role === 'assistant')) return next();
+    if (req.user && (req.user.role === 'superadmin' || req.user.role === 'assistant')) {
+        return next();
+    }
     res.status(403).json({ error: 'Admin access required' });
 };
 
 async function createNotification(userId, message) {
     try {
         if (!userId) return;
-        await pool.query('INSERT INTO notifications (user_id, message, is_read) VALUES ($1, $2, false)', [userId, message]);
-    } catch (err) { console.error('Notification error:', err.message); }
+        await pool.query(
+            'INSERT INTO notifications (user_id, message, is_read) VALUES ($1, $2, false)',
+            [userId, message]
+        );
+    } catch (err) {
+        console.error('Notification error:', err.message);
+    }
 }
 
 async function addActivityFeed(userId, action, amount = 0, description = '') {
     try {
         if (!userId) return;
-        await pool.query('INSERT INTO activity_feed (user_id, action, amount, description) VALUES ($1, $2, $3, $4)', [userId, action, amount, description]);
-    } catch (err) { console.error('Activity feed error:', err.message); }
+        await pool.query(
+            'INSERT INTO activity_feed (user_id, action, amount, description) VALUES ($1, $2, $3, $4)',
+            [userId, action, amount, description]
+        );
+    } catch (err) {
+        console.error('Activity feed error:', err.message);
+    }
 }
 
 // ============================================================
