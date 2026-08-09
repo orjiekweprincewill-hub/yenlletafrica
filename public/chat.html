@@ -688,7 +688,7 @@
             fetch(`${API_URL}/api/toggle-dark-mode`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify({ dark_mode: userDarkMode })
             }).catch(err => console.error('Dark mode sync error:', err));
         }
@@ -734,7 +734,7 @@
                 await fetch(`${API_URL}/api/update-online-status`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ going_offline: false })
                 });
             } catch (e) {}
@@ -902,7 +902,7 @@
             const sessionRes = await safeFetch(`${API_URL}/api/start-chat-session`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify({ partner_id: userId })
             });
             if (sessionRes.ok) chatState.hasEarnedToday = sessionRes.data.already_completed === true;
@@ -991,7 +991,7 @@
 
             const result = await safeFetch(`${API_URL}/api/upload-chat-file`, {
                 method: 'POST',
-                credentials: 'include',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: formData
             });
 
@@ -1111,7 +1111,7 @@
 
             const result = await safeFetch(`${API_URL}/api/upload-chat-file`, {
                 method: 'POST',
-                credentials: 'include',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: formData
             });
 
@@ -1207,7 +1207,7 @@
             const result = await safeFetch(`${API_URL}/api/send-message`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify({
                     receiver_id: chatState.partnerId,
                     message: payload.message || '',
@@ -1260,7 +1260,7 @@
             const result = await safeFetch(`${API_URL}/api/complete-chat-session`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify({ partner_id: chatState.partnerId, duration: chatState.timerSeconds })
             });
 

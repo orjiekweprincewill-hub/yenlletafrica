@@ -287,7 +287,7 @@
                 const res = await fetch(`${API_URL}/api/support/create-ticket`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ subject: 'General Support' })
                 });
                 const data = await res.json();
@@ -336,7 +336,7 @@
                 await fetch(`${API_URL}/api/support/ticket/${activeTicketId}/send`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ message: msg })
                 });
                 loadUserMessages();
@@ -440,7 +440,7 @@
                 await fetch(`${API_URL}/api/vendor/ticket/${activeTicketId}/send`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ message: msg })
                 });
                 loadVendorMessages();

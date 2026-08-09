@@ -489,7 +489,7 @@
                 const res = await fetch(`${API}/api/apply-upgrade-coupon`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ coupon_code: coupon })
                 });
 

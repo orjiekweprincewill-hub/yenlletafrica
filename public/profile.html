@@ -916,7 +916,7 @@
                 await fetch(`${API_URL}/api/toggle-dark-mode`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ dark_mode: isDark })
                 });
                 showAlert(isDark ? '&#127769; Dark mode ON' : '&#9728;&#65039; Dark mode OFF', 'success');
@@ -948,7 +948,7 @@
             formData.append('profile_picture', selectedFile);
             try {
                 const response = await fetch(`${API_URL}/api/upload-profile-picture`, {
-                    method: 'POST', credentials: 'include', body: formData
+                    method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: formData
                 });
                 const data = await response.json();
                 if (response.ok) {
@@ -977,7 +977,7 @@
                 const res = await fetch(`${API_URL}/api/change-password`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ old_password: oldPass, new_password: newPass })
                 });
                 const data = await res.json();

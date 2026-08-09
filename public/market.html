@@ -440,7 +440,7 @@
             try {
                 const response = await fetch(`${API_URL}/api/add-marketplace-product`, {
                     method: 'POST',
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: formData
                 });
 
@@ -529,7 +529,7 @@
             try {
                 const response = await fetch(`${API_URL}/api/create-marketplace-order`, {
                     method: 'POST',
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: formData
                 });
 

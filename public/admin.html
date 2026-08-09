@@ -649,7 +649,7 @@
                 const response = await fetch(`${API_URL}/api/admin/update-active-country`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ country })
                 });
                 if (response.ok) {
@@ -676,7 +676,7 @@
                 const response = await fetch(`${API_URL}/api/admin/toggle-withdrawal`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ wallet_type: type, enabled: enabled })
                 });
 
@@ -717,7 +717,7 @@
                 const response = await fetch(`${API_URL}/api/admin/reject-withdrawal/${id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ reason: reason || 'Bank details mismatch' })
                 });
                 if (response.ok) {
@@ -773,7 +773,7 @@
                 fetch(`${API_URL}/api/admin/reject-withdrawal/${w.id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ reason: reason || 'Batch clearance' })
                 })
             );
@@ -841,7 +841,7 @@
                 const response = await fetch(`${API_URL}/api/admin/add-tiktok-bonus`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: userId, amount: amount })
                 });
 
@@ -890,7 +890,7 @@
                 const response = await fetch(`${API_URL}/api/admin/generate-coupon`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ plan, count: 1 })
                 });
                 const data = await response.json();
@@ -956,7 +956,7 @@
                 const response = await fetch(`${API_URL}/api/admin/post-task`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({
                         title: document.getElementById('taskTitle').value,
                         description: document.getElementById('taskDescription').value,
@@ -1023,7 +1023,7 @@
                 const response = await fetch(`${API_URL}/api/admin/post-video`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({
                         title: document.getElementById('videoTitle').value,
                         url: document.getElementById('videoUrl').value
@@ -1089,7 +1089,7 @@
                 const response = await fetch(`${API_URL}/api/admin/post-article`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({
                         title: document.getElementById('articleTitle').value,
                         content: document.getElementById('articleContent').value,
@@ -1156,7 +1156,7 @@
                 const response = await fetch(`${API_URL}/api/admin/add-social-link`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({
                         platform: document.getElementById('socialPlatform').value,
                         url: document.getElementById('socialUrl').value
@@ -1256,7 +1256,7 @@
                 const res = await fetch(`${API_URL}/api/admin/make-vendor`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: userId })
                 });
                 const data = await res.json();
@@ -1277,7 +1277,7 @@
                 const res = await fetch(`${API_URL}/api/admin/remove-vendor`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: userId })
                 });
                 const data = await res.json();
@@ -1327,7 +1327,7 @@
                 const res = await fetch(`${API_URL}/api/admin/toggle-vendor-status`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: userId, active })
                 });
                 if (res.ok) {

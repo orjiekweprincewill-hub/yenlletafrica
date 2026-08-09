@@ -1523,7 +1523,7 @@
                 const res = await fetch(`${API}/api/assistant/reject-withdrawal/${id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ reason: reason || 'Rejected by assistant' })
                 });
                 const d = await res.json();
@@ -1558,7 +1558,7 @@
                 const res = await fetch(`${API}/api/assistant/generate-coupon`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ plan, count })
                 });
                 const d = await res.json();
@@ -1587,7 +1587,7 @@
                 const res = await fetch(`${API}/api/assistant/generate-coupon`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ plan, count })
                 });
                 const d = await res.json();
@@ -1631,7 +1631,7 @@
                 const res = await fetch(`${API}/api/assistant/post-task`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ title, description, link })
                 });
                 const d = await res.json();
@@ -1687,7 +1687,7 @@
                 const res = await fetch(`${API}/api/assistant/post-video`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ title, url })
                 });
                 const d = await res.json();
@@ -1746,7 +1746,7 @@
                 const res = await fetch(`${API}/api/assistant/post-quiz`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ question, option_a, option_b, option_c, option_d, correct_answer })
                 });
                 const d = await res.json();
@@ -1805,7 +1805,7 @@
                 const res = await fetch(`${API}/api/assistant/post-article`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ title, content, read_time })
                 });
                 const d = await res.json();
@@ -1901,7 +1901,7 @@
                 const res = await fetch(`${API}/api/assistant/credit-wallet`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: currentUserId, wallet_type, amount, reason })
                 });
                 const d = await res.json();
@@ -1920,7 +1920,7 @@
                 const res = await fetch(`${API}/api/assistant/debit-wallet`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: currentUserId, wallet_type, amount, reason })
                 });
                 const d = await res.json();
@@ -1937,7 +1937,7 @@
                 const res = await fetch(`${API}/api/assistant/change-user-password`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: currentUserId, new_password })
                 });
                 const d = await res.json();
@@ -1976,7 +1976,7 @@
                 const res = await fetch(`${API}/api/assistant/add-tiktok-bonus`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: currentTikTokUserId, amount })
                 });
                 const d = await res.json();
@@ -2016,7 +2016,7 @@
                 const res = await fetch(`${API}/api/assistant/add-social-link`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ platform, url })
                 });
                 const d = await res.json();
@@ -2073,7 +2073,7 @@
                 const res = await fetch(`${API}/api/assistant/toggle-withdrawal`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ wallet_type, enabled })
                 });
                 const d = await res.json();
@@ -2091,7 +2091,7 @@
                 const res = await fetch(`${API}/api/assistant/update-active-country`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ country })
                 });
                 const d = await res.json();

@@ -599,7 +599,7 @@
             fetch(`${API_URL}/api/toggle-dark-mode`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify({ dark_mode: userDarkMode })
             }).catch(err => console.error('Dark mode sync error:', err));
         }
@@ -658,7 +658,7 @@
                 const response = await fetch(`${API_URL}/api/transfer-activity`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ recipient_username: recipientUsername, amount: amount })
                 });
                 const data = await response.json();

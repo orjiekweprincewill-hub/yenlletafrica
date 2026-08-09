@@ -6,230 +6,44 @@
     <title>Admin Login - YENLLET</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;
         }
-
-        .login-container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            max-width: 450px;
-            width: 100%;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-size: 32px;
-        }
-
-        .logo h1 {
-            color: #dc3545;
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
-
-        .logo p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .badge {
-            display: inline-block;
-            background: #ffc107;
-            color: #333;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #dc3545;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-bottom: 15px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .login-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 14px;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .links {
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 13px;
-        }
-
-        .links a {
-            color: #dc3545;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .links a:hover {
-            text-decoration: underline;
-        }
-
-        .divider {
-            text-align: center;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #ddd;
-        }
-
-        .divider span {
-            background: white;
-            padding: 0 10px;
-            position: relative;
-            color: #999;
-            font-size: 12px;
-        }
-
-        .user-btn {
-            width: 100%;
-            padding: 12px;
-            background: #f5f5f5;
-            color: #333;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .user-btn:hover {
-            background: #e8e8e8;
-            border-color: #667eea;
-            color: #667eea;
-        }
-
-        .security-notice {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            font-size: 12px;
-            color: #1565c0;
-        }
-
-        .security-notice i {
-            margin-right: 8px;
-        }
+        .login-container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); max-width: 450px; width: 100%; }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #dc3545, #c82333); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 32px; }
+        .logo h1 { color: #dc3545; font-size: 28px; margin-bottom: 5px; }
+        .logo p { color: #666; font-size: 14px; margin-bottom: 5px; }
+        .badge { display: inline-block; background: #ffc107; color: #333; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
+        .form-group input:focus { outline: none; border-color: #dc3545; }
+        .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #dc3545, #c82333); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s; margin-bottom: 15px; }
+        .login-btn:hover { transform: translateY(-2px); }
+        .login-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; font-size: 14px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .links { text-align: center; margin-bottom: 15px; font-size: 13px; }
+        .links a { color: #dc3545; text-decoration: none; font-weight: 600; }
+        .links a:hover { text-decoration: underline; }
+        .divider { text-align: center; margin: 20px 0; position: relative; }
+        .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #ddd; }
+        .divider span { background: white; padding: 0 10px; position: relative; color: #999; font-size: 12px; }
+        .user-btn { width: 100%; padding: 12px; background: #f5f5f5; color: #333; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-block; text-align: center; }
+        .user-btn:hover { background: #e8e8e8; border-color: #667eea; color: #667eea; }
+        .security-notice { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 12px; color: #1565c0; }
+        .security-notice i { margin-right: 8px; }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="logo">
-            <div class="logo-icon">
-                <i class="bi bi-shield-lock"></i>
-            </div>
+            <div class="logo-icon"><i class="bi bi-shield-lock"></i></div>
             <h1>Admin Panel</h1>
             <p>Restricted Access</p>
             <span class="badge"><i class="bi bi-lock-fill"></i> Secure</span>
@@ -272,8 +86,6 @@
     </div>
 
     <script>
-    const API_URL = '';
-        
         function showAlert(message, type) {
             const alertBox = document.getElementById('alertBox');
             alertBox.className = `alert alert-${type}`;
@@ -281,9 +93,7 @@
             alertBox.style.display = 'block';
             
             if (type === 'error') {
-                setTimeout(() => {
-                    alertBox.style.display = 'none';
-                }, 4000);
+                setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
             }
         }
         
@@ -298,10 +108,11 @@
             loginBtn.textContent = 'Authenticating...';
             
             try {
-                const response = await fetch(`${API_URL}/api/login`, {
+                // FIXED: Using relative path '/api/login' so it works perfectly on Vercel
+                const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ username, password })
                 });
                 
@@ -314,7 +125,6 @@
                     return;
                 }
                 
-                // Check if user is admin
                 if (!data.is_admin) {
                     showAlert('❌ Access Denied: Admin credentials required', 'error');
                     loginBtn.disabled = false;
@@ -326,8 +136,12 @@
                     showAlert('✅ Admin login successful! Redirecting...', 'success');
                     document.getElementById('loginForm').reset();
                     
+                    // Save token to localStorage
+                    if (data.token) {
+                        localStorage.setItem('token', data.token);
+                    }
+                    
                     setTimeout(() => {
-                        console.log('🔐 Admin redirecting to:', data.redirect);
                         window.location.href = data.redirect || 'admin.html';
                     }, 1500);
                 } else {

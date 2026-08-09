@@ -860,7 +860,7 @@
             try {
                 const res = await fetch(`${API_BASE}/api/setup-bank`, {
                     method: 'POST',
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ bank_name: bankName, account_number: accountNumber, account_name: accountName, pin, confirm_pin: confirmPin })
                 });
@@ -894,7 +894,7 @@
             try {
                 const res = await fetch(`${API_BASE}/api/update-bank`, {
                     method: 'POST',
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ bank_name: bankName, account_number: accountNumber, account_name: accountName, current_pin: currentPin })
                 });
@@ -936,7 +936,7 @@
             try {
                 const res = await fetch(`${API_BASE}/api/change-withdrawal-pin`, {
                     method: 'POST',
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ old_pin: oldPin, new_pin: newPin, confirm_new_pin: confirmNewPin })
                 });

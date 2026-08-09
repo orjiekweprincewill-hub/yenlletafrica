@@ -719,7 +719,7 @@
                 const response = await fetch(`${API_URL}/api/submit-tiktok-handle`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ tiktok_handle: handle })
                 });
 

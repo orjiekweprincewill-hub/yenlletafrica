@@ -872,7 +872,7 @@
             fetch(`${API_URL}/api/toggle-dark-mode`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify({ dark_mode: userDarkMode })
             }).catch(err => console.error('Dark mode sync error:', err));
         }
@@ -1009,7 +1009,7 @@
             try {
                 const response = await fetch(`${API_URL}/api/create-whatsapp-post`, {
                     method: 'POST',
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: formData
                 });
 
@@ -1053,7 +1053,7 @@
                 const response = await fetch(`${API_URL}/api/mark-whatsapp-shared`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ post_id: postId })
                 });
 
@@ -1085,7 +1085,7 @@
                 const response = await fetch(`${API_URL}/api/generate-post-caption`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ topic, style })
                 });
 
