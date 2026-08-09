@@ -358,1006 +358,1048 @@
         </div>
     </div>
 
-    <script>
-        const API_URL = '';
-        let currentPendingWithdrawals = [];
-        let currentSettings = {};
+   <script>
+    const API_URL = '';
+    let currentPendingWithdrawals = [];
+    let currentSettings = {};
 
-        function escapeHtml(str) {
-            if (str == null) return '';
-            const div = document.createElement('div');
-            div.textContent = String(str);
-            return div.innerHTML;
-        }
+    function escapeHtml(str) {
+        if (str == null) return '';
+        const div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
+    }
 
-        function formatNumber(num) {
-            const n = parseFloat(num);
-            return isNaN(n) ? '0' : n.toLocaleString();
-        }
+    function formatNumber(num) {
+        const n = parseFloat(num);
+        return isNaN(n) ? '0' : n.toLocaleString();
+    }
 
-        async function checkAuth() {
-            try {
-                const response = await fetch(`${API_URL}/api/check-session`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                if (!response.ok) { window.location.href = 'login.html'; return; }
-                const session = await response.json();
+    async function checkAuth() {
+        try {
+            const response = await fetch(`${API_URL}/api/check-session`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            if (!response.ok) { window.location.href = 'login.html'; return; }
+            const session = await response.json();
 
-                if (session.role === 'assistant') {
-                    window.location.href = 'Assistance.html';
-                    return;
-                }
-                if (!session.is_admin) { window.location.href = 'dashboard.html'; return; }
-
-                loadStats();
-                loadCountryStats();
-                loadWithdrawals();
-            } catch (error) {
-                console.error('Auth error:', error);
-                window.location.href = 'login.html';
+            if (session.role === 'assistant') {
+                window.location.href = 'Assistance.html';
+                return;
             }
+            if (!session.is_admin) { window.location.href = 'dashboard.html'; return; }
+
+            loadStats();
+            loadCountryStats();
+            loadWithdrawals();
+        } catch (error) {
+            console.error('Auth error:', error);
+            window.location.href = 'login.html';
         }
+    }
 
-        function switchTab(tabName, event) {
-            event.preventDefault();
-            document.querySelectorAll('#mainTabs .tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            event.target.closest('.tab').classList.add('active');
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-            loadTabData(tabName);
+    function switchTab(tabName, event) {
+        event.preventDefault();
+        document.querySelectorAll('#mainTabs .tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        event.target.closest('.tab').classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        loadTabData(tabName);
+    }
+
+    function switchContentTab(subTab, event) {
+        event.preventDefault();
+        document.querySelectorAll('#contentSubTabs .sub-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('[id$="-subtab"]').forEach(el => el.style.display = 'none');
+        event.target.closest('.sub-tab').classList.add('active');
+        document.getElementById(`${subTab}-subtab`).style.display = 'block';
+        loadContentTab(subTab);
+    }
+
+    function loadTabData(tabName) {
+        switch(tabName) {
+            case 'withdrawals': loadWithdrawals(); break;
+            case 'tiktok': loadTiktokUsers(); break;
+            case 'coupons': break;
+            case 'content': loadContentTab('tasks'); break;
+            case 'social': loadSocialLinks(); break;
+            case 'vendors': loadVendors(); break;
         }
+    }
 
-        function switchContentTab(subTab, event) {
-            event.preventDefault();
-            document.querySelectorAll('#contentSubTabs .sub-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('[id$="-subtab"]').forEach(el => el.style.display = 'none');
-            event.target.closest('.sub-tab').classList.add('active');
-            document.getElementById(`${subTab}-subtab`).style.display = 'block';
-            loadContentTab(subTab);
+    function loadContentTab(subTab) {
+        switch(subTab) {
+            case 'tasks': loadTasks(); break;
+            case 'videos': loadVideos(); break;
+            case 'articles': loadArticles(); break;
         }
+    }
 
-        function loadTabData(tabName) {
-            switch(tabName) {
-                case 'withdrawals': loadWithdrawals(); break;
-                case 'tiktok': loadTiktokUsers(); break;
-                case 'coupons': break;
-                case 'content': loadContentTab('tasks'); break;
-                case 'social': loadSocialLinks(); break;
-                case 'vendors': loadVendors(); break;
-            }
+    async function loadStats() {
+        try {
+            const response = await fetch(`${API_URL}/api/admin/stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            if (!response.ok) throw new Error('Failed to load stats');
+            const stats = await response.json();
+            document.getElementById('totalUsers').textContent = stats.total_users || 0;
+            document.getElementById('totalPayout').textContent = formatNumber(stats.total_payout);
+            document.getElementById('totalTasks').textContent = stats.total_tasks || 0;
+            document.getElementById('totalVideos').textContent = stats.total_videos || 0;
+        } catch (error) {
+            console.error('Stats error:', error);
         }
+    }
 
-        function loadContentTab(subTab) {
-            switch(subTab) {
-                case 'tasks': loadTasks(); break;
-                case 'videos': loadVideos(); break;
-                case 'articles': loadArticles(); break;
-            }
+    async function loadCountryStats() {
+        try {
+            const response = await fetch(`${API_URL}/api/admin/country-stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            if (!response.ok) throw new Error('Failed to load country stats');
+            const stats = await response.json();
+            const html = `
+                <div class="country-stat"><div class="country-name">🇳🇬 Nigeria</div><div class="country-count">${stats.Nigeria || 0}</div></div>
+                <div class="country-stat"><div class="country-name">🇬🇭 Ghana</div><div class="country-count">${stats.Ghana || 0}</div></div>
+                <div class="country-stat"><div class="country-name">🇨🇲 Cameroon</div><div class="country-count">${stats.Cameroon || 0}</div></div>
+                <div class="country-stat"><div class="country-name">📊 Total</div><div class="country-count">${stats.total || 0}</div></div>
+            `;
+            document.getElementById('countryStats').innerHTML = html;
+        } catch (error) {
+            console.error('Country stats error:', error);
         }
+    }
 
-        async function loadStats() {
-            try {
-                const response = await fetch(`${API_URL}/api/admin/stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const stats = await response.json();
-                document.getElementById('totalUsers').textContent = stats.total_users || 0;
-                document.getElementById('totalPayout').textContent = formatNumber(stats.total_payout);
-                document.getElementById('totalTasks').textContent = stats.total_tasks || 0;
-                document.getElementById('totalVideos').textContent = stats.total_videos || 0;
-            } catch (error) {
-                console.error('Stats error:', error);
-            }
-        }
+    const COUNTRY_MAP = {
+        'NG': 'Nigeria 🇳🇬',
+        'GH': 'Ghana 🇬🇭',
+        'CM': 'Cameroon 🇨🇲'
+    };
 
-        async function loadCountryStats() {
-            try {
-                const response = await fetch(`${API_URL}/api/admin/country-stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const stats = await response.json();
-                const html = `
-                    <div class="country-stat"><div class="country-name">🇳🇬 Nigeria</div><div class="country-count">${stats.Nigeria || 0}</div></div>
-                    <div class="country-stat"><div class="country-name">🇬🇭 Ghana</div><div class="country-count">${stats.Ghana || 0}</div></div>
-                    <div class="country-stat"><div class="country-name">🇨🇲 Cameroon</div><div class="country-count">${stats.Cameroon || 0}</div></div>
-                    <div class="country-stat"><div class="country-name">📊 Total</div><div class="country-count">${stats.total || 0}</div></div>
-                `;
-                document.getElementById('countryStats').innerHTML = html;
-            } catch (error) {
-                console.error('Country stats error:', error);
-            }
-        }
+    async function loadWithdrawals() {
+        try {
+            const settingsResponse = await fetch(`${API_URL}/api/admin/get-withdrawal-settings`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const settings = await settingsResponse.json();
+            currentSettings = settings || {};
 
-        const COUNTRY_MAP = {
-            'NG': 'Nigeria 🇳🇬',
-            'GH': 'Ghana 🇬🇭',
-            'CM': 'Cameroon 🇨🇲'
-        };
+            document.getElementById('activityToggle').checked = settings.activity_withdrawal_enabled;
+            document.getElementById('activityStatus').textContent = settings.activity_withdrawal_enabled ? '✅ Enabled' : '❌ Disabled';
+            document.getElementById('referralToggle').checked = settings.referral_withdrawal_enabled;
+            document.getElementById('referralStatus').textContent = settings.referral_withdrawal_enabled ? '✅ Enabled' : '❌ Disabled';
+            document.getElementById('tiktokToggle').checked = settings.tiktok_withdrawal_enabled;
+            document.getElementById('tiktokStatus').textContent = settings.tiktok_withdrawal_enabled ? '✅ Enabled' : '❌ Disabled';
 
-        async function loadWithdrawals() {
-            try {
-                const settingsResponse = await fetch(`${API_URL}/api/admin/get-withdrawal-settings`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const settings = await settingsResponse.json();
-                currentSettings = settings;
+            const countrySelect = document.getElementById('activeCountrySelect');
+            if (settings.active_country) countrySelect.value = settings.active_country;
+            countrySelect.disabled = false;
 
-                document.getElementById('activityToggle').checked = settings.activity_withdrawal_enabled;
-                document.getElementById('activityStatus').textContent = settings.activity_withdrawal_enabled ? '✅ Enabled' : '❌ Disabled';
-                document.getElementById('referralToggle').checked = settings.referral_withdrawal_enabled;
-                document.getElementById('referralStatus').textContent = settings.referral_withdrawal_enabled ? '✅ Enabled' : '❌ Disabled';
-                document.getElementById('tiktokToggle').checked = settings.tiktok_withdrawal_enabled;
-                document.getElementById('tiktokStatus').textContent = settings.tiktok_withdrawal_enabled ? '✅ Enabled' : '❌ Disabled';
+            const currentBadge = document.getElementById('currentCountryBadge');
+            const activeCountryName = COUNTRY_MAP[settings.active_country] || settings.active_country;
+            currentBadge.textContent = `Current: ${activeCountryName}`;
 
-                const countrySelect = document.getElementById('activeCountrySelect');
-                if (settings.active_country) countrySelect.value = settings.active_country;
-                countrySelect.disabled = false;
+            const response = await fetch(`${API_URL}/api/admin/withdrawal-requests`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const withdrawals = await response.json();
 
-                const currentBadge = document.getElementById('currentCountryBadge');
-                const activeCountryName = COUNTRY_MAP[settings.active_country] || settings.active_country;
-                currentBadge.textContent = `Current: ${activeCountryName}`;
+            // FIXED: Ensure it's an array to prevent "forEach is not a function"
+            currentPendingWithdrawals = Array.isArray(withdrawals) ? withdrawals : [];
+            updateSummaryCard();
 
-                const response = await fetch(`${API_URL}/api/admin/withdrawal-requests`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const withdrawals = await response.json();
-
-                currentPendingWithdrawals = withdrawals || [];
-                updateSummaryCard();
-
-                const container = document.getElementById('withdrawalsList');
-                if (!withdrawals || withdrawals.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No pending withdrawals</p></div>';
-                    return;
-                }
-
-                container.innerHTML = withdrawals.map(w => {
-                    const displayAmount = w.wallet_type === 'tiktok' ? `$${formatNumber(w.amount)}` : `¥${formatNumber(w.amount)}`;
-                    const friendlyCountry = COUNTRY_MAP[w.country] || escapeHtml(w.country) || 'Unknown';
-
-                    return `<div class="item-card">
-                        <div class="item-header">
-                            <span class="item-title"><i class="bi bi-person"></i> @${escapeHtml(w.username)}</span>
-                            <span class="badge bg-warning">${escapeHtml(w.wallet_type).toUpperCase()}</span>
-                        </div>
-                        <div class="item-meta"><i class="bi bi-bank"></i> ${escapeHtml(w.bank_name)} - ${escapeHtml(w.account_number)}</div>
-                        <div class="item-meta"><i class="bi bi-geo-alt"></i> ${friendlyCountry}</div>
-                        <div class="item-meta" style="font-weight: 700; color: #1e3c72; margin-top: 10px; font-size: 16px;">${displayAmount}</div>
-                        <div class="item-actions">
-                            <button class="btn btn-success btn-sm" onclick="approveWithdrawal(${w.id})" style="flex: 1;"><i class="bi bi-check-circle"></i> Approve</button>
-                            <button class="btn btn-danger btn-sm" onclick="rejectWithdrawal(${w.id})" style="flex: 1;"><i class="bi bi-x-circle"></i> Reject</button>
-                        </div>
-                    </div>`;
-                }).join('');
-            } catch (error) {
-                console.error('Withdrawals error:', error);
-                showAlert('Failed to load withdrawals', 'error');
-            }
-        }
-
-        function updateSummaryCard() {
-            const totalCount = currentPendingWithdrawals.length;
-            document.getElementById('totalPendingCount').textContent = `${totalCount}`;
-
-            let yenTotal = 0;
-            let dollarTotal = 0;
-
-            currentPendingWithdrawals.forEach(w => {
-                const amt = parseFloat(w.amount) || 0;
-                if (w.wallet_type === 'tiktok') dollarTotal += amt;
-                else yenTotal += amt;
-            });
-
-            document.getElementById('totalPendingAmount').textContent = `¥${formatNumber(yenTotal)} | $${formatNumber(dollarTotal)}`;
-        }
-
-        function downloadWithdrawalsPDF() {
+            const container = document.getElementById('withdrawalsList');
             if (currentPendingWithdrawals.length === 0) {
-                showAlert('❌ No pending withdrawals to export', 'error');
+                container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No pending withdrawals</p></div>';
                 return;
             }
 
-            let yenTotal = 0;
-            let dollarTotal = 0;
-            const rows = currentPendingWithdrawals.map((w, i) => {
-                const amt = parseFloat(w.amount) || 0;
-                const isTiktok = w.wallet_type === 'tiktok';
-                const currency = isTiktok ? '$' : '¥';
-                if (isTiktok) dollarTotal += amt;
-                else yenTotal += amt;
-
+            container.innerHTML = currentPendingWithdrawals.map(w => {
+                const displayAmount = w.wallet_type === 'tiktok' ? `$${formatNumber(w.amount)}` : `¥${formatNumber(w.amount)}`;
                 const friendlyCountry = COUNTRY_MAP[w.country] || escapeHtml(w.country) || 'Unknown';
-                const amountStr = `${currency}${formatNumber(amt)}`;
 
-                return `
-                    <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${i + 1}</td>
-                        <td style="padding: 12px 8px; font-size: 13px; color: #374151; font-weight: 600;">@${escapeHtml(w.username)}</td>
-                        <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${escapeHtml(w.wallet_type).toUpperCase()}</td>
-                        <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${escapeHtml(w.bank_name)}</td>
-                        <td style="padding: 12px 8px; font-size: 13px; color: #374151; font-family: monospace;">${escapeHtml(w.account_number)}</td>
-                        <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${friendlyCountry}</td>
-                        <td style="padding: 12px 8px; font-size: 13px; color: #1e3c72; font-weight: 700; text-align: right;">${amountStr}</td>
-                    </tr>
-                `;
+                return `<div class="item-card">
+                    <div class="item-header">
+                        <span class="item-title"><i class="bi bi-person"></i> @${escapeHtml(w.username)}</span>
+                        <span class="badge bg-warning">${escapeHtml(w.wallet_type).toUpperCase()}</span>
+                    </div>
+                    <div class="item-meta"><i class="bi bi-bank"></i> ${escapeHtml(w.bank_name)} - ${escapeHtml(w.account_number)}</div>
+                    <div class="item-meta"><i class="bi bi-geo-alt"></i> ${friendlyCountry}</div>
+                    <div class="item-meta" style="font-weight: 700; color: #1e3c72; margin-top: 10px; font-size: 16px;">${displayAmount}</div>
+                    <div class="item-actions">
+                        <button class="btn btn-success btn-sm" onclick="approveWithdrawal(${w.id})" style="flex: 1;"><i class="bi bi-check-circle"></i> Approve</button>
+                        <button class="btn btn-danger btn-sm" onclick="rejectWithdrawal(${w.id})" style="flex: 1;"><i class="bi bi-x-circle"></i> Reject</button>
+                    </div>
+                </div>`;
             }).join('');
+        } catch (error) {
+            console.error('Withdrawals error:', error);
+            showAlert('Failed to load withdrawals', 'error');
+        }
+    }
 
-            const element = document.createElement('div');
-            element.style.padding = '30px';
-            element.style.fontFamily = "'Segoe UI', Arial, sans-serif";
-            element.style.background = '#ffffff';
-            element.style.color = '#1f2937';
-            element.innerHTML = `
-                <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #d32f2f; padding-bottom: 20px;">
-                    <h1 style="font-size: 24px; color: #d32f2f; margin: 0 0 8px 0; font-weight: 800; letter-spacing: 1px;">TASKNEST</h1>
-                    <p style="font-size: 14px; color: #6b7280; margin: 0; font-weight: 500;">PENDING PAYOUT SHEET</p>
-                    <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">Generated: ${new Date().toLocaleString()}</p>
+    function updateSummaryCard() {
+        const totalCount = currentPendingWithdrawals.length;
+        document.getElementById('totalPendingCount').textContent = `${totalCount}`;
+
+        let yenTotal = 0;
+        let dollarTotal = 0;
+
+        currentPendingWithdrawals.forEach(w => {
+            const amt = parseFloat(w.amount) || 0;
+            if (w.wallet_type === 'tiktok') dollarTotal += amt;
+            else yenTotal += amt;
+        });
+
+        document.getElementById('totalPendingAmount').textContent = `¥${formatNumber(yenTotal)} | $${formatNumber(dollarTotal)}`;
+    }
+
+    function downloadWithdrawalsPDF() {
+        if (currentPendingWithdrawals.length === 0) {
+            showAlert('❌ No pending withdrawals to export', 'error');
+            return;
+        }
+
+        let yenTotal = 0;
+        let dollarTotal = 0;
+        const rows = currentPendingWithdrawals.map((w, i) => {
+            const amt = parseFloat(w.amount) || 0;
+            const isTiktok = w.wallet_type === 'tiktok';
+            const currency = isTiktok ? '$' : '¥';
+            if (isTiktok) dollarTotal += amt;
+            else yenTotal += amt;
+
+            const friendlyCountry = COUNTRY_MAP[w.country] || escapeHtml(w.country) || 'Unknown';
+            const amountStr = `${currency}${formatNumber(amt)}`;
+
+            return `
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${i + 1}</td>
+                    <td style="padding: 12px 8px; font-size: 13px; color: #374151; font-weight: 600;">@${escapeHtml(w.username)}</td>
+                    <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${escapeHtml(w.wallet_type).toUpperCase()}</td>
+                    <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${escapeHtml(w.bank_name)}</td>
+                    <td style="padding: 12px 8px; font-size: 13px; color: #374151; font-family: monospace;">${escapeHtml(w.account_number)}</td>
+                    <td style="padding: 12px 8px; font-size: 13px; color: #374151;">${friendlyCountry}</td>
+                    <td style="padding: 12px 8px; font-size: 13px; color: #1e3c72; font-weight: 700; text-align: right;">${amountStr}</td>
+                </tr>
+            `;
+        }).join('');
+
+        const element = document.createElement('div');
+        element.style.padding = '30px';
+        element.style.fontFamily = "'Segoe UI', Arial, sans-serif";
+        element.style.background = '#ffffff';
+        element.style.color = '#1f2937';
+        element.innerHTML = `
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #d32f2f; padding-bottom: 20px;">
+                <h1 style="font-size: 24px; color: #d32f2f; margin: 0 0 8px 0; font-weight: 800; letter-spacing: 1px;">TASKNEST</h1>
+                <p style="font-size: 14px; color: #6b7280; margin: 0; font-weight: 500;">PENDING PAYOUT SHEET</p>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">Generated: ${new Date().toLocaleString()}</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 25px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <div>
+                    <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Total Orders</p>
+                    <p style="font-size: 20px; font-weight: 700; color: #1f2937; margin: 0;">${currentPendingWithdrawals.length}</p>
                 </div>
-
-                <div style="display: flex; justify-content: space-between; margin-bottom: 25px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
-                    <div>
-                        <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Total Orders</p>
-                        <p style="font-size: 20px; font-weight: 700; color: #1f2937; margin: 0;">${currentPendingWithdrawals.length}</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Total Amount</p>
-                        <p style="font-size: 20px; font-weight: 700; color: #1e3c72; margin: 0;">¥${formatNumber(yenTotal)} <span style="font-size: 14px; color: #6b7280;">|</span> $${formatNumber(dollarTotal)}</p>
-                    </div>
+                <div style="text-align: right;">
+                    <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Total Amount</p>
+                    <p style="font-size: 20px; font-weight: 700; color: #1e3c72; margin: 0;">¥${formatNumber(yenTotal)} <span style="font-size: 14px; color: #6b7280;">|</span> $${formatNumber(dollarTotal)}</p>
                 </div>
+            </div>
 
-                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                    <thead>
-                        <tr style="background: #1e3c72; color: white;">
-                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">#</th>
-                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">User</th>
-                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Wallet</th>
-                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Bank Name</th>
-                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Account #</th>
-                            <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Country</th>
-                            <th style="padding: 12px 8px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rows}
-                    </tbody>
-                    <tfoot>
-                        <tr style="background: #f3f4f6; border-top: 2px solid #1e3c72;">
-                            <td colspan="6" style="padding: 14px 8px; font-size: 13px; font-weight: 700; color: #1f2937; text-align: right;">TOTAL PAYOUT:</td>
-                            <td style="padding: 14px 8px; font-size: 14px; font-weight: 800; color: #1e3c72; text-align: right;">¥${formatNumber(yenTotal)} <span style="color: #9ca3af; font-weight: 400;">|</span> $${formatNumber(dollarTotal)}</td>
-                        </tr>
-                    </tfoot>
-                </table>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background: #1e3c72; color: white;">
+                        <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">#</th>
+                        <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">User</th>
+                        <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Wallet</th>
+                        <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Bank Name</th>
+                        <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Account #</th>
+                        <th style="padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Country</th>
+                        <th style="padding: 12px 8px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows}
+                </tbody>
+                <tfoot>
+                    <tr style="background: #f3f4f6; border-top: 2px solid #1e3c72;">
+                        <td colspan="6" style="padding: 14px 8px; font-size: 13px; font-weight: 700; color: #1f2937; text-align: right;">TOTAL PAYOUT:</td>
+                        <td style="padding: 14px 8px; font-size: 14px; font-weight: 800; color: #1e3c72; text-align: right;">¥${formatNumber(yenTotal)} <span style="color: #9ca3af; font-weight: 400;">|</span> $${formatNumber(dollarTotal)}</td>
+                    </tr>
+                </tfoot>
+            </table>
 
-                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
-                    <p style="font-size: 11px; color: #9ca3af; margin: 0; line-height: 1.6;">
-                        This document is confidential and intended for administrative use only.<br>
-                        TASKNEST Admin System • ${new Date().getFullYear()}
-                    </p>
+            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
+                <p style="font-size: 11px; color: #9ca3af; margin: 0; line-height: 1.6;">
+                    This document is confidential and intended for administrative use only.<br>
+                    TASKNEST Admin System • ${new Date().getFullYear()}
+                </p>
+            </div>
+        `;
+
+        const opt = {
+            margin: [15, 15, 15, 15],
+            filename: `TASKNEST_Payout_Sheet_${new Date().toISOString().slice(0,10)}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 3, useCORS: true, logging: false },
+            jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+        };
+
+        html2pdf().set(opt).from(element).save()
+            .then(() => showAlert('✅ PDF downloaded successfully', 'success'))
+            .catch(err => {
+                console.error('PDF error:', err);
+                showAlert('❌ PDF generation failed', 'error');
+            });
+    }
+
+    // FIXED: Merged duplicate headers
+    async function updateActiveCountry() {
+        const country = document.getElementById('activeCountrySelect').value;
+        const displayCountry = COUNTRY_MAP[country] || country;
+        try {
+            const response = await fetch(`${API_URL}/api/admin/update-active-country`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({ country })
+            });
+            if (response.ok) {
+                document.getElementById('currentCountryBadge').textContent = `Current: ${displayCountry}`;
+                showAlert(`🌍 Active country set to ${displayCountry}`, 'success');
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to update', 'error');
+            }
+        } catch (error) {
+            showAlert('Failed to update country', 'error');
+        }
+    }
+
+    // FIXED: Merged duplicate headers
+    async function toggleWithdrawal(type) {
+        const toggleEl = document.getElementById(`${type}Toggle`);
+        const statusEl = document.getElementById(`${type}Status`);
+        const enabled = toggleEl.checked;
+
+        statusEl.textContent = enabled ? '✅ Enabled' : '❌ Disabled';
+        toggleEl.disabled = true;
+
+        try {
+            const response = await fetch(`${API_URL}/api/admin/toggle-withdrawal`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({ wallet_type: type, enabled: enabled })
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to update');
+
+            showAlert(`${type.charAt(0).toUpperCase() + type.slice(1)} withdrawal ${enabled ? 'enabled' : 'disabled'}`, 'success');
+
+        } catch (error) {
+            toggleEl.checked = !enabled;
+            statusEl.textContent = !enabled ? '✅ Enabled' : '❌ Disabled';
+            showAlert(error.message || 'Network error', 'error');
+        } finally {
+            toggleEl.disabled = false;
+        }
+    }
+
+    async function approveWithdrawal(id) {
+        if (!confirm('Mark this withdrawal as PAID?')) return;
+        try {
+            const response = await fetch(`${API_URL}/api/admin/approve-withdrawal/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            if (response.ok) {
+                showAlert('✅ Withdrawal approved', 'success');
+                loadWithdrawals();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to approve', 'error');
+            }
+        } catch (error) {
+            showAlert('Failed to approve', 'error');
+        }
+    }
+
+    // FIXED: Merged duplicate headers
+    async function rejectWithdrawal(id) {
+        const reason = prompt('Reason for rejection:');
+        if (reason === null) return;
+        try {
+            const response = await fetch(`${API_URL}/api/admin/reject-withdrawal/${id}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({ reason: reason || 'Bank details mismatch' })
+            });
+            if (response.ok) {
+                showAlert('❌ Withdrawal rejected and refunded', 'success');
+                loadWithdrawals();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to reject', 'error');
+            }
+        } catch (error) {
+            showAlert('Failed to reject', 'error');
+        }
+    }
+
+    async function approveAllWithdrawals() {
+        if (currentPendingWithdrawals.length === 0) {
+            showAlert('❌ No pending withdrawals', 'error');
+            return;
+        }
+        if (!confirm(`Approve all ${currentPendingWithdrawals.length} pending requests?`)) return;
+
+        showAlert('⚙️ Processing...', 'success');
+        const promises = currentPendingWithdrawals.map(w =>
+            fetch(`${API_URL}/api/admin/approve-withdrawal/${w.id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } })
+        );
+
+        try {
+            const results = await Promise.allSettled(promises);
+            const succeeded = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
+            const failed = results.length - succeeded;
+
+            if (failed === 0) showAlert(`✅ All ${succeeded} approved!`, 'success');
+            else showAlert(`⚠️ ${succeeded} approved, ${failed} failed`, 'error');
+
+            loadWithdrawals();
+        } catch (error) {
+            showAlert('Batch approval failed', 'error');
+            loadWithdrawals();
+        }
+    }
+
+    // FIXED: Merged duplicate headers
+    async function rejectAllWithdrawals() {
+        if (currentPendingWithdrawals.length === 0) {
+            showAlert('❌ No pending withdrawals', 'error');
+            return;
+        }
+        const reason = prompt('Rejection reason for all users:');
+        if (reason === null) return;
+        if (!confirm(`Reject all ${currentPendingWithdrawals.length} pending requests?`)) return;
+
+        showAlert('⚙️ Processing...', 'success');
+        const promises = currentPendingWithdrawals.map(w =>
+            fetch(`${API_URL}/api/admin/reject-withdrawal/${w.id}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({ reason: reason || 'Batch clearance' })
+            })
+        );
+
+        try {
+            const results = await Promise.allSettled(promises);
+            const succeeded = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
+            const failed = results.length - succeeded;
+
+            if (failed === 0) showAlert(`✅ All ${succeeded} rejected and refunded!`, 'success');
+            else showAlert(`⚠️ ${succeeded} rejected, ${failed} failed`, 'error');
+
+            loadWithdrawals();
+        } catch (error) {
+            showAlert('Batch rejection failed', 'error');
+            loadWithdrawals();
+        }
+    }
+
+    async function searchTiktokUser(e) {
+        e.preventDefault();
+        const search = document.getElementById('tiktokSearchInput').value.trim();
+
+        try {
+            const response = await fetch(`${API_URL}/api/admin/search-tiktok-user?search=${encodeURIComponent(search)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const data = await response.json();
+
+            if (!response.ok) {
+                showAlert(data.error || 'User not found', 'error');
+                document.getElementById('tiktokSearchResult').innerHTML = '';
+                return;
+            }
+
+            document.getElementById('tiktokSearchResult').innerHTML = `
+                <div class="item-card" style="border-left-color: #ff0050;">
+                    <div class="item-header">
+                        <span class="item-title">@${escapeHtml(data.username)}</span>
+                        <span class="badge bg-info">@${escapeHtml(data.tiktok_handle)}</span>
+                    </div>
+                    <div class="item-meta">Current: $${formatNumber(data.tiktok_wallet)}</div>
+                    <form id="bonusForm" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <input type="number" id="bonusAmountInput" placeholder="Amount ($)" step="0.01" min="0.01" required style="flex: 1; min-width: 150px; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <button type="submit" class="btn btn-success"><i class="bi bi-plus-circle"></i> Add Bonus</button>
+                        </div>
+                    </form>
                 </div>
             `;
 
-            const opt = {
-                margin: [15, 15, 15, 15],
-                filename: `TASKNEST_Payout_Sheet_${new Date().toISOString().slice(0,10)}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true, logging: false },
-                jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
-            };
+            document.getElementById('bonusForm').addEventListener('submit', (ev) => addTiktokBonusToUser(ev, data.user_id));
+        } catch (error) {
+            showAlert('Search failed', 'error');
+        }
+    }
 
-            html2pdf().set(opt).from(element).save()
-                .then(() => showAlert('✅ PDF downloaded successfully', 'success'))
-                .catch(err => {
-                    console.error('PDF error:', err);
-                    showAlert('❌ PDF generation failed', 'error');
-                });
+    // FIXED: Merged duplicate headers
+    async function addTiktokBonusToUser(e, userId) {
+        e.preventDefault();
+        const amount = parseFloat(document.getElementById('bonusAmountInput').value);
+        if (isNaN(amount) || amount <= 0) {
+            showAlert('Invalid amount', 'error');
+            return;
         }
 
-        async function updateActiveCountry() {
-            const country = document.getElementById('activeCountrySelect').value;
-            const displayCountry = COUNTRY_MAP[country] || country;
-            try {
-                const response = await fetch(`${API_URL}/api/admin/update-active-country`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ country })
-                });
-                if (response.ok) {
-                    document.getElementById('currentCountryBadge').textContent = `Current: ${displayCountry}`;
-                    showAlert(`🌍 Active country set to ${displayCountry}`, 'success');
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to update', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to update country', 'error');
-            }
-        }
+        try {
+            const response = await fetch(`${API_URL}/api/admin/add-tiktok-bonus`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({ user_id: userId, amount: amount })
+            });
 
-        async function toggleWithdrawal(type) {
-            const toggleEl = document.getElementById(`${type}Toggle`);
-            const statusEl = document.getElementById(`${type}Status`);
-            const enabled = toggleEl.checked;
-
-            statusEl.textContent = enabled ? '✅ Enabled' : '❌ Disabled';
-            toggleEl.disabled = true;
-
-            try {
-                const response = await fetch(`${API_URL}/api/admin/toggle-withdrawal`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ wallet_type: type, enabled: enabled })
-                });
-
+            if (response.ok) {
+                showAlert(`✅ $${formatNumber(amount)} added!`, 'success');
+                document.getElementById('tiktokSearchForm').reset();
+                document.getElementById('tiktokSearchResult').innerHTML = '';
+                loadTiktokUsers();
+            } else {
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.error || 'Failed to update');
-
-                showAlert(`${type.charAt(0).toUpperCase() + type.slice(1)} withdrawal ${enabled ? 'enabled' : 'disabled'}`, 'success');
-
-            } catch (error) {
-                toggleEl.checked = !enabled;
-                statusEl.textContent = !enabled ? '✅ Enabled' : '❌ Disabled';
-                showAlert(error.message || 'Network error', 'error');
-            } finally {
-                toggleEl.disabled = false;
+                showAlert(data.error || 'Failed to add bonus', 'error');
             }
+        } catch (error) {
+            showAlert('Server error', 'error');
         }
+    }
 
-        async function approveWithdrawal(id) {
-            if (!confirm('Mark this withdrawal as PAID?')) return;
-            try {
-                const response = await fetch(`${API_URL}/api/admin/approve-withdrawal/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                if (response.ok) {
-                    showAlert('✅ Withdrawal approved', 'success');
-                    loadWithdrawals();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to approve', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to approve', 'error');
-            }
-        }
-
-        async function rejectWithdrawal(id) {
-            const reason = prompt('Reason for rejection:');
-            if (reason === null) return;
-            try {
-                const response = await fetch(`${API_URL}/api/admin/reject-withdrawal/${id}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ reason: reason || 'Bank details mismatch' })
-                });
-                if (response.ok) {
-                    showAlert('❌ Withdrawal rejected and refunded', 'success');
-                    loadWithdrawals();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to reject', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to reject', 'error');
-            }
-        }
-
-        async function approveAllWithdrawals() {
-            if (currentPendingWithdrawals.length === 0) {
-                showAlert('❌ No pending withdrawals', 'error');
+    async function loadTiktokUsers() {
+        try {
+            const response = await fetch(`${API_URL}/api/admin/tiktok-users`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const users = await response.json();
+            const container = document.getElementById('tiktokUsersList');
+            if (!Array.isArray(users) || users.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No TikTok users</p></div>';
                 return;
             }
-            if (!confirm(`Approve all ${currentPendingWithdrawals.length} pending requests?`)) return;
 
-            showAlert('⚙️ Processing...', 'success');
-            const promises = currentPendingWithdrawals.map(w =>
-                fetch(`${API_URL}/api/admin/approve-withdrawal/${w.id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } })
-            );
-
-            try {
-                const results = await Promise.allSettled(promises);
-                const succeeded = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
-                const failed = results.length - succeeded;
-
-                if (failed === 0) showAlert(`✅ All ${succeeded} approved!`, 'success');
-                else showAlert(`⚠️ ${succeeded} approved, ${failed} failed`, 'error');
-
-                loadWithdrawals();
-            } catch (error) {
-                showAlert('Batch approval failed', 'error');
-                loadWithdrawals();
-            }
-        }
-
-        async function rejectAllWithdrawals() {
-            if (currentPendingWithdrawals.length === 0) {
-                showAlert('❌ No pending withdrawals', 'error');
-                return;
-            }
-            const reason = prompt('Rejection reason for all users:');
-            if (reason === null) return;
-            if (!confirm(`Reject all ${currentPendingWithdrawals.length} pending requests?`)) return;
-
-            showAlert('⚙️ Processing...', 'success');
-            const promises = currentPendingWithdrawals.map(w =>
-                fetch(`${API_URL}/api/admin/reject-withdrawal/${w.id}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ reason: reason || 'Batch clearance' })
-                })
-            );
-
-            try {
-                const results = await Promise.allSettled(promises);
-                const succeeded = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
-                const failed = results.length - succeeded;
-
-                if (failed === 0) showAlert(`✅ All ${succeeded} rejected and refunded!`, 'success');
-                else showAlert(`⚠️ ${succeeded} rejected, ${failed} failed`, 'error');
-
-                loadWithdrawals();
-            } catch (error) {
-                showAlert('Batch rejection failed', 'error');
-                loadWithdrawals();
-            }
-        }
-
-        async function searchTiktokUser(e) {
-            e.preventDefault();
-            const search = document.getElementById('tiktokSearchInput').value.trim();
-
-            try {
-                const response = await fetch(`${API_URL}/api/admin/search-tiktok-user?search=${encodeURIComponent(search)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const data = await response.json();
-
-                if (!response.ok) {
-                    showAlert(data.error || 'User not found', 'error');
-                    document.getElementById('tiktokSearchResult').innerHTML = '';
-                    return;
-                }
-
-                document.getElementById('tiktokSearchResult').innerHTML = `
-                    <div class="item-card" style="border-left-color: #ff0050;">
-                        <div class="item-header">
-                            <span class="item-title">@${escapeHtml(data.username)}</span>
-                            <span class="badge bg-info">@${escapeHtml(data.tiktok_handle)}</span>
-                        </div>
-                        <div class="item-meta">Current: $${formatNumber(data.tiktok_wallet)}</div>
-                        <form id="bonusForm" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
-                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <input type="number" id="bonusAmountInput" placeholder="Amount ($)" step="0.01" min="0.01" required style="flex: 1; min-width: 150px; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
-                                <button type="submit" class="btn btn-success"><i class="bi bi-plus-circle"></i> Add Bonus</button>
-                            </div>
-                        </form>
+            container.innerHTML = users.map(user => `
+                <div class="item-card" style="border-left-color: #ff0050;">
+                    <div class="item-header">
+                        <span class="item-title">@${escapeHtml(user.tiktok_handle)}</span>
+                        <span class="badge bg-light">${escapeHtml(user.username)}</span>
                     </div>
-                `;
-
-                document.getElementById('bonusForm').addEventListener('submit', (ev) => addTiktokBonusToUser(ev, data.user_id));
-            } catch (error) {
-                showAlert('Search failed', 'error');
-            }
+                    <div class="item-meta">Added: ${new Date(user.created_at).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        } catch (error) {
+            showAlert('Failed to load TikTok users', 'error');
         }
+    }
 
-        async function addTiktokBonusToUser(e, userId) {
-            e.preventDefault();
-            const amount = parseFloat(document.getElementById('bonusAmountInput').value);
-            if (isNaN(amount) || amount <= 0) {
-                showAlert('Invalid amount', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/api/admin/add-tiktok-bonus`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ user_id: userId, amount: amount })
-                });
-
-                if (response.ok) {
-                    showAlert(`✅ $${formatNumber(amount)} added!`, 'success');
-                    document.getElementById('tiktokSearchForm').reset();
-                    document.getElementById('tiktokSearchResult').innerHTML = '';
-                    loadTiktokUsers();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to add bonus', 'error');
-                }
-            } catch (error) {
-                showAlert('Server error', 'error');
-            }
-        }
-
-        async function loadTiktokUsers() {
-            try {
-                const response = await fetch(`${API_URL}/api/admin/tiktok-users`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const users = await response.json();
-                const container = document.getElementById('tiktokUsersList');
-                if (!users || users.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No TikTok users</p></div>';
-                    return;
-                }
-
-                container.innerHTML = users.map(user => `
-                    <div class="item-card" style="border-left-color: #ff0050;">
-                        <div class="item-header">
-                            <span class="item-title">@${escapeHtml(user.tiktok_handle)}</span>
-                            <span class="badge bg-light">${escapeHtml(user.username)}</span>
+    // FIXED: Merged duplicate headers
+    async function generateCoupon(e) {
+        e.preventDefault();
+        const plan = document.getElementById('planSelect').value;
+        try {
+            const response = await fetch(`${API_URL}/api/admin/generate-coupon`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({ plan, count: 1 })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                const code = data.coupons[0];
+                document.getElementById('generatedCoupon').innerHTML = `
+                    <div style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); padding: 20px; border-radius: 10px; text-align: center; color: white;">
+                        <h3 style="margin-bottom: 15px;">✅ Generated Successfully</h3>
+                        <div id="couponCodeDisplay" style="font-size: 28px; font-weight: bold; margin: 15px 0; font-family: monospace; letter-spacing: 3px; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
+                            ${escapeHtml(code)}
                         </div>
-                        <div class="item-meta">Added: ${new Date(user.created_at).toLocaleDateString()}</div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                showAlert('Failed to load TikTok users', 'error');
-            }
-        }
-
-        async function generateCoupon(e) {
-            e.preventDefault();
-            const plan = document.getElementById('planSelect').value;
-            try {
-                const response = await fetch(`${API_URL}/api/admin/generate-coupon`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ plan, count: 1 })
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    const code = data.coupons[0];
-                    document.getElementById('generatedCoupon').innerHTML = `
-                        <div style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); padding: 20px; border-radius: 10px; text-align: center; color: white;">
-                            <h3 style="margin-bottom: 15px;">✅ Generated Successfully</h3>
-                            <div id="couponCodeDisplay" style="font-size: 28px; font-weight: bold; margin: 15px 0; font-family: monospace; letter-spacing: 3px; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
-                                ${escapeHtml(code)}
-                            </div>
-                            <button id="copyCouponBtn" style="background: white; color: #4caf50; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                                📋 Copy Code
-                            </button>
-                        </div>`;
-
-                    document.getElementById('copyCouponBtn').addEventListener('click', () => {
-                        navigator.clipboard.writeText(code).then(() => showAlert('Copied!', 'success'));
-                    });
-
-                    showAlert('✅ Coupon generated!', 'success');
-                } else {
-                    showAlert(data.error || 'Failed to generate', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to generate coupon', 'error');
-            }
-        }
-
-        async function searchUserByCoupon(e) {
-            e.preventDefault();
-            const coupon = document.getElementById('searchCouponInput').value.trim();
-            try {
-                const response = await fetch(`${API_URL}/api/admin/search-user-by-coupon?coupon=${encodeURIComponent(coupon)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const data = await response.json();
-                if (!response.ok) {
-                    showAlert(data.error || 'Search failed', 'error');
-                    return;
-                }
-
-                if (!data.used) {
-                    showAlert('Coupon not used yet', 'error');
-                    return;
-                }
-
-                document.getElementById('couponSearchResult').innerHTML = `
-                    <div class="item-card">
-                        <div><strong>Username:</strong> ${escapeHtml(data.username)}</div>
-                        <div><strong>Email:</strong> ${escapeHtml(data.email)}</div>
-                        <div><strong>Plan:</strong> ${escapeHtml(data.coupon_plan)}</div>
-                        <div><strong>Status:</strong> ${data.is_banned ? '🚫 BANNED' : '✅ ACTIVE'}</div>
-                        <div><strong>Activity:</strong> ¥${formatNumber(data.activity_wallet)}</div>
-                        <div><strong>Referral:</strong> ¥${formatNumber(data.referral_wallet)}</div>
+                        <button id="copyCouponBtn" style="background: white; color: #4caf50; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            📋 Copy Code
+                        </button>
                     </div>`;
-            } catch (error) {
-                showAlert('Search failed', 'error');
-            }
-        }
 
-        async function postTask(e) {
-            e.preventDefault();
-            try {
-                const response = await fetch(`${API_URL}/api/admin/post-task`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({
-                        title: document.getElementById('taskTitle').value,
-                        description: document.getElementById('taskDescription').value,
-                        link: document.getElementById('taskLink').value
-                    })
+                document.getElementById('copyCouponBtn').addEventListener('click', () => {
+                    navigator.clipboard.writeText(code).then(() => showAlert('Copied!', 'success'));
                 });
-                if (response.ok) {
-                    showAlert('✅ Task posted!', 'success');
-                    e.target.reset();
-                    loadTasks();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to post', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to post task', 'error');
-            }
-        }
 
-        async function loadTasks() {
-            try {
-                const response = await fetch(`${API_URL}/api/admin/tasks`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const tasks = await response.json();
-                const container = document.getElementById('tasksList');
-                if (!tasks || tasks.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No tasks posted</p></div>';
-                    return;
-                }
-                container.innerHTML = tasks.map(t => `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <span class="item-title">${escapeHtml(t.title)}</span>
-                            <span class="badge bg-success">${t.completion_count || 0} completed</span>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})"><i class="bi bi-trash"></i> Delete</button>
-                        </div>
+                showAlert('✅ Coupon generated!', 'success');
+            } else {
+                showAlert(data.error || 'Failed to generate', 'error');
+            }
+        } catch (error) {
+            showAlert('Failed to generate coupon', 'error');
+        }
+    }
+
+    async function searchUserByCoupon(e) {
+        e.preventDefault();
+        const coupon = document.getElementById('searchCouponInput').value.trim();
+        try {
+            const response = await fetch(`${API_URL}/api/admin/search-user-by-coupon?coupon=${encodeURIComponent(coupon)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const data = await response.json();
+            if (!response.ok) {
+                showAlert(data.error || 'Search failed', 'error');
+                return;
+            }
+
+            if (!data.used) {
+                showAlert('Coupon not used yet', 'error');
+                return;
+            }
+
+            document.getElementById('couponSearchResult').innerHTML = `
+                <div class="item-card">
+                    <div><strong>Username:</strong> ${escapeHtml(data.username)}</div>
+                    <div><strong>Email:</strong> ${escapeHtml(data.email)}</div>
+                    <div><strong>Plan:</strong> ${escapeHtml(data.coupon_plan)}</div>
+                    <div><strong>Status:</strong> ${data.is_banned ? '🚫 BANNED' : '✅ ACTIVE'}</div>
+                    <div><strong>Activity:</strong> ¥${formatNumber(data.activity_wallet)}</div>
+                    <div><strong>Referral:</strong> ¥${formatNumber(data.referral_wallet)}</div>
+                </div>`;
+        } catch (error) {
+            showAlert('Search failed', 'error');
+        }
+    }
+
+    // FIXED: Merged duplicate headers
+    async function postTask(e) {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${API_URL}/api/admin/post-task`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({
+                    title: document.getElementById('taskTitle').value,
+                    description: document.getElementById('taskDescription').value,
+                    link: document.getElementById('taskLink').value
+                })
+            });
+            if (response.ok) {
+                showAlert('✅ Task posted!', 'success');
+                e.target.reset();
+                loadTasks();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to post', 'error');
+            }
+        } catch (error) {
+            showAlert('Failed to post task', 'error');
+        }
+    }
+
+    async function loadTasks() {
+        try {
+            const response = await fetch(`${API_URL}/api/admin/tasks`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const tasks = await response.json();
+            const container = document.getElementById('tasksList');
+            if (!Array.isArray(tasks) || tasks.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No tasks posted</p></div>';
+                return;
+            }
+            container.innerHTML = tasks.map(t => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <span class="item-title">${escapeHtml(t.title)}</span>
+                        <span class="badge bg-success">${t.completion_count || 0} completed</span>
                     </div>
-                `).join('');
-            } catch (error) {
-                showAlert('Failed to load tasks', 'error');
-            }
-        }
-
-        async function deleteTask(id) {
-            if (!confirm('Delete this task?')) return;
-            try {
-                const response = await fetch(`${API_URL}/api/admin/delete-task/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                if (response.ok) {
-                    showAlert('✅ Task deleted', 'success');
-                    loadTasks();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to delete', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to delete', 'error');
-            }
-        }
-
-        async function postVideo(e) {
-            e.preventDefault();
-            try {
-                const response = await fetch(`${API_URL}/api/admin/post-video`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({
-                        title: document.getElementById('videoTitle').value,
-                        url: document.getElementById('videoUrl').value
-                    })
-                });
-                if (response.ok) {
-                    showAlert('✅ Video posted!', 'success');
-                    e.target.reset();
-                    loadVideos();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to post', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to post video', 'error');
-            }
-        }
-
-        async function loadVideos() {
-            try {
-                const response = await fetch(`${API_URL}/api/admin/videos`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const videos = await response.json();
-                const container = document.getElementById('videosList');
-                if (!videos || videos.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No videos posted</p></div>';
-                    return;
-                }
-                container.innerHTML = videos.map(v => `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <span class="item-title">${escapeHtml(v.title)}</span>
-                            <span class="badge bg-success">${v.completion_count || 0} views</span>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn btn-danger btn-sm" onclick="deleteVideo(${v.id})"><i class="bi bi-trash"></i> Delete</button>
-                        </div>
+                    <div class="item-actions">
+                        <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})"><i class="bi bi-trash"></i> Delete</button>
                     </div>
-                `).join('');
-            } catch (error) {
-                showAlert('Failed to load videos', 'error');
-            }
+                </div>
+            `).join('');
+        } catch (error) {
+            showAlert('Failed to load tasks', 'error');
         }
+    }
 
-        async function deleteVideo(id) {
-            if (!confirm('Delete this video?')) return;
-            try {
-                const response = await fetch(`${API_URL}/api/admin/delete-video/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                if (response.ok) {
-                    showAlert('✅ Video deleted', 'success');
-                    loadVideos();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to delete', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to delete', 'error');
+    async function deleteTask(id) {
+        if (!confirm('Delete this task?')) return;
+        try {
+            const response = await fetch(`${API_URL}/api/admin/delete-task/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            if (response.ok) {
+                showAlert('✅ Task deleted', 'success');
+                loadTasks();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to delete', 'error');
             }
+        } catch (error) {
+            showAlert('Failed to delete', 'error');
         }
+    }
 
-        async function postArticle(e) {
-            e.preventDefault();
-            try {
-                const response = await fetch(`${API_URL}/api/admin/post-article`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({
-                        title: document.getElementById('articleTitle').value,
-                        content: document.getElementById('articleContent').value,
-                        read_time: document.getElementById('readTime').value
-                    })
-                });
-                if (response.ok) {
-                    showAlert('✅ Article posted!', 'success');
-                    e.target.reset();
-                    loadArticles();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to post', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to post article', 'error');
+    // FIXED: Merged duplicate headers
+    async function postVideo(e) {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${API_URL}/api/admin/post-video`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({
+                    title: document.getElementById('videoTitle').value,
+                    url: document.getElementById('videoUrl').value
+                })
+            });
+            if (response.ok) {
+                showAlert('✅ Video posted!', 'success');
+                e.target.reset();
+                loadVideos();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to post', 'error');
             }
+        } catch (error) {
+            showAlert('Failed to post video', 'error');
         }
+    }
 
-        async function loadArticles() {
-            try {
-                const response = await fetch(`${API_URL}/api/admin/articles`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const articles = await response.json();
-                const container = document.getElementById('articlesList');
-                if (!articles || articles.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No articles posted</p></div>';
-                    return;
-                }
-                container.innerHTML = articles.map(a => `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <span class="item-title">${escapeHtml(a.title)}</span>
-                            <span class="badge bg-success">${a.read_count || 0} reads</span>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn btn-danger btn-sm" onclick="deleteArticle(${a.id})"><i class="bi bi-trash"></i> Delete</button>
-                        </div>
+    async function loadVideos() {
+        try {
+            const response = await fetch(`${API_URL}/api/admin/videos`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const videos = await response.json();
+            const container = document.getElementById('videosList');
+            if (!Array.isArray(videos) || videos.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No videos posted</p></div>';
+                return;
+            }
+            container.innerHTML = videos.map(v => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <span class="item-title">${escapeHtml(v.title)}</span>
+                        <span class="badge bg-success">${v.completion_count || 0} views</span>
                     </div>
-                `).join('');
-            } catch (error) {
-                showAlert('Failed to load articles', 'error');
-            }
-        }
-
-        async function deleteArticle(id) {
-            if (!confirm('Delete this article?')) return;
-            try {
-                const response = await fetch(`${API_URL}/api/admin/delete-article/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                if (response.ok) {
-                    showAlert('✅ Article deleted', 'success');
-                    loadArticles();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to delete', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to delete', 'error');
-            }
-        }
-
-        async function addSocialLink(e) {
-            e.preventDefault();
-            try {
-                const response = await fetch(`${API_URL}/api/admin/add-social-link`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({
-                        platform: document.getElementById('socialPlatform').value,
-                        url: document.getElementById('socialUrl').value
-                    })
-                });
-                if (response.ok) {
-                    showAlert('✅ Link added!', 'success');
-                    e.target.reset();
-                    loadSocialLinks();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to add', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to add link', 'error');
-            }
-        }
-
-        async function loadSocialLinks() {
-            try {
-                const response = await fetch(`${API_URL}/api/admin/social-links-stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const links = await response.json();
-                const container = document.getElementById('socialLinksList');
-                if (!links || links.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No social links</p></div>';
-                    return;
-                }
-                container.innerHTML = links.map(l => `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <span class="item-title"><i class="${escapeHtml(l.icon_class)}"></i> ${escapeHtml(l.platform)}</span>
-                        </div>
-                        <div class="item-meta"><a href="${escapeHtml(l.url)}" target="_blank" style="color: #d32f2f; text-decoration: none;">Visit →</a></div>
-                        <div class="item-actions">
-                            <button class="btn btn-danger btn-sm" onclick="deleteSocialLink(${l.id})"><i class="bi bi-trash"></i> Delete</button>
-                        </div>
+                    <div class="item-actions">
+                        <button class="btn btn-danger btn-sm" onclick="deleteVideo(${v.id})"><i class="bi bi-trash"></i> Delete</button>
                     </div>
-                `).join('');
-            } catch (error) {
-                showAlert('Failed to load social links', 'error');
-            }
+                </div>
+            `).join('');
+        } catch (error) {
+            showAlert('Failed to load videos', 'error');
         }
+    }
 
-        async function deleteSocialLink(id) {
-            if (!confirm('Delete this link?')) return;
-            try {
-                const response = await fetch(`${API_URL}/api/admin/delete-social-link/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                if (response.ok) {
-                    showAlert('✅ Link deleted', 'success');
-                    loadSocialLinks();
-                } else {
-                    const data = await response.json();
-                    showAlert(data.error || 'Failed to delete', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to delete', 'error');
+    async function deleteVideo(id) {
+        if (!confirm('Delete this video?')) return;
+        try {
+            const response = await fetch(`${API_URL}/api/admin/delete-video/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            if (response.ok) {
+                showAlert('✅ Video deleted', 'success');
+                loadVideos();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to delete', 'error');
             }
+        } catch (error) {
+            showAlert('Failed to delete', 'error');
         }
+    }
 
-        // ===== VENDOR MANAGEMENT FUNCTIONS =====
-        async function searchUserForVendor(e) {
-            e.preventDefault();
-            const q = document.getElementById('vendorSearchInput').value.trim();
-            try {
-                const res = await fetch(`${API_URL}/api/admin/search-user-for-vendor?q=${encodeURIComponent(q)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const users = await res.json();
-                if (!res.ok) {
-                    document.getElementById('vendorSearchResult').innerHTML = `<div class="item-card"><p>${escapeHtml(users.error || 'Not found')}</p></div>`;
-                    return;
-                }
-                if (users.length === 0) {
-                    document.getElementById('vendorSearchResult').innerHTML = '<div class="item-card"><p>No users found</p></div>';
-                    return;
-                }
-                document.getElementById('vendorSearchResult').innerHTML = users.map(u => `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <span class="item-title">@${escapeHtml(u.username)}</span>
-                            ${u.is_vendor ? '<span class="badge bg-success">Already Vendor</span>' : '<span class="badge bg-light">Regular User</span>'}
-                        </div>
-                        <div class="item-meta">Email: ${escapeHtml(u.email)} | Plan: ${escapeHtml(u.plan)}</div>
-                        <div class="item-actions">
-                            ${u.is_vendor 
-                                ? `<button class="btn btn-danger btn-sm" onclick="removeVendor(${u.id})"><i class="bi bi-x-circle"></i> Remove Vendor</button>`
-                                : `<button class="btn btn-success btn-sm" onclick="makeVendor(${u.id})"><i class="bi bi-check-circle"></i> Make Vendor</button>`}
-                        </div>
+    // FIXED: Merged duplicate headers
+    async function postArticle(e) {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${API_URL}/api/admin/post-article`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({
+                    title: document.getElementById('articleTitle').value,
+                    content: document.getElementById('articleContent').value,
+                    read_time: document.getElementById('readTime').value
+                })
+            });
+            if (response.ok) {
+                showAlert('✅ Article posted!', 'success');
+                e.target.reset();
+                loadArticles();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to post', 'error');
+            }
+        } catch (error) {
+            showAlert('Failed to post article', 'error');
+        }
+    }
+
+    async function loadArticles() {
+        try {
+            const response = await fetch(`${API_URL}/api/admin/articles`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const articles = await response.json();
+            const container = document.getElementById('articlesList');
+            if (!Array.isArray(articles) || articles.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No articles posted</p></div>';
+                return;
+            }
+            container.innerHTML = articles.map(a => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <span class="item-title">${escapeHtml(a.title)}</span>
+                        <span class="badge bg-success">${a.read_count || 0} reads</span>
                     </div>
-                `).join('');
-            } catch (err) {
-                showAlert('Search failed', 'error');
-            }
-        }
-
-        async function makeVendor(userId) {
-            if (!confirm('Make this user a support vendor?')) return;
-            try {
-                const res = await fetch(`${API_URL}/api/admin/make-vendor`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ user_id: userId })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    showAlert(data.message, 'success');
-                    document.getElementById('vendorSearchForm').reset();
-                    document.getElementById('vendorSearchResult').innerHTML = '';
-                    loadVendors();
-                } else {
-                    showAlert(data.error || 'Failed', 'error');
-                }
-            } catch (err) { showAlert('Failed', 'error'); }
-        }
-
-        async function removeVendor(userId) {
-            if (!confirm('Remove vendor status from this user?')) return;
-            try {
-                const res = await fetch(`${API_URL}/api/admin/remove-vendor`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ user_id: userId })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    showAlert(data.message, 'success');
-                    document.getElementById('vendorSearchForm').reset();
-                    document.getElementById('vendorSearchResult').innerHTML = '';
-                    loadVendors();
-                } else {
-                    showAlert(data.error || 'Failed', 'error');
-                }
-            } catch (err) { showAlert('Failed', 'error'); }
-        }
-
-        async function loadVendors() {
-            try {
-                const res = await fetch(`${API_URL}/api/admin/vendors`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const vendors = await res.json();
-                const container = document.getElementById('vendorsList');
-                if (!vendors || vendors.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="bi bi-headset"></i><p>No vendors yet. Search above to add one.</p></div>';
-                    return;
-                }
-                container.innerHTML = vendors.map(v => `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <span class="item-title">@${escapeHtml(v.username)}</span>
-                            <span class="badge ${v.vendor_active ? 'bg-success' : 'bg-warning'}">${v.vendor_active ? 'Active' : 'Inactive'}</span>
-                        </div>
-                        <div class="item-meta">Email: ${escapeHtml(v.email)}</div>
-                        <div class="item-meta">Total Handled: ${v.total_handled || 0} | Active Now: ${v.active_now || 0}</div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-sm" onclick="toggleVendorStatus(${v.id}, ${!v.vendor_active})">
-                                <i class="bi bi-power"></i> ${v.vendor_active ? 'Deactivate' : 'Activate'}
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="removeVendor(${v.id})">
-                                <i class="bi bi-x-circle"></i> Remove Vendor
-                            </button>
-                        </div>
+                    <div class="item-actions">
+                        <button class="btn btn-danger btn-sm" onclick="deleteArticle(${a.id})"><i class="bi bi-trash"></i> Delete</button>
                     </div>
-                `).join('');
-            } catch (err) { showAlert('Failed to load vendors', 'error'); }
+                </div>
+            `).join('');
+        } catch (error) {
+            showAlert('Failed to load articles', 'error');
         }
+    }
 
-        async function toggleVendorStatus(userId, active) {
-            try {
-                const res = await fetch(`${API_URL}/api/admin/toggle-vendor-status`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ user_id: userId, active })
-                });
-                if (res.ok) {
-                    showAlert(`Vendor ${active ? 'activated' : 'deactivated'}`, 'success');
-                    loadVendors();
-                }
-            } catch (err) { showAlert('Failed', 'error'); }
-        }
-
-        async function logout() {
-            try {
-                await fetch(`${API_URL}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-            } catch (error) {
-                console.warn("Logout network error");
-            } finally {
-                window.location.href = 'login.html';
+    async function deleteArticle(id) {
+        if (!confirm('Delete this article?')) return;
+        try {
+            const response = await fetch(`${API_URL}/api/admin/delete-article/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            if (response.ok) {
+                showAlert('✅ Article deleted', 'success');
+                loadArticles();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to delete', 'error');
             }
+        } catch (error) {
+            showAlert('Failed to delete', 'error');
         }
+    }
 
-        function showAlert(message, type) {
-            const container = document.getElementById('alertContainer');
-            container.innerHTML = '';
-            const div = document.createElement('div');
-            div.className = `alert alert-${type}`;
-            div.textContent = message;
-            container.appendChild(div);
-            setTimeout(() => div.remove(), 5000);
+    // FIXED: Merged duplicate headers
+    async function addSocialLink(e) {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${API_URL}/api/admin/add-social-link`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({
+                    platform: document.getElementById('socialPlatform').value,
+                    url: document.getElementById('socialUrl').value
+                })
+            });
+            if (response.ok) {
+                showAlert('✅ Link added!', 'success');
+                e.target.reset();
+                loadSocialLinks();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to add', 'error');
+            }
+        } catch (error) {
+            showAlert('Failed to add link', 'error');
         }
+    }
 
-        checkAuth();
-    </script>
+    async function loadSocialLinks() {
+        try {
+            const response = await fetch(`${API_URL}/api/admin/social-links-stats`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const links = await response.json();
+            const container = document.getElementById('socialLinksList');
+            if (!Array.isArray(links) || links.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No social links</p></div>';
+                return;
+            }
+            container.innerHTML = links.map(l => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <span class="item-title"><i class="${escapeHtml(l.icon_class)}"></i> ${escapeHtml(l.platform)}</span>
+                    </div>
+                    <div class="item-meta"><a href="${escapeHtml(l.url)}" target="_blank" style="color: #d32f2f; text-decoration: none;">Visit →</a></div>
+                    <div class="item-actions">
+                        <button class="btn btn-danger btn-sm" onclick="deleteSocialLink(${l.id})"><i class="bi bi-trash"></i> Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (error) {
+            showAlert('Failed to load social links', 'error');
+        }
+    }
+
+    async function deleteSocialLink(id) {
+        if (!confirm('Delete this link?')) return;
+        try {
+            const response = await fetch(`${API_URL}/api/admin/delete-social-link/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            if (response.ok) {
+                showAlert('✅ Link deleted', 'success');
+                loadSocialLinks();
+            } else {
+                const data = await response.json();
+                showAlert(data.error || 'Failed to delete', 'error');
+            }
+        } catch (error) {
+            showAlert('Failed to delete', 'error');
+        }
+    }
+
+    // ===== VENDOR MANAGEMENT FUNCTIONS =====
+    async function searchUserForVendor(e) {
+        e.preventDefault();
+        const q = document.getElementById('vendorSearchInput').value.trim();
+        try {
+            const res = await fetch(`${API_URL}/api/admin/search-user-for-vendor?q=${encodeURIComponent(q)}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const users = await res.json();
+            if (!res.ok) {
+                document.getElementById('vendorSearchResult').innerHTML = `<div class="item-card"><p>${escapeHtml(users.error || 'Not found')}</p></div>`;
+                return;
+            }
+            if (!Array.isArray(users) || users.length === 0) {
+                document.getElementById('vendorSearchResult').innerHTML = '<div class="item-card"><p>No users found</p></div>';
+                return;
+            }
+            document.getElementById('vendorSearchResult').innerHTML = users.map(u => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <span class="item-title">@${escapeHtml(u.username)}</span>
+                        ${u.is_vendor ? '<span class="badge bg-success">Already Vendor</span>' : '<span class="badge bg-light">Regular User</span>'}
+                    </div>
+                    <div class="item-meta">Email: ${escapeHtml(u.email)} | Plan: ${escapeHtml(u.plan)}</div>
+                    <div class="item-actions">
+                        ${u.is_vendor 
+                            ? `<button class="btn btn-danger btn-sm" onclick="removeVendor(${u.id})"><i class="bi bi-x-circle"></i> Remove Vendor</button>`
+                            : `<button class="btn btn-success btn-sm" onclick="makeVendor(${u.id})"><i class="bi bi-check-circle"></i> Make Vendor</button>`}
+                    </div>
+                </div>
+            `).join('');
+        } catch (err) {
+            showAlert('Search failed', 'error');
+        }
+    }
+
+    // FIXED: Merged duplicate headers
+    async function makeVendor(userId) {
+        if (!confirm('Make this user a support vendor?')) return;
+        try {
+            const res = await fetch(`${API_URL}/api/admin/make-vendor`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({ user_id: userId })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showAlert(data.message, 'success');
+                document.getElementById('vendorSearchForm').reset();
+                document.getElementById('vendorSearchResult').innerHTML = '';
+                loadVendors();
+            } else {
+                showAlert(data.error || 'Failed', 'error');
+            }
+        } catch (err) { showAlert('Failed', 'error'); }
+    }
+
+    // FIXED: Merged duplicate headers
+    async function removeVendor(userId) {
+        if (!confirm('Remove vendor status from this user?')) return;
+        try {
+            const res = await fetch(`${API_URL}/api/admin/remove-vendor`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({ user_id: userId })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showAlert(data.message, 'success');
+                document.getElementById('vendorSearchForm').reset();
+                document.getElementById('vendorSearchResult').innerHTML = '';
+                loadVendors();
+            } else {
+                showAlert(data.error || 'Failed', 'error');
+            }
+        } catch (err) { showAlert('Failed', 'error'); }
+    }
+
+    async function loadVendors() {
+        try {
+            const res = await fetch(`${API_URL}/api/admin/vendors`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            const vendors = await res.json();
+            const container = document.getElementById('vendorsList');
+            if (!Array.isArray(vendors) || vendors.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="bi bi-headset"></i><p>No vendors yet. Search above to add one.</p></div>';
+                return;
+            }
+            container.innerHTML = vendors.map(v => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <span class="item-title">@${escapeHtml(v.username)}</span>
+                        <span class="badge ${v.vendor_active ? 'bg-success' : 'bg-warning'}">${v.vendor_active ? 'Active' : 'Inactive'}</span>
+                    </div>
+                    <div class="item-meta">Email: ${escapeHtml(v.email)}</div>
+                    <div class="item-meta">Total Handled: ${v.total_handled || 0} | Active Now: ${v.active_now || 0}</div>
+                    <div class="item-actions">
+                        <button class="btn btn-primary btn-sm" onclick="toggleVendorStatus(${v.id}, ${!v.vendor_active})">
+                            <i class="bi bi-power"></i> ${v.vendor_active ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="removeVendor(${v.id})">
+                            <i class="bi bi-x-circle"></i> Remove Vendor
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (err) { showAlert('Failed to load vendors', 'error'); }
+    }
+
+    // FIXED: Merged duplicate headers
+    async function toggleVendorStatus(userId, active) {
+        try {
+            const res = await fetch(`${API_URL}/api/admin/toggle-vendor-status`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({ user_id: userId, active })
+            });
+            if (res.ok) {
+                showAlert(`Vendor ${active ? 'activated' : 'deactivated'}`, 'success');
+                loadVendors();
+            }
+        } catch (err) { showAlert('Failed', 'error'); }
+    }
+
+    async function logout() {
+        try {
+            await fetch(`${API_URL}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+        } catch (error) {
+            console.warn("Logout network error");
+        } finally {
+            window.location.href = 'login.html';
+        }
+    }
+
+    function showAlert(message, type) {
+        const container = document.getElementById('alertContainer');
+        container.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = `alert alert-${type}`;
+        div.textContent = message;
+        container.appendChild(div);
+        setTimeout(() => div.remove(), 5000);
+    }
+
+    checkAuth();
+</script>
 </body>
 </html>
