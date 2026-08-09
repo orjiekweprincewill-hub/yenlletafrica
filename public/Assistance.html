@@ -962,7 +962,7 @@
                             <select id="couponPlan" class="form-control">
                                 <option value="YENLITE">YENLITE</option>
                                 <option value="YENPRO">YENPRO</option>
-                                <option value="YENVITE">YENVITE</option>
+                            
                             </select>
                         </div>
                         <div class="form-group">
@@ -1287,68 +1287,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- SETTINGS TAB -->
-            <div id="tab-settings" class="tab-content hidden">
-                <div class="card" style="max-width: 700px; margin:0 auto;">
-                    <div class="card-header">
-                        <h3><i class="bi bi-gear"></i> Withdrawal Settings</h3>
-                        <span id="role-badge" class="badge badge-lite">Loading...</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <h4>Activity Withdrawals</h4>
-                                <p>Allow users to withdraw from activity wallet</p>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="toggle-activity" onchange="toggleWithdrawal('activity', this.checked)">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <h4>Referral Withdrawals</h4>
-                                <p>Allow users to withdraw from referral wallet</p>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="toggle-referral" onchange="toggleWithdrawal('referral', this.checked)">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <h4>TikTok Withdrawals</h4>
-                                <p>Allow users to withdraw from TikTok wallet</p>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="toggle-tiktok" onchange="toggleWithdrawal('tiktok', this.checked)">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="setting-row" style="border-top:2px solid var(--border); margin-top:8px; padding-top:24px;">
-                            <div class="setting-info">
-                                <h4>Active Country</h4>
-                                <p>Set the country allowed for withdrawals (NG, GH, CM)</p>
-                            </div>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <span id="current-country" style="font-weight:700; font-size:14px;">—</span>
-                                <select id="countrySelect" class="form-control" style="width:120px; margin:0;">
-                                    <option value="NG">NG</option>
-                                    <option value="GH">GH</option>
-                                    <option value="CM">CM</option>
-                                </select>
-                                <button class="btn btn-primary btn-sm" onclick="updateCountry()">Update</button>
-                            </div>
-                        </div>
-                        <div id="settings-error" class="hidden" style="margin-top:16px; padding:12px; background:#fef2f2; border-radius:8px; color:var(--primary); font-size:13px; font-weight:600;">
-                            <i class="bi bi-exclamation-triangle-fill"></i> <span id="settings-error-msg"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
 
     <div class="toast-container" id="toasts"></div>
 

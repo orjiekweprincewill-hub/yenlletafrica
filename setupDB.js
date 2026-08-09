@@ -1,21 +1,21 @@
 const { Pool } = require('pg');
 const crypto = require('crypto');
 require('dotenv').config();
-
-// ============================================================
-// 🔌 POOL CONFIGURATION (Updated for Neon)
-// ============================================================
+// ============================================================ // 🔌 POOL CONFIGURATION (Updated for Neon Serverless) // ============================================================
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: true }, // REQUIRED FOR NEON!
-    max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 30000,
-    keepAlive: true
+  connectionString: process.env.DATABASE_URL,
+  // Automatically relaxes SSL checks on Vercel or deployment builds to prevent connection drops
+  ssl: process.env.VERCEL 
+    ? { rejectUnauthorized: false } 
+    : { rejectUnauthorized: true },
+  max: process.env.VERCEL ? 4 : 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 30000,
+  keepAlive: !process.env.VERCEL
 });
 
 pool.on('error', (err) => {
-    console.error('Unexpected database pool idle exception:', err.message);
+  console.error('Unexpected database pool idle exception:', err.message);
 });
 
 // ============================================================

@@ -48,23 +48,26 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-
-// ============================================================
-// 🗄️ DATABASE
-// ============================================================
+// ============================================================ // 🗄️ DATABASE // ============================================================
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: true }, // REQUIRED FOR NEON!
-    max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 30000, 
-    keepAlive: true
+  connectionString: process.env.DATABASE_URL,
+  // Bypasses isolated root certificate errors on Vercel while keeping it strict locally
+  ssl: process.env.VERCEL 
+    ? { rejectUnauthorized: false } 
+    : { rejectUnauthorized: true }, 
+  // Prevents serverless bursts from overloading Neon's connection limits
+  max: process.env.VERCEL ? 4 : 20, 
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 30000,
+  keepAlive: !process.env.VERCEL // Keepalive should be off in serverless runtime environments
 });
+
+// Run verification tests only when working on your local machine
 if (!process.env.VERCEL) {
-    pool.query('SELECT NOW()', (err) => {
-        if (err) console.error('❌ Database connection error:', err.message);
-        else console.log(`✅ Connected to Neon Database successfully!`);
-    });
+  pool.query('SELECT NOW()', (err) => {
+    if (err) console.error('❌ Database connection error:', err.message);
+    else console.log(`✅ Connected to Neon Database successfully!`);
+  });
 }
 
 // ============================================================
