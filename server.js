@@ -218,6 +218,9 @@ const isAdmin = (req, res, next) => {
     if (req.user && (req.user.role === 'superadmin' || req.user.role === 'assistant')) return next();
     res.status(403).json({ error: 'Admin access required' });
 };
+    if (req.user && (req.user.role === 'superadmin' || req.user.role === 'assistant')) return next();
+    res.status(403).json({ error: 'Admin access required' });
+};
 
 async function createNotification(userId, message) {
     try {
