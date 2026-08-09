@@ -108,11 +108,13 @@
             loginBtn.textContent = 'Authenticating...';
             
             try {
-                // FIXED: Using relative path '/api/login' so it works perfectly on Vercel
+                // Using relative path '/api/login' so it works perfectly on Vercel
                 const response = await fetch('/api/login', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 
+                        'Content-Type': 'application/json'
+                        // We do NOT send the Authorization token here because the user is trying to log in
+                    },
                     body: JSON.stringify({ username, password })
                 });
                 
