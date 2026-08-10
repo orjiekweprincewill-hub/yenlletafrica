@@ -229,6 +229,7 @@ const isAdmin = async (req, res, next) => {
             return res.status(403).json({ error: 'Admin access required (No token user)' });
         }
         
+        // Check the database DIRECTLY for the user's role
         const result = await pool.query('SELECT role, is_admin FROM users WHERE id = $1', [req.user.user_id]);
         
         if (result.rows.length > 0) {
@@ -1667,7 +1668,7 @@ app.post('/api/admin/credit-wallet', isAdmin, async (req, res) => {
         if (userResult.rows.length === 0) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'User not found' }); }
         await client.query(`UPDATE users SET ${column} = ${column} + $1 WHERE id = $2`, [amount, user_id]);
         await client.query('COMMIT');
-        await addActivityFeed(user_id, 'Admin Credit', amount, reason || `Credited by admin to ${wallet_type}``);
+        await addActivityFeed(user_id, 'Admin Credit', amount, reason || `Credited by admin to ${wallet_type}`);
         await createNotification(user_id, `💰 Admin credited ¥${amount.toLocaleString()} to your ${wallet_type} wallet.`);
         res.json({ success: true, message: `Credited ¥${amount} to ${wallet_type} wallet` });
     } catch (err) { if (client) await client.query('ROLLBACK'); console.error('Credit wallet error:', err); res.status(500).json({ error: 'Failed to credit wallet' }); }
@@ -1689,7 +1690,7 @@ app.post('/api/admin/debit-wallet', isAdmin, async (req, res) => {
         if (balance < amount) { await client.query('ROLLBACK'); return res.status(400).json({ error: `Insufficient balance. Available: ¥${balance}` }); }
         await client.query(`UPDATE users SET ${column} = ${column} - $1 WHERE id = $2`, [amount, user_id]);
         await client.query('COMMIT');
-        await addActivityFeed(user_id, 'Admin Debit', amount, reason || `Debited by admin from ${wallet_type}``);
+        await addActivityFeed(user_id, 'Admin Debit', amount, reason || `Debited by admin from ${wallet_type}`);
         await createNotification(user_id, `⚠️ Admin debited ¥${amount.toLocaleString()} from your ${wallet_type} wallet.`);
         res.json({ success: true, message: `Debited ¥${amount} from ${wallet_type} wallet` });
     } catch (err) { if (client) await client.query('ROLLBACK'); console.error('Debit wallet error:', err); res.status(500).json({ error: 'Failed to debit wallet' }); }
@@ -2032,7 +2033,7 @@ app.post('/api/assistant/credit-wallet', isAdmin, async (req, res) => {
         if (userResult.rows.length === 0) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'User not found' }); }
         await client.query(`UPDATE users SET ${column} = ${column} + $1 WHERE id = $2`, [amount, user_id]);
         await client.query('COMMIT');
-        await addActivityFeed(user_id, 'Admin Credit', amount, reason || `Credited by assistant to ${wallet_type}``);
+        await addActivityFeed(user_id, 'Admin Credit', amount, reason || `Credited by assistant to ${wallet_type}`);
         await createNotification(user_id, `💰 Assistant credited ¥${amount.toLocaleString()} to your ${wallet_type} wallet.`);
         res.json({ success: true, message: `Credited ¥${amount} to ${wallet_type} wallet` });
     } catch (err) { if (client) await client.query('ROLLBACK'); console.error('Assistant credit wallet error:', err); res.status(500).json({ error: 'Failed to credit wallet' }); }
@@ -2054,7 +2055,7 @@ app.post('/api/assistant/debit-wallet', isAdmin, async (req, res) => {
         if (balance < amount) { await client.query('ROLLBACK'); return res.status(400).json({ error: `Insufficient balance. Available: ¥${balance}` }); }
         await client.query(`UPDATE users SET ${column} = ${column} - $1 WHERE id = $2`, [amount, user_id]);
         await client.query('COMMIT');
-        await addActivityFeed(user_id, 'Admin Debit', amount, reason || `Debited by assistant from ${wallet_type}``);
+        await addActivityFeed(user_id, 'Admin Debit', amount, reason || `Debited by assistant from ${wallet_type}`);
         await createNotification(user_id, `⚠️ Assistant debited ¥${amount.toLocaleString()} from your ${wallet_type} wallet.`);
         res.json({ success: true, message: `Debited ¥${amount} from ${wallet_type} wallet` });
     } catch (err) { if (client) await client.query('ROLLBACK'); console.error('Assistant debit wallet error:', err); res.status(500).json({ error: 'Failed to debit wallet' }); }
