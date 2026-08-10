@@ -226,15 +226,31 @@ function isAuthenticated(req, res, next) {
         return res.status(403).json({ error: 'Invalid or expired token' });
     }
 }
-
-const isAdmin = (req, res, next) => {
-    if (req.user && (req.user.role === 'superadmin' || req.user.role === 'assistant')) {
-        return next();
+const isAdmin = async (req, res, next) => {
+    try {
+        if (!req.user || !req.user.user_id) {
+            return res.status(403).json({ error: 'Admin access required (No token user)' });
+        }
+        
+        // Check the database DIRECTLY for the user's role
+        const result = await pool.query('SELECT role, is_admin FROM users WHERE id = $1', [req.user.user_id]);
+        
+        if (result.rows.length > 0) {
+            const dbUser = result.rows[0];
+            // If the database says you are superadmin or assistant, let you in!
+            if (dbUser.is_admin && (dbUser.role === 'superadmin' || dbUser.role === 'assistant')) {
+                req.user.role = dbUser.role; // Update the request with the DB role
+                return next();
+            }
+        }
+        
+        console.warn(`Access Denied: User ID '${req.user.user_id}' is not an admin in the database.`);
+        return res.status(403).json({ error: 'Admin access required' });
+    } catch (err) {
+        console.error('Admin check database error:', err.message);
+        return res.status(500).json({ error: 'Server error during admin check' });
     }
-    console.warn(`Access Denied: User role '${req.user ? req.user.role : 'Unknown'}' is not an admin.`);
-    res.status(403).json({ error: 'Admin access required' });
 };
-
 async function createNotification(userId, message) {
     try {
         if (!userId) return;
