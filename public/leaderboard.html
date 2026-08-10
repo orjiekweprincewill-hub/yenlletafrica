@@ -227,7 +227,6 @@
             .user-name { font-size: 0.9rem; }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
     <!-- Header -->
@@ -243,8 +242,8 @@
                 <li><a href="index.html#about">About</a></li>
                 <li><a href="leaderboard.html">Leaderboard</a></li>
                 <li><a href="vendor.html">Vendor</a></li>
-            <li><a href="coupon-checker.html">Coupon Checker</a></li>
-                <li><a href="#" class="btn-login">Login</a></li>
+                <li><a href="coupon-checker.html">Coupon Checker</a></li>
+                <li><a href="login.html" class="btn-login">Login</a></li>
             </ul>
             <div class="menu-toggle" onclick="toggleMenu()">
                 <span></span><span></span><span></span>
@@ -262,7 +261,7 @@
             <li><a href="leaderboard.html">Leaderboard</a></li>
             <li><a href="vendor.html">Vendor</a></li>
             <li><a href="coupon-checker.html">Coupon Checker</a></li>
-            <li><a href="#" class="btn-login">Login</a></li>
+            <li><a href="login.html" class="btn-login">Login</a></li>
         </ul>
     </div>
 
@@ -293,6 +292,9 @@
     </section>
 
     <script>
+        // MUST use your Render backend URL here
+        const API_URL = 'https://yenlletafrica.onrender.com';
+
         // Mobile menu toggle
         function toggleMenu() {
             document.querySelector('.menu-toggle').classList.toggle('active');
@@ -309,13 +311,15 @@
 
         // Get initials from username
         function getInitials(username) {
+            if (!username) return '?';
             return username.split(/[\s._]+/).map(n => n[0]).join('').toUpperCase().slice(0, 2);
         }
 
         // Get avatar URL (use profile picture if available, otherwise initials)
         function getAvatar(user, index) {
             if (user.profile_picture) {
-                return `<img src="/uploads/${user.profile_picture}" alt="${user.username}" onerror="this.parentElement.innerHTML='${getInitials(user.username)}'">`;
+                // FIX: user.profile_picture is already a full Cloudinary URL
+                return `<img src="${user.profile_picture}" alt="${escapeHtml(user.username)}" onerror="this.parentElement.innerHTML='${getInitials(user.username)}'">`;
             }
             return getInitials(user.username);
         }
@@ -346,7 +350,8 @@
         async function loadLeaderboard() {
             const body = document.getElementById('leaderboardBody');
             try {
-                const response = await fetch('/api/leaderboard');
+                // FIX: Fetching from the Render backend
+                const response = await fetch(`${API_URL}/api/leaderboard`);
                 if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 
                 const data = await response.json();
