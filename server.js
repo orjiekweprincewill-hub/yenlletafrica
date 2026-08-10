@@ -208,40 +208,7 @@ function verifyToken(token) {
     }
 }
 
-const isAdmin = async (req, res, next) => {
-    try {
-        // 1. Check the token first (Combined isAuthenticated)
-        const authHeader = req.headers['authorization'];
-        if (!authHeader) return res.status(401).json({ error: 'Authentication required' });
 
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-        if (!token || token === 'null' || token === 'undefined') return res.status(401).json({ error: 'Invalid token format' });
-
-        const decoded = verifyToken(token);
-        if (!decoded || !decoded.user_id) {
-            return res.status(403).json({ error: 'Invalid or expired token' });
-        }
-        
-        req.user = decoded;
-
-        // 2. Check the database for the admin role
-        const result = await pool.query('SELECT role, is_admin FROM users WHERE id = $1', [req.user.user_id]);
-        
-        if (result.rows.length > 0) {
-            const dbUser = result.rows[0];
-            if (dbUser.is_admin && (dbUser.role === 'superadmin' || dbUser.role === 'assistant')) {
-                req.user.role = dbUser.role; // Force DB role
-                return next();
-            }
-        }
-        
-        console.warn(`Access Denied: User ID '${req.user.user_id}' is not an admin in the database.`);
-        return res.status(403).json({ error: 'Admin access required' });
-    } catch (err) {
-        console.error('Admin check database error:', err.message);
-        return res.status(500).json({ error: 'Server error during admin check' });
-    }
-};
 
 async function createNotification(userId, message) {
     try {
