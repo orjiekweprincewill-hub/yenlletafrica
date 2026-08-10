@@ -359,7 +359,8 @@
     </div>
 
    <script>
-  const API_URL = 'https://yenlletafrica.onrender.com';
+    // CHANGE THIS IF YOUR FRONTEND IS ON VERCEL BUT BACKEND IS ON RENDER!
+    const API_URL = ''; 
     let currentPendingWithdrawals = [];
     let currentSettings = {};
 
@@ -381,11 +382,16 @@
             if (!response.ok) { window.location.href = 'login.html'; return; }
             const session = await response.json();
 
+            // FIX: Check the role string directly to prevent redirect loops
+            if (session.role !== 'superadmin' && session.role !== 'assistant') {
+                window.location.href = 'dashboard.html'; 
+                return; 
+            }
+
             if (session.role === 'assistant') {
                 window.location.href = 'Assistance.html';
                 return;
             }
-            if (!session.is_admin) { window.location.href = 'dashboard.html'; return; }
 
             loadStats();
             loadCountryStats();
@@ -494,7 +500,6 @@
             const response = await fetch(`${API_URL}/api/admin/withdrawal-requests`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             const withdrawals = await response.json();
 
-            // FIXED: Ensure it's an array to prevent "forEach is not a function"
             currentPendingWithdrawals = Array.isArray(withdrawals) ? withdrawals : [];
             updateSummaryCard();
 
@@ -645,7 +650,6 @@
             });
     }
 
-    // FIXED: Merged duplicate headers
     async function updateActiveCountry() {
         const country = document.getElementById('activeCountrySelect').value;
         const displayCountry = COUNTRY_MAP[country] || country;
@@ -670,7 +674,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function toggleWithdrawal(type) {
         const toggleEl = document.getElementById(`${type}Toggle`);
         const statusEl = document.getElementById(`${type}Status`);
@@ -719,7 +722,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function rejectWithdrawal(id) {
         const reason = prompt('Reason for rejection:');
         if (reason === null) return;
@@ -771,7 +773,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function rejectAllWithdrawals() {
         if (currentPendingWithdrawals.length === 0) {
             showAlert('❌ No pending withdrawals', 'error');
@@ -844,7 +845,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function addTiktokBonusToUser(e, userId) {
         e.preventDefault();
         const amount = parseFloat(document.getElementById('bonusAmountInput').value);
@@ -901,7 +901,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function generateCoupon(e) {
         e.preventDefault();
         const plan = document.getElementById('planSelect').value;
@@ -971,7 +970,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function postTask(e) {
         e.preventDefault();
         try {
@@ -1041,7 +1039,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function postVideo(e) {
         e.preventDefault();
         try {
@@ -1110,7 +1107,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function postArticle(e) {
         e.preventDefault();
         try {
@@ -1180,7 +1176,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function addSocialLink(e) {
         e.preventDefault();
         try {
@@ -1249,7 +1244,6 @@
         }
     }
 
-    // ===== VENDOR MANAGEMENT FUNCTIONS =====
     async function searchUserForVendor(e) {
         e.preventDefault();
         const q = document.getElementById('vendorSearchInput').value.trim();
@@ -1283,7 +1277,6 @@
         }
     }
 
-    // FIXED: Merged duplicate headers
     async function makeVendor(userId) {
         if (!confirm('Make this user a support vendor?')) return;
         try {
@@ -1307,7 +1300,6 @@
         } catch (err) { showAlert('Failed', 'error'); }
     }
 
-    // FIXED: Merged duplicate headers
     async function removeVendor(userId) {
         if (!confirm('Remove vendor status from this user?')) return;
         try {
@@ -1361,7 +1353,6 @@
         } catch (err) { showAlert('Failed to load vendors', 'error'); }
     }
 
-    // FIXED: Merged duplicate headers
     async function toggleVendorStatus(userId, active) {
         try {
             const res = await fetch(`${API_URL}/api/admin/toggle-vendor-status`, {
