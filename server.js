@@ -207,79 +207,9 @@ function verifyToken(token) {
         return null;
     }
 }
-
 // ============================================================
 // 🛡️ AUTHENTICATION MIDDLEWARE
 // ============================================================
-
-// Middleware 1: Check if user is authenticated (any logged-in user)
-const isAuthenticated = async (req, res, next) => {
-    try {
-        const authHeader = req.headers['authorization'];
-        if (!authHeader) return res.status(401).json({ error: 'Authentication required' });
-
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-        if (!token || token === 'null' || token === 'undefined') {
-            return res.status(401).json({ error: 'Invalid token format' });
-        }
-
-        const decoded = verifyToken(token);
-        if (!decoded || !decoded.user_id) {
-            return res.status(403).json({ error: 'Invalid or expired token' });
-        }
-
-        req.user = decoded;
-        next();
-    } catch (err) {
-        console.error('Authentication error:', err.message);
-        return res.status(500).json({ error: 'Server error during authentication' });
-    }
-};
-
-// Middleware 2: Check if user is admin (FIXED VERSION)
-const isAdmin = async (req, res, next) => {
-    try {
-        const authHeader = req.headers['authorization'];
-        if (!authHeader) return res.status(401).json({ error: 'Authentication required' });
-
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-        if (!token || token === 'null' || token === 'undefined') {
-            return res.status(401).json({ error: 'Invalid token format' });
-        }
-
-        const decoded = verifyToken(token);
-        if (!decoded || !decoded.user_id) {
-            return res.status(403).json({ error: 'Invalid or expired token' });
-        }
-
-        req.user = decoded;
-
-        // Check the database for the admin role
-        const result = await pool.query(
-            'SELECT role FROM users WHERE id = $1',
-            [req.user.user_id]
-        );
-
-        if (result.rows.length === 0) {
-            console.warn(`Access Denied: User ID '${req.user.user_id}' not found in database`);
-            return res.status(403).json({ error: 'User not found' });
-        }
-
-        const dbUser = result.rows[0];
-        
-        // FIX: Only check role, not is_admin flag
-        if (dbUser.role === 'superadmin' || dbUser.role === 'assistant') {
-            req.user.role = dbUser.role;
-            return next();
-        }
-
-        console.warn(`Access Denied: User ID '${req.user.user_id}' (role: ${dbUser.role}) is not an admin`);
-        return res.status(403).json({ error: 'Admin access required' });
-    } catch (err) {
-        console.error('Admin check error:', err.message);
-        return res.status(500).json({ error: 'Server error during authorization check' });
-    }
-};
 
 // Middleware 1: Check if user is authenticated (any logged-in user)
 const isAuthenticated = async (req, res, next) => {
