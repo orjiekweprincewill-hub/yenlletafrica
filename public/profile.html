@@ -744,7 +744,7 @@
             <span>YenlletAfrica</span>
         </a>
         <div class="header-profile">
-            <img src="/uploads/default-avatar.png" alt="Profile" class="profile-pic-small" id="profilePicSmall">
+            <img src="https://via.placeholder.com/150/0d47a1/ffffff?text=User" alt="Profile" class="profile-pic-small" id="profilePicSmall">
             <div class="username-header" id="usernameDisplay">Loading...</div>
         </div>
     </div>
@@ -893,7 +893,8 @@
 
                 if (userData.profile_picture) {
                     const cacheBuster = new Date().getTime();
-                    const picUrl = `${API_URL}/uploads/${userData.profile_picture}?t=${cacheBuster}`;
+                    // FIX: userData.profile_picture is already a full Cloudinary URL
+                    const picUrl = `${userData.profile_picture}?t=${cacheBuster}`;
                     const smallPic = document.getElementById('profilePicSmall');
                     const largePic = document.getElementById('profilePicLarge');
                     if (smallPic) smallPic.src = picUrl;
