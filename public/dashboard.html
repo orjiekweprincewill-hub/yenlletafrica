@@ -205,7 +205,7 @@
         <div class="overlay-content">
             <ul class="menu-list">
                 <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
-                <li><a href="transfer.html"><i class="bi bi-transfer"></i> Transfer</a></li>
+                <li><a href="transfer.html"><i class="bi bi-arrow-left-right"></i> Transfer</a></li>
                 <li><a href="tiktok.html"><i class="bi bi-tiktok"></i> Tiktok</a></li>
                 <li><a href="whatsapp.html"><i class="bi bi-whatsapp"></i> Whatsapp</a></li>
                 <li><a href="task.html"><i class="bi bi-check-circle-fill"></i> Tasks</a></li>
@@ -549,7 +549,7 @@ if (profilePic && data.profile_picture) {
             if (data.account_number) { safeSetText('accountNumber', data.account_number); }
             if (data.bank_name) { safeSetText('bankName', data.bank_name); }
 
-            const referralLink = `${window.location.origin}/register.html?ref=${encodeURIComponent(data.username || '')}`;
+            const referralLink = `https://yenlletafrica.vercel.app/register.html?ref=${encodeURIComponent(data.username || '')}`;
             const linkInput = document.getElementById('referralLink');
             if (linkInput) linkInput.value = referralLink;
 
