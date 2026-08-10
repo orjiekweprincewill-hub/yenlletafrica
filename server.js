@@ -8,7 +8,7 @@ const multer = require('multer');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cloudinary = require('cloudinary').v2;
-const jwt = require('jsonwebtoken'); // ADDED JWT
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -48,21 +48,21 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-// ============================================================ // 🗄️ DATABASE // ============================================================
+
+// ============================================================
+// 🗄️ DATABASE
+// ============================================================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Bypasses isolated root certificate errors on Vercel while keeping it strict locally
   ssl: process.env.VERCEL 
     ? { rejectUnauthorized: false } 
     : { rejectUnauthorized: true }, 
-  // Prevents serverless bursts from overloading Neon's connection limits
   max: process.env.VERCEL ? 4 : 20, 
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 30000,
-  keepAlive: !process.env.VERCEL // Keepalive should be off in serverless runtime environments
+  keepAlive: !process.env.VERCEL
 });
 
-// Run verification tests only when working on your local machine
 if (!process.env.VERCEL) {
   pool.query('SELECT NOW()', (err) => {
     if (err) console.error('❌ Database connection error:', err.message);
@@ -139,7 +139,6 @@ const chatUpload = multer({
     }
 });
 
-// Helper to upload buffer to Cloudinary
 const uploadToCloudinary = (buffer, folder, resource_type = 'image') => {
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -194,7 +193,7 @@ app.use((req, res, next) => {
 });
 
 // ============================================================
-// 🔧 UTILITIES & JWT AUTH MIDDLEWARE
+// 🔧 UTILITIES & JWT AUTH MIDDLEWARE (FIXED)
 // ============================================================
 function hashPassword(password) {
     return crypto.createHash('sha256').update(password).digest('hex');
@@ -206,10 +205,18 @@ function hashPin(pin) {
 
 function isAuthenticated(req, res, next) {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
-    if (!token) {
+    
+    if (!authHeader) {
+        console.error("Auth Error: No Authorization header provided");
         return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+    // Prevents "Bearer null" or "Bearer undefined" strings from passing
+    if (!token || token === 'null' || token === 'undefined') {
+        console.error("Auth Error: Token is missing or invalid format");
+        return res.status(401).json({ error: 'Invalid token format' });
     }
 
     try {
@@ -217,6 +224,7 @@ function isAuthenticated(req, res, next) {
         req.user = decoded; // { user_id, username, role }
         next();
     } catch (err) {
+        console.error("Auth Error: Token verification failed -", err.message);
         return res.status(403).json({ error: 'Invalid or expired token' });
     }
 }
@@ -225,6 +233,7 @@ const isAdmin = (req, res, next) => {
     if (req.user && (req.user.role === 'superadmin' || req.user.role === 'assistant')) {
         return next();
     }
+    console.warn(`Access Denied: User role '${req.user ? req.user.role : 'Unknown'}' is not an admin.`);
     res.status(403).json({ error: 'Admin access required' });
 };
 
@@ -272,7 +281,7 @@ app.post('/api/upload-chat-file', isAuthenticated, chatUpload.single('file'), as
 
 app.post('/api/send-message', isAuthenticated, async (req, res) => {
     const { receiver_id, message, message_type, file_url, file_name, duration } = req.body;
-    const sender_id = req.user.user_id; // Changed from req.session
+    const sender_id = req.user.user_id; 
     if (!receiver_id) return res.status(400).json({ error: 'Receiver required' });
 
     const validTypes = ['text', 'image', 'voice', 'sticker'];
@@ -291,7 +300,7 @@ app.post('/api/send-message', isAuthenticated, async (req, res) => {
 });
 
 app.get('/api/chat-messages/:partnerId', isAuthenticated, async (req, res) => {
-    const userId = req.user.user_id; // Changed from req.session
+    const userId = req.user.user_id; 
     const partnerId = parseInt(req.params.partnerId);
     if (isNaN(partnerId)) return res.status(400).json({ error: 'Invalid partner ID' });
 
@@ -494,7 +503,6 @@ app.post('/api/register', authLimiter, async (req, res) => {
         }
         await client.query('COMMIT');
 
-        // Generate JWT
         const token = jwt.sign({ user_id: userId, username: username.trim(), role: 'user' }, JWT_SECRET, { expiresIn: '7d' });
 
         res.status(201).json({ success: true, token, message: 'Registration successful!', redirect: '/dashboard.html' });
@@ -517,7 +525,6 @@ app.post('/api/login', authLimiter, async (req, res) => {
         if (!user) return res.status(401).json({ error: 'Invalid username or password' });
         if (user.is_banned) return res.status(403).json({ error: 'Your account has been banned' });
         
-        // Generate JWT
         const token = jwt.sign(
             { user_id: user.id, username: user.username, role: user.role || 'user' },
             JWT_SECRET,
@@ -533,12 +540,10 @@ app.post('/api/login', authLimiter, async (req, res) => {
 });
 
 app.get('/api/check-session', isAuthenticated, (req, res) => {
-    // Verify token is valid and return user data
     res.json({ user_id: req.user.user_id, username: req.user.username, role: req.user.role, is_admin: (req.user.role === 'superadmin' || req.user.role === 'assistant'), authenticated: true });
 });
 
 app.post('/api/logout', (req, res) => {
-    // With JWT, logout is handled client-side by deleting the token.
     res.json({ message: 'Logged out successfully' });
 });
 
