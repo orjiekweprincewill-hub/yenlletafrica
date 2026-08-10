@@ -29,7 +29,6 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         html { scroll-behavior: smooth; }
 
         body {
@@ -41,10 +40,7 @@
             min-height: 100vh;
         }
 
-        .app {
-            display: flex;
-            min-height: 100vh;
-        }
+        .app { display: flex; min-height: 100vh; }
 
         /* ── Sidebar ── */
         .sidebar {
@@ -52,8 +48,7 @@
             color: #fff;
             padding: 28px 20px;
             position: fixed;
-            left: 0;
-            top: 0;
+            left: 0; top: 0;
             height: 100vh;
             width: var(--sidebar-width);
             display: flex;
@@ -65,79 +60,49 @@
             scrollbar-width: thin;
             scrollbar-color: rgba(255,255,255,0.1) transparent;
         }
-
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
-        .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
 
         .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding-bottom: 28px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            margin-bottom: 24px;
-            white-space: nowrap;
+            display: flex; align-items: center; gap: 12px;
+            padding-bottom: 28px; border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 24px; white-space: nowrap;
         }
         .brand i { font-size: 26px; color: var(--primary); flex-shrink: 0; }
         .brand div h2 { font-size: 18px; font-weight: 800; letter-spacing: 0.5px; }
         .brand div span { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
 
-        .nav {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+        .nav { display: flex; flex-direction: column; gap: 6px; }
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 13px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.25s;
-            color: #cbd5e1;
-            user-select: none;
-            white-space: nowrap;
+            display: flex; align-items: center; gap: 12px;
+            padding: 13px 14px; border-radius: 10px; cursor: pointer;
+            font-size: 14px; font-weight: 500; transition: all 0.25s;
+            color: #cbd5e1; user-select: none; white-space: nowrap;
         }
-        .nav-item:hover, .nav-item.active {
-            background: rgba(220,53,69,0.12);
-            color: #fff;
-        }
+        .nav-item:hover, .nav-item.active { background: rgba(220,53,69,0.12); color: #fff; }
         .nav-item.active { box-shadow: 0 0 0 1px rgba(220,53,69,0.25); }
         .nav-item i { font-size: 18px; flex-shrink: 0; }
-        .nav-item span { opacity: 1; transition: opacity 0.2s; }
 
         .sidebar-footer {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            font-size: 12px;
-            opacity: 0.5;
-            text-align: center;
-            white-space: nowrap;
+            margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 12px; opacity: 0.5; text-align: center; white-space: nowrap;
         }
 
         .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            z-index: 199;
-            opacity: 0;
-            transition: opacity 0.3s;
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px); z-index: 199; opacity: 0; transition: opacity 0.3s;
         }
         .sidebar-overlay.open { display: block; opacity: 1; }
 
-        /* Collapsed sidebar for desktop */
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed);
-            padding: 28px 14px;
+        .collapse-toggle {
+            display: none; position: absolute; right: -12px; top: 32px;
+            width: 24px; height: 24px; background: var(--primary); border-radius: 50%;
+            border: 2px solid #fff; color: #fff; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 10px; z-index: 201; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
         }
+        .sidebar.collapsed { width: var(--sidebar-collapsed); padding: 28px 14px; }
         .sidebar.collapsed .brand { justify-content: center; padding-bottom: 20px; }
         .sidebar.collapsed .brand div { display: none; }
         .sidebar.collapsed .nav-item { justify-content: center; padding: 14px; }
@@ -145,117 +110,41 @@
         .sidebar.collapsed .sidebar-footer span { display: none; }
         .sidebar.collapsed .sidebar-footer { font-size: 10px; }
 
-        .collapse-toggle {
-            display: none;
-            position: absolute;
-            right: -12px;
-            top: 32px;
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            border-radius: 50%;
-            border: 2px solid #fff;
-            color: #fff;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 10px;
-            z-index: 201;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            transition: transform 0.3s;
-        }
-        .collapse-toggle:hover { transform: scale(1.1); }
-        .sidebar.collapsed .collapse-toggle { transform: rotate(180deg); }
-        .sidebar.collapsed .collapse-toggle:hover { transform: rotate(180deg) scale(1.1); }
-
         /* ── Main ── */
         .main {
-            margin-left: var(--sidebar-width);
-            padding: 32px;
-            min-height: 100vh;
-            width: calc(100% - var(--sidebar-width));
-            transition: margin-left 0.35s, width 0.35s;
-            overflow-x: hidden;
+            margin-left: var(--sidebar-width); padding: 32px;
+            min-height: 100vh; width: calc(100% - var(--sidebar-width));
+            transition: margin-left 0.35s, width 0.35s; overflow-x: hidden;
         }
-
-        .main.expanded {
-            margin-left: var(--sidebar-collapsed);
-            width: calc(100% - var(--sidebar-collapsed));
-        }
+        .main.expanded { margin-left: var(--sidebar-collapsed); width: calc(100% - var(--sidebar-collapsed)); }
 
         .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-            gap: 14px;
-            flex-wrap: wrap;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 28px; gap: 14px; flex-wrap: wrap;
         }
         .topbar h1 { font-size: 26px; font-weight: 800; }
         .topbar p { color: var(--muted); font-size: 14px; margin-top: 4px; }
         .user-chip {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--card);
-            padding: 10px 18px;
-            border-radius: 50px;
-            box-shadow: var(--shadow);
-            font-size: 14px;
-            font-weight: 600;
-            white-space: nowrap;
+            display: flex; align-items: center; gap: 10px; background: var(--card);
+            padding: 10px 18px; border-radius: 50px; box-shadow: var(--shadow);
+            font-size: 14px; font-weight: 600; white-space: nowrap;
         }
         .logout-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            white-space: nowrap;
+            background: var(--primary); color: white; border: none; padding: 10px 18px;
+            border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap;
         }
         .logout-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-
-        .menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
+        .menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 24px; cursor: pointer; padding: 8px; border-radius: 8px; transition: background 0.2s; }
         .menu-btn:hover { background: var(--border); }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 28px;
-        }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 28px; }
         .stat-card {
-            background: var(--card);
-            padding: 24px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
+            background: var(--card); padding: 24px; border-radius: var(--radius);
+            box-shadow: var(--shadow); border: 1px solid var(--border); transition: all 0.3s;
+            position: relative; overflow: hidden;
         }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-        }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
         .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
         .stat-card.total::before { background: var(--primary); }
         .stat-card.ng::before { background: #008751; }
@@ -265,18 +154,8 @@
         .stat-card.tasks::before { background: var(--info); }
         .stat-card.videos::before { background: #7c3aed; }
 
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 14px;
-        }
-        .stat-icon {
-            width: 44px; height: 44px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px;
-        }
+        .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+        .stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
         .total .stat-icon { background: #fef2f2; color: var(--primary); }
         .ng .stat-icon { background: #ecfdf5; color: #008751; }
         .gh .stat-icon { background: #fffbeb; color: #d97706; }
@@ -288,56 +167,20 @@
         .stat-value { font-size: 32px; font-weight: 900; letter-spacing: -0.5px; }
         .stat-label { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 4px; }
 
-        .card {
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            margin-bottom: 24px;
-            overflow: hidden;
-        }
-        .card-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
+        .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 24px; overflow: hidden; }
+        .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .card-header h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         .card-body { padding: 24px; }
 
-        .table-wrap { 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
+        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
         th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
-        th {
-            background: #f9fafb;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: var(--muted);
-            font-weight: 700;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+        th { background: #f9fafb; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 700; position: sticky; top: 0; z-index: 10; }
         tr { transition: background 0.15s; }
         tr:hover { background: #f9fafb; }
         tbody tr:last-child td { border-bottom: none; }
-        .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-            display: inline-block;
-        }
+
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; display: inline-block; }
         .badge-pending { background: #fef3c7; color: #92400e; }
         .badge-approved { background: #d1fae5; color: #065f46; }
         .badge-rejected { background: #fee2e2; color: #991b1b; }
@@ -345,326 +188,105 @@
         .badge-pro { background: #fce7f3; color: #9d174d; }
         .badge-vite { background: #f3e8ff; color: #6b21a8; }
 
-        .btn {
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: none;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-            touch-action: manipulation;
-        }
+        .btn { padding: 10px 18px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; touch-action: manipulation; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
         .btn:active { transform: translateY(0); }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-        .btn-success {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-        .btn-warning {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-        }
-        .btn-info {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-        }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .btn-info { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
 
         .btn-generate {
-            width: 100%;
-            padding: 16px 24px;
-            font-size: 16px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 16px rgba(79,70,229,0.3);
+            width: 100%; padding: 16px 24px; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            border-radius: 12px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; border: none; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 16px rgba(79,70,229,0.3);
         }
-        .btn-generate:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(79,70,229,0.4);
-        }
-        .btn-generate:disabled {
-            opacity: 0.7;
-            transform: none;
-            cursor: wait;
-        }
+        .btn-generate:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(79,70,229,0.4); }
+        .btn-generate:disabled { opacity: 0.7; transform: none; cursor: wait; }
 
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; }
         .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            font-size: 15px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            -webkit-appearance: none;
-            font-family: inherit;
+            width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 10px;
+            font-size: 15px; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; font-family: inherit;
         }
-        .form-control:focus { 
-            outline: none; 
-            border-color: #4f46e5; 
-            box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
-        }
+        .form-control:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
         textarea.form-control { min-height: 120px; resize: vertical; }
         select.form-control { background: white; cursor: pointer; }
 
-        .coupon-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 16px;
-        }
+        .coupon-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
         .coupon-chip {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-            padding: 12px 18px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 15px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 12px rgba(79,70,229,0.25);
-            cursor: pointer;
-            user-select: all;
-            position: relative;
-            word-break: break-all;
-            transition: transform 0.15s;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 12px 18px; border-radius: 10px;
+            font-family: 'Courier New', monospace; font-size: 15px; font-weight: 800; letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(79,70,229,0.25); cursor: pointer; user-select: all; position: relative; word-break: break-all; transition: transform 0.15s;
         }
         .coupon-chip:hover { transform: translateY(-2px); }
         .coupon-chip:active { transform: scale(0.96); }
 
-        .empty {
-            text-align: center;
-            padding: 48px 20px;
-            color: var(--muted);
-        }
+        .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
         .empty i { font-size: 52px; margin-bottom: 16px; opacity: 0.3; display: block; }
 
-        .toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-width: 400px;
-            width: 100%;
-            pointer-events: none;
-        }
+        .toast-container { position: fixed; top: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; max-width: 400px; width: 100%; pointer-events: none; }
         .toast {
-            background: white;
-            padding: 16px 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            border-left: 4px solid var(--success);
-            font-size: 14px;
-            font-weight: 600;
-            pointer-events: auto;
+            background: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            display: flex; align-items: center; gap: 12px; animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            border-left: 4px solid var(--success); font-size: 14px; font-weight: 600; pointer-events: auto;
         }
         .toast.error { border-left-color: var(--primary); }
         .toast.warn { border-left-color: var(--warning); }
-        @keyframes slideIn {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        .spin {
-            width: 18px; height: 18px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
+        .spin { width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-            margin-bottom: 28px;
-        }
-        .action-card {
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            padding: 24px;
-        }
-        .action-card h4 {
-            font-size: 15px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 28px; }
+        .action-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 24px; }
+        .action-card h4 { font-size: 15px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
 
-        .hidden { display: none !important; }
-
+        .hidden { display: none !important;; }
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
-        .user-result {
-            background: #f9fafb;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 16px;
-        }
+        .user-result { background: #f9fafb; border-radius: 12px; padding: 20px; margin-top: 16px; }
         .user-result h4 { margin-bottom: 12px; font-size: 16px; }
-        .user-detail {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
+        .user-detail { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
         .user-detail:last-child { border-bottom: none; }
         .user-detail span:first-child { color: var(--muted); font-weight: 600; }
         .user-detail span:last-child { font-weight: 700; }
 
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 52px;
-            height: 28px;
-        }
+        .toggle-switch { position: relative; display: inline-block; width: 52px; height: 28px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 28px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 28px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-        }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
         .setting-row:last-child { border-bottom: none; }
         .setting-info h4 { font-size: 15px; margin-bottom: 4px; }
         .setting-info p { font-size: 13px; color: var(--muted); }
 
-        .tabs-nav {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .tab-btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: white;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        .tab-btn:hover:not(.active) { background: #f9fafb; }
+        @media (min-width: 1400px) { .main { padding: 40px 48px; } .stats { grid-template-columns: repeat(4, 1fr); } .grid-2 { gap: 28px; } .topbar h1 { font-size: 28px; } }
+        @media (min-width: 1200px) and (max-width: 1399px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 1024px) { .collapse-toggle { display: flex; } .table-wrap { min-width: 0; } table { min-width: 0; } th, td { white-space: normal; } th { white-space: nowrap; } }
+        @media (min-width: 769px) and (max-width: 1023px) { .stats { grid-template-columns: repeat(2, 1fr); } .grid-2 { grid-template-columns: 1fr; } .grid-3 { grid-template-columns: repeat(2, 1fr); } }
 
-        /* Desktop/Laptop enhancements */
-        @media (min-width: 1400px) {
-            .main { padding: 40px 48px; }
-            .stats { grid-template-columns: repeat(4, 1fr); }
-            .grid-2 { gap: 28px; }
-            .topbar h1 { font-size: 28px; }
-        }
-
-        @media (min-width: 1200px) and (max-width: 1399px) {
-            .stats { grid-template-columns: repeat(4, 1fr); }
-        }
-
-        @media (min-width: 1024px) {
-            .collapse-toggle { display: flex; }
-            .table-wrap { min-width: 0; }
-            table { min-width: 0; }
-            th, td { white-space: normal; }
-            th { white-space: nowrap; }
-        }
-
-        @media (min-width: 769px) and (max-width: 1023px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .grid-2 { grid-template-columns: 1fr; }
-            .grid-3 { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        /* ── Mobile Responsive ── */
         @media (max-width: 768px) {
             .app { display: block; }
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-                box-shadow: 4px 0 24px rgba(0,0,0,0.3);
-            }
+            .sidebar { transform: translateX(-100%); width: 280px; box-shadow: 4px 0 24px rgba(0,0,0,0.3); }
             .sidebar.open { transform: translateX(0); }
             .sidebar.collapsed { width: 280px; }
             .sidebar.collapsed .brand div { display: block; }
             .sidebar.collapsed .nav-item span { display: inline; }
             .sidebar.collapsed .sidebar-footer span { display: inline; }
             .collapse-toggle { display: none !important; }
-            .main { 
-                margin-left: 0; 
-                padding: 16px; 
-                width: 100%;
-            }
+            .main { margin-left: 0; padding: 16px; width: 100%; }
             .main.expanded { margin-left: 0; width: 100%; }
             .menu-btn { display: flex; }
-            .topbar {
-                flex-wrap: wrap;
-                margin-bottom: 20px;
-            }
+            .topbar { flex-wrap: wrap; margin-bottom: 20px; }
             .topbar h1 { font-size: 20px; }
             .topbar p { font-size: 12px; }
             .user-chip { padding: 8px 12px; font-size: 12px; }
@@ -687,14 +309,8 @@
             .toast-container { right: 16px; top: 16px; max-width: none; }
             .grid-2, .grid-3 { grid-template-columns: 1fr; }
         }
-
-        @media (max-width: 480px) {
-            .stats { grid-template-columns: 1fr; }
-            .topbar { gap: 10px; }
-        }
+        @media (max-width: 480px) { .stats { grid-template-columns: 1fr; } .topbar { gap: 10px; } }
     </style>
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -714,45 +330,34 @@
 
             <nav class="nav">
                 <div class="nav-item active" onclick="switchTab('dashboard', this); closeSidebar();">
-                    <i class="bi bi-grid-1x2-fill"></i>
-                    <span>Dashboard</span>
+                    <i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span>
                 </div>
                 <div class="nav-item" onclick="switchTab('withdrawals', this); closeSidebar();">
-                    <i class="bi bi-cash-coin"></i>
-                    <span>Withdrawals</span>
+                    <i class="bi bi-cash-coin"></i> <span>Withdrawals</span>
                 </div>
                 <div class="nav-item" onclick="switchTab('coupons', this); closeSidebar();">
-                    <i class="bi bi-ticket-perforated-fill"></i>
-                    <span>Coupons</span>
+                    <i class="bi bi-ticket-perforated-fill"></i> <span>Coupons</span>
                 </div>
-                
                 <div class="nav-item" onclick="switchTab('videos', this); closeSidebar();">
-                    <i class="bi bi-play-btn-fill"></i>
-                    <span>Videos</span>
+                    <i class="bi bi-play-btn-fill"></i> <span>Videos</span>
                 </div>
                 <div class="nav-item" onclick="switchTab('quizzes', this); closeSidebar();">
-                    <i class="bi bi-question-circle-fill"></i>
-                    <span>Quizzes</span>
+                    <i class="bi bi-question-circle-fill"></i> <span>Quizzes</span>
                 </div>
                 <div class="nav-item" onclick="switchTab('articles', this); closeSidebar();">
-                    <i class="bi bi-journal-text"></i>
-                    <span>Articles</span>
+                    <i class="bi bi-journal-text"></i> <span>Articles</span>
                 </div>
                 <div class="nav-item" onclick="switchTab('users', this); closeSidebar();">
-                    <i class="bi bi-people-fill"></i>
-                    <span>Users</span>
+                    <i class="bi bi-people-fill"></i> <span>Users</span>
                 </div>
                 <div class="nav-item" onclick="switchTab('tiktok', this); closeSidebar();">
-                    <i class="bi bi-tiktok"></i>
-                    <span>TikTok</span>
+                    <i class="bi bi-tiktok"></i> <span>TikTok</span>
                 </div>
                 <div class="nav-item" onclick="switchTab('social', this); closeSidebar();">
-                    <i class="bi bi-share-fill"></i>
-                    <span>Social Links</span>
+                    <i class="bi bi-share-fill"></i> <span>Social Links</span>
                 </div>
                 <div class="nav-item" onclick="switchTab('settings', this); closeSidebar();">
-                    <i class="bi bi-gear-fill"></i>
-                    <span>Settings</span>
+                    <i class="bi bi-gear-fill"></i> <span>Settings</span>
                 </div>
             </nav>
 
@@ -962,7 +567,7 @@
                             <select id="couponPlan" class="form-control">
                                 <option value="YENLITE">YENLITE</option>
                                 <option value="YENPRO">YENPRO</option>
-                            
+                                <option value="YENVITE">YENVITE</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -980,61 +585,11 @@
                 </div>
             </div>
 
-            <!-- TASKS TAB -->
-            <div id="tab-tasks" class="tab-content hidden">
-                <div class="grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="bi bi-plus-circle"></i> Post New Task</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Title</label>
-                                <input type="text" id="taskTitle" class="form-control" placeholder="Task title">
-                            </div>
-                            <div class="form-group">
-                                <label>Description</label>
-                                <textarea id="taskDesc" class="form-control" placeholder="Task description"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Link</label>
-                                <input type="url" id="taskLink" class="form-control" placeholder="https://...">
-                            </div>
-                            <button class="btn btn-primary" onclick="postTask()" id="btn-post-task">
-                                <i class="bi bi-send"></i> Post Task
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="bi bi-list-check"></i> All Tasks</h3>
-                            <button class="btn btn-primary btn-sm" onclick="loadTasks()">
-                                <i class="bi bi-arrow-repeat"></i> Refresh
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-wrap">
-                                <table>
-                                    <thead>
-                                        <tr><th>ID</th><th>Title</th><th>Completions</th><th>Created</th><th>Action</th></tr>
-                                    </thead>
-                                    <tbody id="tasks-table">
-                                        <tr><td colspan="5" class="empty"><i class="bi bi-inbox"></i> No tasks</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- VIDEOS TAB -->
             <div id="tab-videos" class="tab-content hidden">
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-header">
-                            <h3><i class="bi bi-plus-circle"></i> Post New Video</h3>
-                        </div>
+                        <div class="card-header"><h3><i class="bi bi-plus-circle"></i> Post New Video</h3></div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Title</label>
@@ -1052,16 +607,12 @@
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="bi bi-play-btn"></i> All Videos</h3>
-                            <button class="btn btn-primary btn-sm" onclick="loadVideos()">
-                                <i class="bi bi-arrow-repeat"></i> Refresh
-                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="loadVideos()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
                         </div>
                         <div class="card-body">
                             <div class="table-wrap">
                                 <table>
-                                    <thead>
-                                        <tr><th>ID</th><th>Title</th><th>Completions</th><th>Created</th><th>Action</th></tr>
-                                    </thead>
+                                    <thead><tr><th>ID</th><th>Title</th><th>Completions</th><th>Created</th><th>Action</th></tr></thead>
                                     <tbody id="videos-table">
                                         <tr><td colspan="5" class="empty"><i class="bi bi-inbox"></i> No videos</td></tr>
                                     </tbody>
@@ -1076,57 +627,31 @@
             <div id="tab-quizzes" class="tab-content hidden">
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-header">
-                            <h3><i class="bi bi-plus-circle"></i> Post New Quiz</h3>
-                        </div>
+                        <div class="card-header"><h3><i class="bi bi-plus-circle"></i> Post New Quiz</h3></div>
                         <div class="card-body">
-                            <div class="form-group">
-                                <label>Question</label>
-                                <input type="text" id="quizQuestion" class="form-control" placeholder="Enter question">
-                            </div>
-                            <div class="form-group">
-                                <label>Option A</label>
-                                <input type="text" id="quizOptA" class="form-control" placeholder="Option A">
-                            </div>
-                            <div class="form-group">
-                                <label>Option B</label>
-                                <input type="text" id="quizOptB" class="form-control" placeholder="Option B">
-                            </div>
-                            <div class="form-group">
-                                <label>Option C</label>
-                                <input type="text" id="quizOptC" class="form-control" placeholder="Option C">
-                            </div>
-                            <div class="form-group">
-                                <label>Option D</label>
-                                <input type="text" id="quizOptD" class="form-control" placeholder="Option D">
-                            </div>
+                            <div class="form-group"><label>Question</label><input type="text" id="quizQuestion" class="form-control" placeholder="Enter question"></div>
+                            <div class="form-group"><label>Option A</label><input type="text" id="quizOptA" class="form-control" placeholder="Option A"></div>
+                            <div class="form-group"><label>Option B</label><input type="text" id="quizOptB" class="form-control" placeholder="Option B"></div>
+                            <div class="form-group"><label>Option C</label><input type="text" id="quizOptC" class="form-control" placeholder="Option C"></div>
+                            <div class="form-group"><label>Option D</label><input type="text" id="quizOptD" class="form-control" placeholder="Option D"></div>
                             <div class="form-group">
                                 <label>Correct Answer</label>
                                 <select id="quizCorrect" class="form-control">
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                    <option value="C">C</option>
-                                    <option value="D">D</option>
+                                    <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
                                 </select>
                             </div>
-                            <button class="btn btn-primary" onclick="postQuiz()" id="btn-post-quiz">
-                                <i class="bi bi-send"></i> Post Quiz
-                            </button>
+                            <button class="btn btn-primary" onclick="postQuiz()" id="btn-post-quiz"><i class="bi bi-send"></i> Post Quiz</button>
                         </div>
                     </div>
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="bi bi-question-circle"></i> All Quizzes</h3>
-                            <button class="btn btn-primary btn-sm" onclick="loadQuizzes()">
-                                <i class="bi bi-arrow-repeat"></i> Refresh
-                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="loadQuizzes()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
                         </div>
                         <div class="card-body">
                             <div class="table-wrap">
                                 <table>
-                                    <thead>
-                                        <tr><th>ID</th><th>Question</th><th>Answer</th><th>Attempts</th><th>Action</th></tr>
-                                    </thead>
+                                    <thead><tr><th>ID</th><th>Question</th><th>Answer</th><th>Attempts</th><th>Action</th></tr></thead>
                                     <tbody id="quizzes-table">
                                         <tr><td colspan="5" class="empty"><i class="bi bi-inbox"></i> No quizzes</td></tr>
                                     </tbody>
@@ -1141,40 +666,23 @@
             <div id="tab-articles" class="tab-content hidden">
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-header">
-                            <h3><i class="bi bi-plus-circle"></i> Post New Article</h3>
-                        </div>
+                        <div class="card-header"><h3><i class="bi bi-plus-circle"></i> Post New Article</h3></div>
                         <div class="card-body">
-                            <div class="form-group">
-                                <label>Title</label>
-                                <input type="text" id="articleTitle" class="form-control" placeholder="Article title">
-                            </div>
-                            <div class="form-group">
-                                <label>Content</label>
-                                <textarea id="articleContent" class="form-control" placeholder="Article content..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Read Time (minutes)</label>
-                                <input type="number" id="articleReadTime" class="form-control" min="1" value="3">
-                            </div>
-                            <button class="btn btn-primary" onclick="postArticle()" id="btn-post-article">
-                                <i class="bi bi-send"></i> Post Article
-                            </button>
+                            <div class="form-group"><label>Title</label><input type="text" id="articleTitle" class="form-control" placeholder="Article title"></div>
+                            <div class="form-group"><label>Content</label><textarea id="articleContent" class="form-control" placeholder="Article content..."></textarea></div>
+                            <div class="form-group"><label>Read Time (minutes)</label><input type="number" id="articleReadTime" class="form-control" min="1" value="3"></div>
+                            <button class="btn btn-primary" onclick="postArticle()" id="btn-post-article"><i class="bi bi-send"></i> Post Article</button>
                         </div>
                     </div>
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="bi bi-journal-text"></i> All Articles</h3>
-                            <button class="btn btn-primary btn-sm" onclick="loadArticles()">
-                                <i class="bi bi-arrow-repeat"></i> Refresh
-                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="loadArticles()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
                         </div>
                         <div class="card-body">
                             <div class="table-wrap">
                                 <table>
-                                    <thead>
-                                        <tr><th>ID</th><th>Title</th><th>Read Time</th><th>Reads</th><th>Action</th></tr>
-                                    </thead>
+                                    <thead><tr><th>ID</th><th>Title</th><th>Read Time</th><th>Reads</th><th>Action</th></tr></thead>
                                     <tbody id="articles-table">
                                         <tr><td colspan="5" class="empty"><i class="bi bi-inbox"></i> No articles</td></tr>
                                     </tbody>
@@ -1185,19 +693,76 @@
                 </div>
             </div>
 
+            <!-- USERS TAB -->
+            <div id="tab-users" class="tab-content hidden">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><h3><i class="bi bi-search"></i> Search User</h3></div>
+                        <div class="card-body">
+                            <div style="display:flex; gap:12px; margin-bottom:20px;">
+                                <select id="searchType" class="form-control" style="max-width: 120px;">
+                                    <option value="username">Username</option>
+                                    <option value="coupon">Coupon Code</option>
+                                </select>
+                                <input type="text" id="searchQuery" class="form-control" placeholder="Enter search query...">
+                                <button class="btn btn-primary" onclick="searchUser()" id="btn-search-user"><i class="bi bi-search"></i></button>
+                            </div>
+                            <div id="user-search-result" class="hidden">
+                                <div class="user-result" id="user-details"></div>
+                                <div style="margin-top: 24px;">
+                                    <h4 style="margin-bottom:16px;"><i class="bi bi-wallet2"></i> Manage Wallet</h4>
+                                    <div class="form-group">
+                                        <label>Wallet Type</label>
+                                        <select id="walletType" class="form-control">
+                                            <option value="activity">Activity Wallet</option>
+                                            <option value="referral">Referral Wallet</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Amount</label>
+                                        <input type="number" id="walletAmount" class="form-control" placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Reason (Optional)</label>
+                                        <input type="text" id="walletReason" class="form-control" placeholder="Reason for adjustment">
+                                    </div>
+                                    <div style="display:flex; gap:10px;">
+                                        <button class="btn btn-success" style="flex:1;" onclick="creditWallet()"><i class="bi bi-plus-circle"></i> Credit</button>
+                                        <button class="btn btn-danger" style="flex:1;" onclick="debitWallet()"><i class="bi bi-dash-circle"></i> Debit</button>
+                                    </div>
+                                    <hr style="margin: 24px 0; border:none; border-top:1px solid var(--border);">
+                                    <h4 style="margin-bottom:16px;"><i class="bi bi-key"></i> Change User Password</h4>
+                                    <div class="form-group">
+                                        <label>New Password</label>
+                                        <input type="text" id="newPassword" class="form-control" placeholder="Enter new password (min 6 chars)">
+                                    </div>
+                                    <button class="btn btn-warning" onclick="changeUserPassword()"><i class="bi bi-pencil"></i> Update Password</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3><i class="bi bi-info-circle"></i> User Management</h3></div>
+                        <div class="card-body">
+                            <div class="empty">
+                                <i class="bi bi-people-fill"></i>
+                                <h3>Search for a user</h3>
+                                <p>Use the form to find a user by username or coupon code to manage their wallets and settings.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TIKTOK TAB -->
             <div id="tab-tiktok" class="tab-content hidden">
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-header">
-                            <h3><i class="bi bi-search"></i> Search TikTok User</h3>
-                        </div>
+                        <div class="card-header"><h3><i class="bi bi-search"></i> Search TikTok User</h3></div>
                         <div class="card-body">
                             <div style="display:flex; gap:12px; margin-bottom:20px;">
                                 <input type="text" id="tiktokSearch" class="form-control" placeholder="Username or TikTok handle...">
-                                <button class="btn btn-primary" onclick="searchTikTokUser()">
-                                    <i class="bi bi-search"></i>
-                                </button>
+                                <button class="btn btn-primary" onclick="searchTikTokUser()"><i class="bi bi-search"></i></button>
                             </div>
                             <div id="tiktok-search-result" class="hidden">
                                 <div class="user-result" id="tiktok-user-details"></div>
@@ -1206,9 +771,7 @@
                                         <label>Bonus Amount ($)</label>
                                         <input type="number" id="tiktokBonusAmount" class="form-control" placeholder="0.00">
                                     </div>
-                                    <button class="btn btn-success" onclick="addTikTokBonus()" id="btn-tiktok-bonus">
-                                        <i class="bi bi-gift"></i> Add Bonus
-                                    </button>
+                                    <button class="btn btn-success" onclick="addTikTokBonus()" id="btn-tiktok-bonus"><i class="bi bi-gift"></i> Add Bonus</button>
                                 </div>
                             </div>
                         </div>
@@ -1216,16 +779,12 @@
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="bi bi-tiktok"></i> TikTok Submissions</h3>
-                            <button class="btn btn-primary btn-sm" onclick="loadTikTokUsers()">
-                                <i class="bi bi-arrow-repeat"></i> Refresh
-                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="loadTikTokUsers()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
                         </div>
                         <div class="card-body">
                             <div class="table-wrap">
                                 <table>
-                                    <thead>
-                                        <tr><th>User</th><th>TikTok Handle</th><th>Submitted</th></tr>
-                                    </thead>
+                                    <thead><tr><th>User</th><th>TikTok Handle</th><th>Submitted</th></tr></thead>
                                     <tbody id="tiktok-table">
                                         <tr><td colspan="3" class="empty"><i class="bi bi-inbox"></i> No submissions</td></tr>
                                     </tbody>
@@ -1240,9 +799,7 @@
             <div id="tab-social" class="tab-content hidden">
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-header">
-                            <h3><i class="bi bi-plus-circle"></i> Add Social Link</h3>
-                        </div>
+                        <div class="card-header"><h3><i class="bi bi-plus-circle"></i> Add Social Link</h3></div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Platform</label>
@@ -1260,24 +817,18 @@
                                 <label>URL</label>
                                 <input type="url" id="socialUrl" class="form-control" placeholder="https://...">
                             </div>
-                            <button class="btn btn-primary" onclick="addSocialLink()" id="btn-add-social">
-                                <i class="bi bi-plus-lg"></i> Add Link
-                            </button>
+                            <button class="btn btn-primary" onclick="addSocialLink()" id="btn-add-social"><i class="bi bi-plus-lg"></i> Add Link</button>
                         </div>
                     </div>
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="bi bi-share"></i> Social Links</h3>
-                            <button class="btn btn-primary btn-sm" onclick="loadSocialLinks()">
-                                <i class="bi bi-arrow-repeat"></i> Refresh
-                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="loadSocialLinks()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
                         </div>
                         <div class="card-body">
                             <div class="table-wrap">
                                 <table>
-                                    <thead>
-                                        <tr><th>Platform</th><th>URL</th><th>Action</th></tr>
-                                    </thead>
+                                    <thead><tr><th>Platform</th><th>URL</th><th>Action</th></tr></thead>
                                     <tbody id="social-table">
                                         <tr><td colspan="3" class="empty"><i class="bi bi-inbox"></i> No links</td></tr>
                                     </tbody>
@@ -1288,10 +839,71 @@
                 </div>
             </div>
 
+            <!-- SETTINGS TAB -->
+            <div id="tab-settings" class="tab-content hidden">
+                <div class="card" style="max-width: 800px; margin: 0 auto;">
+                    <div class="card-header">
+                        <h3><i class="bi bi-gear-fill"></i> Withdrawal Settings</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <h4>Activity Wallet Withdrawals</h4>
+                                <p>Allow users to withdraw from their activity wallet</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-activity" onchange="toggleWithdrawal('activity', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <h4>Referral Wallet Withdrawals</h4>
+                                <p>Allow users to withdraw from their referral wallet</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-referral" onchange="toggleWithdrawal('referral', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <h4>TikTok Wallet Withdrawals</h4>
+                                <p>Allow users to withdraw from their TikTok wallet</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-tiktok" onchange="toggleWithdrawal('tiktok', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <h4>Active Country for Payouts</h4>
+                                <p>Current: <strong id="current-country">NG</strong></p>
+                            </div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <select id="countrySelect" class="form-control" style="width: auto; margin: 0;">
+                                    <option value="NG">Nigeria</option>
+                                    <option value="GH">Ghana</option>
+                                    <option value="CM">Cameroon</option>
+                                </select>
+                                <button class="btn btn-primary" onclick="updateCountry()">Update</button>
+                            </div>
+                        </div>
+                        <p style="font-size: 12px; color: var(--muted); margin-top: 16px;">
+                            <i class="bi bi-info-circle"></i> Note: You must turn OFF all withdrawal toggles before you can change the active country.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
     <div class="toast-container" id="toasts"></div>
 
     <script>
-       const API = 'https://yenlletafrica.onrender.com';
+        // FIX: Must point to your Render backend URL
+        const API = 'https://yenlletafrica.onrender.com';
         let currentUserId = null;
         let currentTikTokUserId = null;
         let userRole = '';
@@ -1359,21 +971,32 @@
                 const res = await fetch(`${API}/api/check-session`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 const data = await res.json();
 
-                if (!data.authenticated || (!data.is_admin && data.role !== 'assistant')) {
+                if (!data.authenticated || (data.role !== 'assistant' && data.role !== 'superadmin')) {
                     window.location.href = 'admin-login.html';
                     return;
                 }
 
                 userRole = data.role || 'assistant';
                 document.getElementById('adminName').textContent = data.username || 'Assistant';
-                document.getElementById('role-badge').textContent = userRole.toUpperCase();
+                
+                // FIX: Only update the role badge if it actually exists on the page
+                const roleBadge = document.getElementById('role-badge');
+                if (roleBadge) {
+                    roleBadge.textContent = userRole.toUpperCase();
+                }
 
                 if (userRole !== 'superadmin') {
-                    document.getElementById('toggle-activity').disabled = true;
-                    document.getElementById('toggle-referral').disabled = true;
-                    document.getElementById('toggle-tiktok').disabled = true;
-                    document.getElementById('countrySelect').disabled = true;
-                    document.querySelector('#tab-settings button[onclick="updateCountry()"]').disabled = true;
+                    const toggleActivity = document.getElementById('toggle-activity');
+                    const toggleReferral = document.getElementById('toggle-referral');
+                    const toggleTiktok = document.getElementById('toggle-tiktok');
+                    const countrySelect = document.getElementById('countrySelect');
+                    if(toggleActivity) toggleActivity.disabled = true;
+                    if(toggleReferral) toggleReferral.disabled = true;
+                    if(toggleTiktok) toggleTiktok.disabled = true;
+                    if(countrySelect) countrySelect.disabled = true;
+                    
+                    const updateCountryBtn = document.querySelector('#tab-settings button[onclick="updateCountry()"]');
+                    if(updateCountryBtn) updateCountryBtn.disabled = true;
                 }
 
                 restoreSidebarState();
@@ -1382,6 +1005,7 @@
                 loadWithdrawals();
                 loadSettings();
             } catch (e) {
+                console.error("Init error:", e);
                 window.location.href = 'admin-login.html';
             }
         }
@@ -1393,7 +1017,6 @@
             if (el) el.classList.add('active');
 
             if (tab === 'withdrawals') loadWithdrawals();
-            if (tab === 'tasks') loadTasks();
             if (tab === 'videos') loadVideos();
             if (tab === 'quizzes') loadQuizzes();
             if (tab === 'articles') loadArticles();
@@ -1522,8 +1145,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/reject-withdrawal/${id}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ reason: reason || 'Rejected by assistant' })
                 });
                 const d = await res.json();
@@ -1557,8 +1179,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/generate-coupon`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ plan, count })
                 });
                 const d = await res.json();
@@ -1586,8 +1207,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/generate-coupon`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ plan, count })
                 });
                 const d = await res.json();
@@ -1619,63 +1239,6 @@
             }
         }
 
-        // ── Tasks ──
-        async function postTask() {
-            const title = document.getElementById('taskTitle').value.trim();
-            const description = document.getElementById('taskDesc').value.trim();
-            const link = document.getElementById('taskLink').value.trim();
-            const btn = document.getElementById('btn-post-task');
-            if (!title || !description || !link) { toast('All fields are required', 'warn'); return; }
-            btn.disabled = true;
-            try {
-                const res = await fetch(`${API}/api/assistant/post-task`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ title, description, link })
-                });
-                const d = await res.json();
-                if (res.ok) {
-                    toast('Task posted successfully');
-                    document.getElementById('taskTitle').value = '';
-                    document.getElementById('taskDesc').value = '';
-                    document.getElementById('taskLink').value = '';
-                    loadTasks();
-                } else { toast(d.error || 'Failed', 'error'); }
-            } catch (e) { toast('Network error', 'error'); }
-            finally { btn.disabled = false; }
-        }
-
-        async function loadTasks() {
-            try {
-                const res = await fetch(`${API}/api/assistant/tasks`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('tasks-table');
-                if (!res.ok || !data.length) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="empty"><i class="bi bi-inbox"></i> No tasks</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = data.map(t => `
-                    <tr>
-                        <td>#${t.id}</td>
-                        <td>${t.title}</td>
-                        <td>${t.completion_count || 0}</td>
-                        <td>${new Date(t.created_at).toLocaleDateString()}</td>
-                        <td><button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})"><i class="bi bi-trash"></i></button></td>
-                    </tr>
-                `).join('');
-            } catch (e) { console.error('Tasks error:', e); }
-        }
-
-        async function deleteTask(id) {
-            if (!confirm('Delete this task?')) return;
-            try {
-                const res = await fetch(`${API}/api/assistant/delete-task/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                if (res.ok) { toast('Task deleted'); loadTasks(); }
-                else { const d = await res.json(); toast(d.error || 'Failed', 'error'); }
-            } catch (e) { toast('Network error', 'error'); }
-        }
-
         // ── Videos ──
         async function postVideo() {
             const title = document.getElementById('videoTitle').value.trim();
@@ -1686,8 +1249,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/post-video`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ title, url })
                 });
                 const d = await res.json();
@@ -1745,8 +1307,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/post-quiz`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ question, option_a, option_b, option_c, option_d, correct_answer })
                 });
                 const d = await res.json();
@@ -1804,8 +1365,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/post-article`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ title, content, read_time })
                 });
                 const d = await res.json();
@@ -1900,8 +1460,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/credit-wallet`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: currentUserId, wallet_type, amount, reason })
                 });
                 const d = await res.json();
@@ -1919,8 +1478,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/debit-wallet`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: currentUserId, wallet_type, amount, reason })
                 });
                 const d = await res.json();
@@ -1936,8 +1494,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/change-user-password`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: currentUserId, new_password })
                 });
                 const d = await res.json();
@@ -1975,8 +1532,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/add-tiktok-bonus`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ user_id: currentTikTokUserId, amount })
                 });
                 const d = await res.json();
@@ -2015,8 +1571,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/add-social-link`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ platform, url })
                 });
                 const d = await res.json();
@@ -2072,8 +1627,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/toggle-withdrawal`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ wallet_type, enabled })
                 });
                 const d = await res.json();
@@ -2090,8 +1644,7 @@
             try {
                 const res = await fetch(`${API}/api/assistant/update-active-country`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     body: JSON.stringify({ country })
                 });
                 const d = await res.json();
@@ -2101,7 +1654,10 @@
         }
 
         async function logout() {
-            await fetch(`${API}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            try {
+                await fetch(`${API}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            } catch(e) {}
+            localStorage.removeItem('token');
             window.location.href = 'admin-login.html';
         }
 
