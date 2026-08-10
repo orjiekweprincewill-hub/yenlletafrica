@@ -3,20 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0a1628">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="YENLLET">
-
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230a1628' width='180' height='180' rx='40'/><text x='50%' y='50%' font-size='90' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>TN</text></svg>">
-
+    <meta name="theme-color" content="#0d47a1">
+    <title>Upgrade Plan - YENLLET</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <title>Upgrade Plan — YENLLET</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         :root {
             --primary-dark: #0a1628;
@@ -27,16 +19,6 @@
             --white: #ffffff;
             --off-white: #f0f4f8;
             --gray: #8892b0;
-            --light-gray: #e2e8f0;
-            --success: #28a745;
-            --success-light: #d4edda;
-            --success-dark: #155724;
-            --danger: #dc3545;
-            --danger-light: #f8d7da;
-            --danger-dark: #721c24;
-            --warning: #f59e0b;
-            --warning-light: #fef3c7;
-            --warning-dark: #92400e;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -44,14 +26,14 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
             position: relative;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         body::before {
@@ -61,9 +43,8 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(0,188,212,0.08) 0%, transparent 60%);
             animation: pulse 8s ease-in-out infinite;
-            z-index: 0;
         }
 
         @keyframes pulse {
@@ -71,176 +52,55 @@
             50% { transform: scale(1.1); opacity: 0.8; }
         }
 
-        .container {
-            background: rgba(255, 255, 255, 0.95);
+        .upgrade-container {
+            background: rgba(10, 22, 40, 0.85);
             backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-            max-width: 520px;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 50px 45px;
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0,188,212,0.1);
+            max-width: 450px;
             width: 100%;
             position: relative;
             z-index: 1;
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Logo Section */
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            text-decoration: none;
-            margin-bottom: 30px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid var(--light-gray);
-        }
-
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.3);
-        }
-
-        .logo-icon svg {
-            width: 28px;
-            height: 28px;
-            fill: white;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .logo-brand {
+        .logo { text-align: center; margin-bottom: 35px; }
+        .logo i { font-size: 40px; color: var(--accent); margin-bottom: 10px; display: block; }
+        .logo h1 {
+            font-size: 2rem;
             font-weight: 800;
-            font-size: 1.5rem;
             letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            line-height: 1.2;
-        }
-
-        .logo-tagline {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 2px;
-        }
-
-        .page-title {
-            text-align: center;
             margin-bottom: 8px;
         }
+        .logo p { color: var(--gray); font-size: 0.95rem; }
 
-        .page-title h1 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            margin-bottom: 6px;
-        }
-
-        .page-title p {
-            color: var(--gray);
-            font-size: 0.9rem;
-            font-weight: 400;
-        }
-
-        .plan-badge {
-            display: inline-block;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 24px;
-            transition: var(--transition);
-        }
-        .plan-lite { background: #fef2f2; color: #dc3545; }
-        .plan-pro { background: #eff6ff; color: #2563eb; }
-        .plan-vite { background: #f5f3ff; color: #7c3aed; }
-
-        .info-box {
-            background: linear-gradient(135deg, rgba(0,188,212,0.08) 0%, rgba(13,71,161,0.08) 100%);
-            border-left: 4px solid var(--accent);
-            padding: 16px 18px;
-            margin: 25px 0;
-            border-radius: 12px;
-            position: relative;
-            text-align: left;
-        }
-
-        .info-box::before {
-            content: '💡';
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.2rem;
-        }
-
-        .info-box p {
-            color: var(--primary);
-            font-size: 0.85rem;
-            line-height: 1.6;
-            padding-left: 30px;
-            font-weight: 500;
-        }
-
-        .info-box strong {
-            color: var(--primary-dark);
-        }
-
-        .form-group {
-            text-align: left;
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            color: var(--primary-dark);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .form-control {
+        .form-group { margin-bottom: 22px; }
+        .form-group label { display: block; margin-bottom: 10px; color: rgba(255,255,255,0.85); font-weight: 500; font-size: 0.9rem; }
+        
+        .input-wrapper { position: relative; }
+        .form-group input {
             width: 100%;
-            padding: 14px 16px 14px 48px;
-            border: 2px solid var(--light-gray);
+            padding: 14px 18px 14px 48px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             font-size: 0.95rem;
-            font-weight: 500;
-            transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: var(--off-white);
-            color: var(--primary-dark);
+            color: var(--white);
             font-family: 'Inter', sans-serif;
+            transition: var(--transition);
         }
-
-        .form-control::placeholder {
-            color: var(--gray);
-            text-transform: none;
-            letter-spacing: 0;
+        .form-group input::placeholder { color: rgba(255,255,255,0.35); }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.15);
         }
-
         .input-icon {
             position: absolute;
             left: 16px;
@@ -248,279 +108,123 @@
             transform: translateY(-50%);
             color: var(--gray);
             font-size: 1.1rem;
-            transition: var(--transition);
         }
 
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.1);
-        }
-
-        .form-control:focus + .input-icon {
-            color: var(--accent);
-        }
-
-        .btn {
+        .upgrade-btn {
             width: 100%;
-            padding: 16px;
+            padding: 15px;
             background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
-            color: white;
+            color: var(--white);
             border: none;
             border-radius: 12px;
             font-size: 1rem;
-            font-weight: 700;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
             cursor: pointer;
             transition: var(--transition);
-            font-family: 'Inter', sans-serif;
-            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.3);
-            position: relative;
-            overflow: hidden;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.3);
         }
+        .upgrade-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(0, 188, 212, 0.4); }
+        .upgrade-btn:disabled { background: #334155; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: var(--transition);
-        }
+        .alert { padding: 14px; border-radius: 12px; margin-bottom: 22px; display: none; font-size: 0.9rem; font-weight: 500; }
+        .alert-success { background: rgba(46, 125, 50, 0.15); color: #81c784; border: 1px solid rgba(46, 125, 50, 0.3); }
+        .alert-error { background: rgba(198, 40, 40, 0.15); color: #ef5350; border: 1px solid rgba(198, 40, 40, 0.3); }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(0, 188, 212, 0.4);
-        }
-
-        .btn:hover::after {
-            left: 100%;
-        }
-
-        .btn:disabled {
-            background: var(--light-gray);
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .alert {
-            padding: 16px 18px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: none;
-            animation: fadeInUp 0.5s ease forwards;
-            text-align: left;
-            position: relative;
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, var(--success-light) 0%, #c3e6cb 100%);
-            border: 2px solid var(--success);
-            color: var(--success-dark);
-        }
-
-        .alert-error {
-            background: linear-gradient(135deg, var(--danger-light) 0%, #f5c6cb 100%);
-            border: 2px solid var(--danger);
-            color: var(--danger-dark);
-        }
-
-        .alert-warning {
-            background: linear-gradient(135deg, var(--warning-light) 0%, #fde68a 100%);
-            border: 2px solid var(--warning);
-            color: var(--warning-dark);
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 28px;
-            padding-top: 24px;
-            border-top: 1px solid var(--light-gray);
-            width: 100%;
-            color: var(--primary);
-            font-size: 0.9rem;
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .back-link:hover {
-            color: var(--accent);
-        }
-
-        .spin {
-            width: 18px; height: 18px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .container {
-                padding: 28px 20px;
-                margin: 10px;
-            }
-            .logo-brand {
-                font-size: 1.3rem;
-            }
-            .page-title h1 {
-                font-size: 1.3rem;
-            }
-        }
+        .back-link { text-align: center; margin-top: 22px; color: var(--gray); font-size: 0.9rem; }
+        .back-link a { color: var(--accent-light); text-decoration: none; font-weight: 600; }
+        .back-link a:hover { text-decoration: underline; }
     </style>
-<base target="_blank">
 </head>
 <body>
-
-    <div class="container">
-        <!-- YenlletAfrica Style Logo -->
-        <a href="dashboard.html" class="logo">
-            <div class="logo-icon">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                </svg>
-            </div>
-            <div class="logo-text">
-                <span class="logo-brand">YenlletAfrica</span>
-                <span class="logo-tagline">Earn With Confidence</span>
-            </div>
-        </a>
-
-        <div class="page-title">
-            <h1>⬆️ Upgrade Your Plan</h1>
-            <p>Enter an upgrade coupon to unlock higher rewards</p>
+    <div class="upgrade-container">
+        <div class="logo">
+            <i class="bi bi-stars"></i>
+            <h1>Upgrade Plan</h1>
+            <p>Enter your upgrade coupon code to unlock more rewards!</p>
         </div>
-
-        <div id="currentPlanBadge" class="plan-badge plan-lite">Current: YENLITE</div>
 
         <div id="alertBox" class="alert"></div>
 
-        <div class="info-box">
-            <p><strong>Tip:</strong> Upgrade coupons start with <strong>PRO</strong> or <strong>VITE</strong>. You cannot downgrade to a lower plan once upgraded.</p>
-        </div>
-
         <form id="upgradeForm">
             <div class="form-group">
-                <label for="coupon">Upgrade Coupon Code</label>
+                <label for="couponCode">Upgrade Coupon Code</label>
                 <div class="input-wrapper">
-                    <input type="text" id="coupon" class="form-control" placeholder="Example: PROABC123" required maxlength="20">
-                    <span class="input-icon">🎫</span>
+                    <input type="text" id="couponCode" placeholder="PRO12345 or VITE12345" required autofocus>
+                    <span class="input-icon"><i class="bi bi-ticket-perforated"></i></span>
                 </div>
             </div>
 
-            <button type="submit" class="btn" id="submitBtn">
-                <span id="btnIcon">✅</span> <span id="btnText">Apply Upgrade</span>
-            </button>
+            <button type="submit" class="upgrade-btn" id="upgradeBtn">Upgrade Now</button>
         </form>
 
-        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+        <div class="back-link">
+            <a href="dashboard.html"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+        </div>
     </div>
 
     <script>
-        const API = 'http://localhost:5000';
+        const API_URL = 'https://yenlletafrica.onrender.com';
 
-        function showAlert(msg, type) {
-            const box = document.getElementById('alertBox');
-            box.className = `alert alert-${type}`;
-            box.innerHTML = msg;
-            box.style.display = 'block';
-        }
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert alert-${type}`;
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
 
-        function hideAlert() {
-            document.getElementById('alertBox').style.display = 'none';
-        }
-
-        async function init() {
-            try {
-                const res = await fetch(`${API}/api/check-session`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const data = await res.json();
-                if (!data.authenticated) {
-                    window.location.href = 'login.html';
-                    return;
-                }
-
-                // Load profile to show current plan
-                const profileRes = await fetch(`${API}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                const profile = await profileRes.json();
-                if (profile.plan) {
-                    const badge = document.getElementById('currentPlanBadge');
-                    badge.textContent = `Current: ${profile.plan}`;
-                    badge.className = `plan-badge plan-${profile.plan.toLowerCase().replace('yen','')}`;
-                }
-            } catch (e) {
-                console.error('Init error:', e);
+            if (type === 'error') {
+                setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
             }
         }
 
         document.getElementById('upgradeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const coupon = document.getElementById('coupon').value.trim();
-            const btn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const btnIcon = document.getElementById('btnIcon');
 
-            if (!coupon) return;
+            const couponCode = document.getElementById('couponCode').value.trim();
+            const upgradeBtn = document.getElementById('upgradeBtn');
 
-            hideAlert();
-            btn.disabled = true;
-            btnIcon.innerHTML = '<div class="spin"></div>';
-            btnText.textContent = 'Processing...';
+            upgradeBtn.disabled = true;
+            upgradeBtn.textContent = 'Upgrading...';
 
             try {
-                const res = await fetch(`${API}/api/apply-upgrade-coupon`, {
+                const response = await fetch(`${API_URL}/api/apply-upgrade-coupon`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ coupon_code: coupon })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ coupon_code: couponCode })
                 });
 
-                const data = await res.json();
+                const data = await response.json();
 
-                if (res.ok && data.success) {
-                    showAlert(`🎉 Upgraded to <strong>${data.new_plan}</strong>!<br>Welcome bonus: <strong>₦${data.welcome_bonus.toLocaleString()}</strong>`, 'success');
-                    document.getElementById('currentPlanBadge').textContent = `Current: ${data.new_plan}`;
-                    document.getElementById('currentPlanBadge').className = `plan-badge plan-${data.new_plan.toLowerCase().replace('yen','')}`;
-                    document.getElementById('coupon').value = '';
-                } else {
-                    showAlert(data.error || 'Upgrade failed. Check your coupon code.', 'error');
+                if (!response.ok) {
+                    showAlert('❌ ' + (data.error || 'Upgrade failed'), 'error');
+                    upgradeBtn.disabled = false;
+                    upgradeBtn.textContent = 'Upgrade Now';
+                    return;
                 }
-            } catch (err) {
-                showAlert('Network error. Please try again.', 'error');
-            } finally {
-                btn.disabled = false;
-                btnIcon.textContent = '✅';
-                btnText.textContent = 'Apply Upgrade';
+
+                if (data.success) {
+                    showAlert(`✅ ${data.message}`, 'success');
+                    document.getElementById('upgradeForm').reset();
+
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
+                } else {
+                    showAlert('❌ Upgrade failed', 'error');
+                    upgradeBtn.disabled = false;
+                    upgradeBtn.textContent = 'Upgrade Now';
+                }
+            } catch (error) {
+                console.error('Upgrade error:', error);
+                showAlert('❌ Network error! Please try again.', 'error');
+                upgradeBtn.disabled = false;
+                upgradeBtn.textContent = 'Upgrade Now';
             }
         });
-
-        init();
-    </script>
-    <script>
-    (async function(){
-      try {
-        const r = await fetch('http://localhost:5000/api/profile', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-        if(r.ok){ const d = await r.json(); if(d.dark_mode) document.body.classList.add('dark-mode'); }
-      } catch(e){}
-    })();
     </script>
 </body>
 </html>

@@ -625,9 +625,9 @@
             </div>
         </div>
     </div>
-
     <script>
-        const API_URL = window.location.origin.includes('localhost') ? 'http://localhost:5000' : window.location.origin;
+        // Hardcoded to your Render backend so it works on Vercel
+        const API_URL = 'https://yenlletafrica.onrender.com';
 
         // Load user data on page load
         document.addEventListener('DOMContentLoaded', async () => {
@@ -718,8 +718,11 @@
             try {
                 const response = await fetch(`${API_URL}/api/submit-tiktok-handle`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    // FIX: Merged headers into one object
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
                     body: JSON.stringify({ tiktok_handle: handle })
                 });
 
