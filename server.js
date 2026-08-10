@@ -40,6 +40,7 @@ if (!process.env.VERCEL) {
 // ============================================================
 // 🛡️ MIDDLEWARE
 // ============================================================
+app.set('trust proxy', 1); // FIX FOR RENDER PROXY ERROR
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
