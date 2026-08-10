@@ -8,11 +8,10 @@ const multer = require('multer');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cloudinary = require('cloudinary').v2;
-const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key_change_this';
+const TOKEN_SECRET = process.env.JWT_SECRET || 'default_fallback_secret';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -25,14 +24,13 @@ cloudinary.config({
 // ============================================================
 process.on('uncaughtException', (err) => {
     console.error('❌ UNCAUGHT EXCEPTION:', err.message);
-    console.error(err.stack);
 });
 process.on('unhandledRejection', (reason, promise) => {
     console.error('❌ UNHANDLED REJECTION at:', promise, 'reason:', reason);
 });
 
 // ============================================================
-// 📁 FOLDER CREATION (Local only - Vercel is read-only)
+// 📁 FOLDER CREATION
 // ============================================================
 if (!process.env.VERCEL) {
     const dirs = ['uploads', 'uploads/marketplace', 'uploads/courses', 'uploads/vendors', 'uploads/whatsapp', 'uploads/profiles', 'uploads/chat'];
@@ -54,7 +52,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.ht
 // ============================================================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }, // Works perfectly on Render, Vercel, and Local
+  ssl: { rejectUnauthorized: false },
   max: 20, 
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 30000,
@@ -68,34 +66,14 @@ if (!process.env.VERCEL) {
   });
 }
 
-// ============================================================
-// 💓 DATABASE HEARTBEAT & 🧹 AUTO-DELETE (Local only)
-// ============================================================
 if (!process.env.VERCEL) {
     setInterval(async () => {
         try {
             await pool.query('SELECT 1');
-            console.log('💓 DB Heartbeat: OK');
         } catch (err) {
             console.error('💓 DB Heartbeat Failed:', err.message);
         }
     }, 120000);
-
-    setInterval(async () => {
-        try {
-            const settingsResult = await pool.query('SELECT * FROM settings WHERE id = 1');
-            const settings = settingsResult.rows[0];
-            if (settings) {
-                const taskMinutes = settings.auto_delete_tasks_after_minutes || 1440;
-                const videoMinutes = settings.auto_delete_videos_after_minutes || 1440;
-                await pool.query(`DELETE FROM task_completions WHERE task_id IN (SELECT id FROM tasks WHERE created_at < NOW() - ($1 * INTERVAL '1 minute'))`, [taskMinutes]);
-                await pool.query(`DELETE FROM tasks WHERE created_at < NOW() - ($1 * INTERVAL '1 minute')`, [taskMinutes]);
-                await pool.query(`DELETE FROM video_completions WHERE video_id IN (SELECT id FROM videos WHERE created_at < NOW() - ($1 * INTERVAL '1 minute'))`, [videoMinutes]);
-                await pool.query(`DELETE FROM videos WHERE created_at < NOW() - ($1 * INTERVAL '1 minute')`, [videoMinutes]);
-                console.log(`🧹 Cleaned up expired tasks & videos (${taskMinutes}m / ${videoMinutes}m)`);
-            }
-        } catch (err) { console.error('Auto-delete error:', err.message); }
-    }, 300000);
 }
 
 const nodemailer = require('nodemailer');
@@ -117,7 +95,7 @@ const REWARDS = {
 function getRewardsForPlan(plan) { return REWARDS[plan] || REWARDS.YENLITE; }
 
 // ============================================================
-// 📎 MULTER CONFIG (Memory Storage for Cloudinary)
+// 📎 MULTER CONFIG 
 // ============================================================
 const storage = multer.memoryStorage();
 
@@ -191,7 +169,7 @@ app.use((req, res, next) => {
 });
 
 // ============================================================
-// 🔧 UTILITIES & JWT AUTH MIDDLEWARE (FIXED)
+// 🔧 UTILITIES & CUSTOM CRYPTO AUTH MIDDLEWARE (NO JWT)
 // ============================================================
 function hashPassword(password) {
     return crypto.createHash('sha256').update(password).digest('hex');
@@ -201,45 +179,62 @@ function hashPin(pin) {
     return crypto.createHash('sha256').update(pin.toString()).digest('hex');
 }
 
-function isAuthenticated(req, res, next) {
-    const authHeader = req.headers['authorization'];
+// Custom Token Generation (Replaces JWT)
+function generateToken(payload) {
+    const data = Buffer.from(JSON.stringify(payload)).toString('base64');
+    const signature = crypto.createHmac('sha256', TOKEN_SECRET).update(data).digest('hex');
+    return `${data}.${signature}`;
+}
+
+// Custom Token Verification (Replaces JWT)
+function verifyToken(token) {
+    if (!token) return null;
+    const parts = token.split('.');
+    if (parts.length !== 2) return null;
+    const [data, signature] = parts;
+    const expectedSignature = crypto.createHmac('sha256', TOKEN_SECRET).update(data).digest('hex');
     
-    if (!authHeader) {
-        console.error("Auth Error: No Authorization header provided");
-        return res.status(401).json({ error: 'Authentication required' });
+    if (signature !== expectedSignature) {
+        console.error("Auth Error: Token signature mismatch");
+        return null;
     }
-
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-
-    // Prevents "Bearer null" or "Bearer undefined" strings from passing
-    if (!token || token === 'null' || token === 'undefined') {
-        console.error("Auth Error: Token is missing or invalid format");
-        return res.status(401).json({ error: 'Invalid token format' });
-    }
-
+    
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded; // { user_id, username, role }
-        next();
+        return JSON.parse(Buffer.from(data, 'base64').toString('utf8'));
     } catch (err) {
-        console.error("Auth Error: Token verification failed -", err.message);
-        return res.status(403).json({ error: 'Invalid or expired token' });
+        console.error("Auth Error: Failed to parse token payload");
+        return null;
     }
 }
+
+function isAuthenticated(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: 'Authentication required' });
+
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+    if (!token || token === 'null' || token === 'undefined') return res.status(401).json({ error: 'Invalid token format' });
+
+    const decoded = verifyToken(token);
+    if (!decoded || !decoded.user_id) {
+        return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+    
+    req.user = decoded;
+    next();
+}
+
 const isAdmin = async (req, res, next) => {
     try {
         if (!req.user || !req.user.user_id) {
             return res.status(403).json({ error: 'Admin access required (No token user)' });
         }
         
-        // Check the database DIRECTLY for the user's role
         const result = await pool.query('SELECT role, is_admin FROM users WHERE id = $1', [req.user.user_id]);
         
         if (result.rows.length > 0) {
             const dbUser = result.rows[0];
-            // If the database says you are superadmin or assistant, let you in!
             if (dbUser.is_admin && (dbUser.role === 'superadmin' || dbUser.role === 'assistant')) {
-                req.user.role = dbUser.role; // Update the request with the DB role
+                req.user.role = dbUser.role; // Force DB role
                 return next();
             }
         }
@@ -251,13 +246,11 @@ const isAdmin = async (req, res, next) => {
         return res.status(500).json({ error: 'Server error during admin check' });
     }
 };
+
 async function createNotification(userId, message) {
     try {
         if (!userId) return;
-        await pool.query(
-            'INSERT INTO notifications (user_id, message, is_read) VALUES ($1, $2, false)',
-            [userId, message]
-        );
+        await pool.query('INSERT INTO notifications (user_id, message, is_read) VALUES ($1, $2, false)', [userId, message]);
     } catch (err) {
         console.error('Notification error:', err.message);
     }
@@ -266,10 +259,7 @@ async function createNotification(userId, message) {
 async function addActivityFeed(userId, action, amount = 0, description = '') {
     try {
         if (!userId) return;
-        await pool.query(
-            'INSERT INTO activity_feed (user_id, action, amount, description) VALUES ($1, $2, $3, $4)',
-            [userId, action, amount, description]
-        );
+        await pool.query('INSERT INTO activity_feed (user_id, action, amount, description) VALUES ($1, $2, $3, $4)', [userId, action, amount, description]);
     } catch (err) {
         console.error('Activity feed error:', err.message);
     }
@@ -281,11 +271,9 @@ async function addActivityFeed(userId, action, amount = 0, description = '') {
 app.post('/api/upload-chat-file', isAuthenticated, chatUpload.single('file'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-        
         const isImage = req.file.mimetype.startsWith('image/');
         const resource_type = isImage ? 'image' : 'video';
         const result = await uploadToCloudinary(req.file.buffer, 'chat_files', resource_type);
-        
         res.json({ success: true, file_url: result.secure_url, file_name: req.file.originalname, mimetype: req.file.mimetype });
     } catch (err) {
         console.error('Chat upload error:', err);
@@ -517,7 +505,7 @@ app.post('/api/register', authLimiter, async (req, res) => {
         }
         await client.query('COMMIT');
 
-        const token = jwt.sign({ user_id: userId, username: username.trim(), role: 'user' }, JWT_SECRET, { expiresIn: '7d' });
+        const token = generateToken({ user_id: userId, username: username.trim(), role: 'user' });
 
         res.status(201).json({ success: true, token, message: 'Registration successful!', redirect: '/dashboard.html' });
     } catch (err) { 
@@ -539,10 +527,8 @@ app.post('/api/login', authLimiter, async (req, res) => {
         if (!user) return res.status(401).json({ error: 'Invalid username or password' });
         if (user.is_banned) return res.status(403).json({ error: 'Your account has been banned' });
         
-        const token = jwt.sign(
-            { user_id: user.id, username: user.username, role: user.role || 'user' },
-            JWT_SECRET,
-            { expiresIn: '7d' }
+        const token = generateToken(
+            { user_id: user.id, username: user.username, role: user.role || 'user' }
         );
         
         let redirectUrl = '/dashboard.html';
@@ -592,7 +578,6 @@ app.post('/api/upload-profile-picture', isAuthenticated, upload.single('profile_
     try {
         const result = await uploadToCloudinary(req.file.buffer, 'profile_pictures');
         const imageUrl = result.secure_url;
-        
         await pool.query('UPDATE users SET profile_picture = $1 WHERE id = $2', [imageUrl, userId]);
         res.json({ message: 'Profile picture updated successfully', profile_picture: imageUrl, url: imageUrl });
     } catch (err) {
@@ -1682,7 +1667,7 @@ app.post('/api/admin/credit-wallet', isAdmin, async (req, res) => {
         if (userResult.rows.length === 0) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'User not found' }); }
         await client.query(`UPDATE users SET ${column} = ${column} + $1 WHERE id = $2`, [amount, user_id]);
         await client.query('COMMIT');
-        await addActivityFeed(user_id, 'Admin Credit', amount, reason || `Credited by admin to ${wallet_type}`);
+        await addActivityFeed(user_id, 'Admin Credit', amount, reason || `Credited by admin to ${wallet_type}``);
         await createNotification(user_id, `💰 Admin credited ¥${amount.toLocaleString()} to your ${wallet_type} wallet.`);
         res.json({ success: true, message: `Credited ¥${amount} to ${wallet_type} wallet` });
     } catch (err) { if (client) await client.query('ROLLBACK'); console.error('Credit wallet error:', err); res.status(500).json({ error: 'Failed to credit wallet' }); }
@@ -1704,7 +1689,7 @@ app.post('/api/admin/debit-wallet', isAdmin, async (req, res) => {
         if (balance < amount) { await client.query('ROLLBACK'); return res.status(400).json({ error: `Insufficient balance. Available: ¥${balance}` }); }
         await client.query(`UPDATE users SET ${column} = ${column} - $1 WHERE id = $2`, [amount, user_id]);
         await client.query('COMMIT');
-        await addActivityFeed(user_id, 'Admin Debit', amount, reason || `Debited by admin from ${wallet_type}`);
+        await addActivityFeed(user_id, 'Admin Debit', amount, reason || `Debited by admin from ${wallet_type}``);
         await createNotification(user_id, `⚠️ Admin debited ¥${amount.toLocaleString()} from your ${wallet_type} wallet.`);
         res.json({ success: true, message: `Debited ¥${amount} from ${wallet_type} wallet` });
     } catch (err) { if (client) await client.query('ROLLBACK'); console.error('Debit wallet error:', err); res.status(500).json({ error: 'Failed to debit wallet' }); }
@@ -2047,7 +2032,7 @@ app.post('/api/assistant/credit-wallet', isAdmin, async (req, res) => {
         if (userResult.rows.length === 0) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'User not found' }); }
         await client.query(`UPDATE users SET ${column} = ${column} + $1 WHERE id = $2`, [amount, user_id]);
         await client.query('COMMIT');
-        await addActivityFeed(user_id, 'Admin Credit', amount, reason || `Credited by assistant to ${wallet_type}`);
+        await addActivityFeed(user_id, 'Admin Credit', amount, reason || `Credited by assistant to ${wallet_type}``);
         await createNotification(user_id, `💰 Assistant credited ¥${amount.toLocaleString()} to your ${wallet_type} wallet.`);
         res.json({ success: true, message: `Credited ¥${amount} to ${wallet_type} wallet` });
     } catch (err) { if (client) await client.query('ROLLBACK'); console.error('Assistant credit wallet error:', err); res.status(500).json({ error: 'Failed to credit wallet' }); }
@@ -2069,7 +2054,7 @@ app.post('/api/assistant/debit-wallet', isAdmin, async (req, res) => {
         if (balance < amount) { await client.query('ROLLBACK'); return res.status(400).json({ error: `Insufficient balance. Available: ¥${balance}` }); }
         await client.query(`UPDATE users SET ${column} = ${column} - $1 WHERE id = $2`, [amount, user_id]);
         await client.query('COMMIT');
-        await addActivityFeed(user_id, 'Admin Debit', amount, reason || `Debited by assistant from ${wallet_type}`);
+        await addActivityFeed(user_id, 'Admin Debit', amount, reason || `Debited by assistant from ${wallet_type}``);
         await createNotification(user_id, `⚠️ Assistant debited ¥${amount.toLocaleString()} from your ${wallet_type} wallet.`);
         res.json({ success: true, message: `Debited ¥${amount} from ${wallet_type} wallet` });
     } catch (err) { if (client) await client.query('ROLLBACK'); console.error('Assistant debit wallet error:', err); res.status(500).json({ error: 'Failed to debit wallet' }); }
@@ -2173,7 +2158,7 @@ app.post('/api/assistant/update-active-country', isAdmin, async (req, res) => {
 });
 
 // ============================================================
-// 📊 PUBLIC STATS (for index.html landing page)
+// 📊 PUBLIC STATS 
 // ============================================================
 app.get('/api/public/stats', async (req, res) => {
     try {
