@@ -215,8 +215,10 @@
             Don't have an account? <a href="register.html">Register now</a>
         </div>
     </div>
-
     <script>
+        // MUST use your Render backend URL here since frontend is on Vercel
+        const API_URL = 'https://yenlletafrica.onrender.com';
+
         function showAlert(message, type) {
             const alertBox = document.getElementById('alertBox');
             alertBox.className = `alert alert-${type}`;
@@ -239,8 +241,8 @@
             loginBtn.textContent = 'Logging in...';
 
             try {
-                // FIXED: Using relative path '/api/login'
-                const response = await fetch('/api/login', {
+                // Fetching from the Render backend
+                const response = await fetch(`${API_URL}/api/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
@@ -256,7 +258,7 @@
                 }
 
                 if (data.success) {
-                    // FIXED: Save the JWT token to localStorage
+                    // Save the JWT token to localStorage
                     if (data.token) {
                         localStorage.setItem('token', data.token);
                     }
