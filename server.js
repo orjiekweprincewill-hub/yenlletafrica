@@ -54,13 +54,11 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.ht
 // ============================================================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.VERCEL 
-    ? { rejectUnauthorized: false } 
-    : { rejectUnauthorized: true }, 
-  max: process.env.VERCEL ? 4 : 20, 
+  ssl: { rejectUnauthorized: false }, // Works perfectly on Render, Vercel, and Local
+  max: 20, 
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 30000,
-  keepAlive: !process.env.VERCEL
+  keepAlive: true
 });
 
 if (!process.env.VERCEL) {

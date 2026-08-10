@@ -4,14 +4,12 @@ require('dotenv').config();
 // ============================================================ // 🔌 POOL CONFIGURATION (Updated for Neon Serverless) // ============================================================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Automatically relaxes SSL checks on Vercel or deployment builds to prevent connection drops
-  ssl: process.env.VERCEL 
-    ? { rejectUnauthorized: false } 
-    : { rejectUnauthorized: true },
-  max: process.env.VERCEL ? 4 : 20,
+  // Automatically relaxes SSL checks to prevent connection drops on Render/Vercel
+  ssl: { rejectUnauthorized: false },
+  max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 30000,
-  keepAlive: !process.env.VERCEL
+  keepAlive: true
 });
 
 pool.on('error', (err) => {
