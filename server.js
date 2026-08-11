@@ -1106,14 +1106,26 @@ app.get('/api/social-links', async (req, res) => {
         res.json(result.rows);
     } catch (err) { console.error('Social links error:', err.message); res.status(500).json({ error: 'Failed to load social links' }); }
 });
-
 app.get('/api/leaderboard', async (req, res) => {
     try {
-        const result = await pool.query(`SELECT username, profile_picture, plan, COALESCE(total_referral_earnings, 0) as total_earnings, (SELECT COUNT(*) FROM users WHERE referrer_id = u.id) as referral_count FROM users u WHERE is_banned = false AND is_admin = false ORDER BY total_earnings DESC, referral_count DESC LIMIT 50`);
+        const result = await pool.query(`
+            SELECT 
+                u.username, 
+                u.profile_picture, 
+                u.plan, 
+                COALESCE(u.total_referral_earnings, 0) as total_earnings, 
+                (SELECT COUNT(*)::int FROM users WHERE referrer_id = u.id) as referral_count 
+            FROM users u 
+            WHERE u.is_banned = false AND u.is_admin = false 
+            ORDER BY total_earnings DESC, referral_count DESC 
+            LIMIT 50
+        `);
         res.json(result.rows);
-    } catch (err) { console.error('Leaderboard error:', err.message); res.status(500).json({ error: 'Failed to load leaderboard' }); }
+    } catch (err) { 
+        console.error('Leaderboard error:', err.message); 
+        res.status(500).json({ error: 'Failed to load leaderboard' }); 
+    }
 });
-
 // ============================================================
 // 🔔 NOTIFICATIONS & ACTIVITY
 // ============================================================
