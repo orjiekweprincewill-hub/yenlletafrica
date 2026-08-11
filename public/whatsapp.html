@@ -1026,8 +1026,12 @@
             }
         }
 
-        async function sharePostToWhatsApp(title, postId) {
-            const text = `Check this out! ${title}\n\n🚀 via YENLLET App`;
+        async function sharePostToWhatsApp(title, postId, imageUrl) {
+            let text = `Check this out! ${title}\n\n`;
+            if (imageUrl) {
+                text += `View image here: ${imageUrl}\n\n`;
+            }
+            text += `🚀 via YENLLET App`;
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
             
             window.open(whatsappUrl, '_blank');
@@ -1126,7 +1130,7 @@
 
                     return `
                     <div class="post-card">
-                        ${post.image_filename ? `<img src="${API_URL}/uploads/whatsapp/${post.image_filename}" class="post-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%230a1628%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 font-size=%2220%22 fill=%22%238892b0%22%3EImage Not Found%3C/text%3E%3C/svg%3E';">` : ''}
+                        ${post.image_filename ? `<img src="${post.image_filename}" class="post-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%230a1628%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 font-size=%2220%22 fill=%22%238892b0%22%3EImage Not Found%3C/text%3E%3C/svg%3E';">` : ''}
                         <div class="post-body">
                             <div class="post-title">${post.title}</div>
                             <div class="post-description">${post.description}</div>
@@ -1136,7 +1140,7 @@
                             ${post.status === 'earned' ? '<div class="reward-info"><i class="bi bi-star-fill"></i> ¥190 earned!</div>' : ''}
                         </div>
                         <div class="post-actions">
-                            <button class="btn-share" onclick="sharePostToWhatsApp('${post.title.replace(/'/g, "\\'")}', ${post.id})">
+                            <button class="btn-share" onclick="sharePostToWhatsApp('${post.title.replace(/'/g, "\\'")}', ${post.id}, '${post.image_filename || ''}')">
                                 <i class="bi bi-whatsapp"></i> Share & Earn
                             </button>
                         </div>
