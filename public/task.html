@@ -664,7 +664,8 @@
                 const data = await response.json();
                 document.getElementById('usernameDisplay').textContent = data.username;
                 if (data.profile_picture) {
-                    document.getElementById('profilePic').src = `${API_URL}/uploads/${data.profile_picture}`;
+                    document.getElementById('profilePic').src = data.profile_picture;
+document.getElementById('profilePic').onerror = () => { document.getElementById('profilePic').src = 'https://via.placeholder.com/150'; };
                 }
 
                 // Sync dark mode from server (server wins over localStorage)

@@ -672,9 +672,9 @@
             </div>
         </div>
     </div>
-
     <script>
-        const API_BASE = '';
+        // FIX: Hardcoded to your Render backend
+        const API_BASE = 'https://yenlletafrica.onrender.com';
         let bankDetails = null;
 
         // Check session on load
@@ -860,8 +860,11 @@
             try {
                 const res = await fetch(`${API_BASE}/api/setup-bank`, {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    headers: { 'Content-Type': 'application/json' },
+                    // FIX: Merged headers
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
                     body: JSON.stringify({ bank_name: bankName, account_number: accountNumber, account_name: accountName, pin, confirm_pin: confirmPin })
                 });
                 let data;
@@ -894,8 +897,11 @@
             try {
                 const res = await fetch(`${API_BASE}/api/update-bank`, {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    headers: { 'Content-Type': 'application/json' },
+                    // FIX: Merged headers
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
                     body: JSON.stringify({ bank_name: bankName, account_number: accountNumber, account_name: accountName, current_pin: currentPin })
                 });
                 let data;
@@ -936,8 +942,11 @@
             try {
                 const res = await fetch(`${API_BASE}/api/change-withdrawal-pin`, {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    headers: { 'Content-Type': 'application/json' },
+                    // FIX: Merged headers
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
                     body: JSON.stringify({ old_pin: oldPin, new_pin: newPin, confirm_new_pin: confirmNewPin })
                 });
                 let data;

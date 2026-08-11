@@ -1,1481 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0d47a1">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="YENLLET">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d47a1">
     <title>Chat & Earn - YENLLET</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        :root {
-            --primary-dark: #0a1628;
-            --primary: #0d47a1;
-            --primary-light: #1565c0;
-            --accent: #00bcd4;
-            --accent-light: #4fc3f7;
-            --white: #ffffff;
-            --off-white: #f0f4f8;
-            --gray: #8892b0;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
+        :root { --primary-dark: #0a1628; --primary: #0d47a1; --primary-light: #1565c0; --accent: #00bcd4; --accent-light: #4fc3f7; --white: #ffffff; --off-white: #f0f4f8; --gray: #8892b0; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--off-white);
-            color: var(--primary-dark);
-            overflow: hidden; /* Prevent body scroll for chat app */
-            min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        /* ===== HEADER ===== */
-        .top-header {
-            position: fixed;
-            top: 0; left: 0; width: 100%; z-index: 1000;
-            background: rgba(10, 22, 40, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: var(--transition);
-            padding: 0 20px;
-        }
-        .top-header.scrolled { box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-
-        .nav-container {
-            max-width: 1200px; margin: 0 auto;
-            display: flex; justify-content: space-between; align-items: center;
-            height: 70px;
-        }
-
-        .logo {
-            display: flex; align-items: center; gap: 10px;
-            text-decoration: none; color: var(--white);
-            font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px;
-        }
-        .logo-img { height: 35px; width: auto; border-radius: 8px; }
-        .logo span {
-            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-
-        .header-controls { display: flex; align-items: center; gap: 15px; }
-        .menu-icon {
-            font-size: 24px; color: white; cursor: pointer;
-            transition: var(--transition); padding: 8px; border-radius: 8px;
-        }
-        .menu-icon:hover { background: rgba(255,255,255,0.1); }
-
-        .dark-mode-toggle {
-            background: rgba(255,255,255,0.1); border: none; color: white;
-            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
-            font-size: 20px; display: flex; align-items: center; justify-content: center;
-            transition: var(--transition);
-        }
-        .dark-mode-toggle:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
-
-        .header-profile { display: flex; align-items: center; gap: 10px; }
-        .profile-pic-small {
-            width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
-            border: 2px solid rgba(255,255,255,0.3); transition: var(--transition);
-        }
-        .profile-pic-small:hover { border-color: var(--accent); }
-        .username-header { color: var(--white); font-weight: 600; font-size: 16px; }
-
-        /* ===== HERO SECTION ===== */
-        .hero-section {
-            min-height: 30vh;
-            display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
-            position: relative; overflow: hidden;
-            padding: 100px 2rem 40px;
-            margin-bottom: 0;
-        }
-        .hero-section::before {
-            content: ''; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); width: 300px; height: 300px;
-            background-image: url('/uploads/default-avatar.png');
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            opacity: 0.08; filter: blur(2px); pointer-events: none;
-        }
-        .hero-section::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%);
-            animation: pulse 8s ease-in-out infinite; pointer-events: none;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-        .hero-content { max-width: 1200px; width: 100%; text-align: center; position: relative; z-index: 1; }
-        .hero-content h1 {
-            font-size: 2.5rem; font-weight: 800; color: var(--white);
-            line-height: 1.1; margin-bottom: 1rem; opacity: 0; animation: fadeInUp 1s ease forwards;
-        }
-        .hero-content h1 span {
-            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .hero-content p {
-            font-size: 1.1rem; color: rgba(255,255,255,0.8); line-height: 1.7;
-            margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;
-            opacity: 0; animation: fadeInUp 1s ease 0.2s forwards;
-        }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ===== CHAT CONTAINER ===== */
-        .main-content {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            height: calc(100vh - 30vh - 40px); /* Fill remaining screen */
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-card {
-            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(10, 22, 40, 0.08);
-            border: 1px solid rgba(0,0,0,0.03);
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(40px);
-            animation: fadeInUp 0.6s ease forwards;
-            animation-delay: 0.3s;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .users-sidebar {
-            width: 320px; border-right: 1px solid rgba(0,0,0,0.03);
-            display: flex; flex-direction: column; background: transparent;
-        }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(0,0,0,0.03); }
-        .sidebar-header h2 { font-size: 18px; color: var(--primary-dark); margin-bottom: 4px; font-weight: 700; }
-        .sidebar-subtitle { font-size: 13px; color: var(--gray); }
-        .online-count {
-            display: inline-block; background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
-            color: white; padding: 4px 12px; border-radius: 50px; font-size: 12px; margin-top: 8px; font-weight: 600;
-        }
-        .search-box { padding: 15px 20px; border-bottom: 1px solid rgba(0,0,0,0.03); }
-        .search-input {
-            width: 100%; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 50px;
-            font-size: 14px; outline: none; background: var(--off-white); transition: var(--transition);
-            font-family: 'Inter', sans-serif;
-        }
-        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1); }
-
-        .users-list { flex: 1; overflow-y: auto; }
-        .user-item {
-            padding: 15px 20px; cursor: pointer; transition: var(--transition);
-            display: flex; align-items: center; gap: 14px; position: relative; border-bottom: 1px solid rgba(0,0,0,0.02);
-        }
-        .user-item:hover:not(.offline) { background: rgba(0, 188, 212, 0.05); }
-        .user-item.active { background: linear-gradient(135deg, rgba(0,188,212,0.1) 0%, rgba(13,71,161,0.05) 100%); }
-        .user-item.offline { opacity: 0.5; cursor: not-allowed; }
-        .user-avatar {
-            width: 48px; height: 48px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 600; font-size: 18px;
-            position: relative; flex-shrink: 0; overflow: hidden;
-        }
-        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .online-indicator {
-            position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px;
-            background: #4caf50; border: 2px solid white; border-radius: 50%;
-        }
-        .offline-indicator { background: #8696a0; }
-        .user-info { flex: 1; min-width: 0; }
-        .user-name { font-weight: 600; color: var(--primary-dark); margin-bottom: 3px; font-size: 15px; }
-        .user-status { font-size: 13px; color: var(--gray); }
-        .user-status.online { color: #4caf50; font-weight: 500; }
-
-        /* ===== CHAT MAIN ===== */
-        .chat-main {
-            flex: 1; display: flex; flex-direction: column;
-            background: var(--off-white);
-        }
-        .chat-header {
-            padding: 15px 20px; background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.03);
-            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
-        }
-        .chat-user-info { display: flex; align-items: center; gap: 12px; }
-        .back-btn-mobile {
-            display: none; background: rgba(0,188,212,0.1); border: none; padding: 8px 12px;
-            border-radius: 8px; color: var(--primary); cursor: pointer; font-size: 16px; margin-right: 8px;
-        }
-        .timer-display { display: flex; flex-direction: column; align-items: flex-end; }
-        .timer-text { font-size: 22px; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
-        .timer-label { font-size: 11px; color: var(--gray); max-width: 140px; text-align: right; }
-        
-        .chat-status-banner {
-            padding: 10px 20px; text-align: center; font-size: 13px; font-weight: 500;
-            background: rgba(255, 243, 205, 0.5); color: #856404;
-            border-bottom: 1px solid rgba(0,0,0,0.03); display: none; flex-shrink: 0;
-        }
-        .chat-status-banner.earned { background: rgba(212, 237, 218, 0.5); color: #155724; }
-        .chat-status-banner.timer-running { background: rgba(204, 229, 255, 0.5); color: #004085; }
-        .reward-notice {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white; padding: 12px 20px; text-align: center;
-            font-weight: 600; display: none; font-size: 14px; flex-shrink: 0;
-        }
-
-        .messages-container {
-            flex: 1; overflow-y: auto; padding: 20px 8%;
-            display: flex; flex-direction: column; gap: 2px;
-        }
-        .message {
-            display: flex; gap: 8px; max-width: 65%;
-            animation: msgIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 4px;
-        }
-        @keyframes msgIn {
-            from { opacity: 0; transform: translateY(10px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .message.sent { align-self: flex-end; flex-direction: row-reverse; }
-        .message-avatar {
-            width: 32px; height: 32px; border-radius: 50%; 
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 600; font-size: 13px;
-            flex-shrink: 0; align-self: flex-end; margin-bottom: 4px;
-        }
-        .message-bubble {
-            background: white; padding: 10px 14px; border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            position: relative; word-break: break-word; min-width: 80px;
-        }
-        .message.sent .message-bubble { 
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); 
-            color: white; 
-            border-bottom-right-radius: 4px;
-        }
-        .message:not(.sent) .message-bubble { border-bottom-left-radius: 4px; }
-        .message-text { line-height: 1.4; font-size: 14.2px; white-space: pre-wrap; }
-        .message-image { max-width: 260px; max-height: 260px; border-radius: 8px; cursor: pointer; display: block; }
-        .message-sticker { font-size: 48px; line-height: 1; padding: 4px; }
-
-        /* Voice Message */
-        .voice-message { display: flex; align-items: center; gap: 10px; min-width: 220px; max-width: 280px; }
-        .voice-play-btn {
-            width: 36px; height: 36px; border-radius: 50%; 
-            background: rgba(255,255,255,0.2); color: white; border: none; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px; flex-shrink: 0; transition: transform 0.1s; z-index: 2;
-        }
-        .message:not(.sent) .voice-play-btn { background: var(--primary); color: white; }
-        .voice-play-btn:active { transform: scale(0.9); }
-        .voice-waveform {
-            flex: 1; height: 32px; background: rgba(0,0,0,0.05);
-            border-radius: 6px; position: relative; overflow: hidden;
-            cursor: pointer; display: flex; align-items: center; padding: 0 4px;
-        }
-        .message.sent .voice-waveform { background: rgba(255,255,255,0.2); }
-        .voice-progress-fill {
-            position: absolute; top: 0; left: 0; bottom: 0;
-            background: rgba(255,255,255,0.3); width: 0%; pointer-events: none; z-index: 1;
-        }
-        .message:not(.sent) .voice-progress-fill { background: rgba(13, 71, 161, 0.2); }
-        .voice-bars { display: flex; align-items: center; gap: 2px; width: 100%; height: 100%; z-index: 2; }
-        .voice-bar { flex: 1; background: white; border-radius: 1px; opacity: 0.8; min-height: 4px; }
-        .message:not(.sent) .voice-bar { background: var(--primary); }
-        .voice-time { font-size: 11px; font-weight: 500; white-space: nowrap; min-width: 70px; text-align: right; }
-        .message.sent .voice-time { color: rgba(255,255,255,0.8); }
-        .message:not(.sent) .voice-time { color: var(--gray); }
-
-        .message-meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; }
-        .message-time { font-size: 11px; }
-        .message.sent .message-time { color: rgba(255,255,255,0.7); }
-        .message:not(.sent) .message-time { color: var(--gray); }
-        .message-check { font-size: 14px; }
-        .message.sent .message-check { color: rgba(255,255,255,0.9); }
-
-        /* Input Area */
-        .message-input-container {
-            padding: 15px 20px; background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0,0,0,0.03);
-            position: relative; flex-shrink: 0;
-        }
-        .message-input-form { display: flex; gap: 10px; align-items: center; }
-        .message-input {
-            flex: 1; padding: 12px 18px; border: 1px solid #e2e8f0; border-radius: 50px;
-            font-size: 15px; outline: none; background: var(--off-white);
-            font-family: 'Inter', sans-serif; transition: var(--transition);
-        }
-        .message-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1); }
-        .input-actions { display: flex; gap: 5px; align-items: center; position: relative; }
-        .icon-btn {
-            width: 40px; height: 40px; border-radius: 50%; border: none;
-            background: transparent; color: var(--gray); cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; transition: var(--transition);
-        }
-        .icon-btn:hover { background: rgba(0,188,212,0.1); color: var(--primary); }
-        .icon-btn.recording { background: #f44336; color: white; animation: pulse 1s infinite; }
-        
-        .send-btn {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
-            border: none; color: white; width: 45px; height: 45px; border-radius: 50%;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 18px; transition: var(--transition); flex-shrink: 0;
-            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
-        }
-        .send-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4); }
-        .send-btn:active:not(:disabled) { transform: scale(0.95); }
-        .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Emoji/Sticker Panels */
-        .emoji-panel, .sticker-panel {
-            position: absolute; bottom: calc(100% + 8px); left: 0;
-            background: white; border-radius: 12px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1); padding: 15px;
-            display: none; z-index: 60; max-height: 280px; overflow-y: auto;
-            border: 1px solid rgba(0,0,0,0.05); width: 320px;
-        }
-        .emoji-panel.show, .sticker-panel.show { display: block; animation: fadeInUp 0.2s ease; }
-        .emoji-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
-        .sticker-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
-        .emoji-item, .sticker-item {
-            font-size: 24px; text-align: center; cursor: pointer; padding: 6px;
-            border-radius: 6px; transition: var(--transition); user-select: none;
-        }
-        .emoji-item:hover, .sticker-item:hover { background: var(--off-white); transform: scale(1.2); }
-
-        .voice-recording-indicator {
-            position: absolute; bottom: calc(100% + 8px); left: 50%;
-            transform: translateX(-50%); background: #f44336; color: white;
-            padding: 8px 16px; border-radius: 20px; font-size: 13px;
-            font-weight: 600; display: none; z-index: 60; white-space: nowrap;
-        }
-        .voice-recording-indicator.show { display: block; }
-
-        .empty-state {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; color: var(--gray);
-            text-align: center; padding: 40px;
-        }
-        .empty-state i { font-size: 64px; margin-bottom: 16px; opacity: 0.2; color: var(--primary); }
-        .empty-state h3 { font-size: 20px; color: var(--primary-dark); margin-bottom: 8px; font-weight: 600; }
-        .empty-state p { font-size: 14px; max-width: 300px; }
-
-        .no-users { padding: 40px 20px; text-align: center; color: var(--gray); }
-        .no-users i { font-size: 48px; margin-bottom: 10px; opacity: 0.2; display: block; }
-
-        /* ===== SIDE MENU OVERLAY ===== */
-        .overlay {
-            height: 100%; width: 0; position: fixed; z-index: 2000;
-            top: 0; left: 0; background-color: rgba(10, 22, 40, 0.98);
-            backdrop-filter: blur(20px); overflow-x: hidden; transition: 0.3s;
-        }
-        .overlay-content { position: relative; width: 100%; padding: 60px 30px 30px 30px; }
-        .closebtn {
-            position: absolute; top: 20px; right: 30px; font-size: 40px;
-            color: white; text-decoration: none; cursor: pointer; transition: var(--transition);
-        }
-        .closebtn:hover { color: var(--accent); }
-        .menu-list { list-style: none; }
-        .menu-list li { margin-bottom: 15px; }
-        .menu-list a {
-            color: white; text-decoration: none; font-size: 18px; font-weight: 500;
-            display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: 8px; transition: var(--transition);
-        }
-        .menu-list a:hover { background: rgba(255, 255, 255, 0.1); }
-        .menu-list i { font-size: 20px; color: var(--accent-light); }
-        .logout-btn {
-            width: 100%; padding: 14px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
-            font-weight: 600; margin-top: 30px; transition: var(--transition);
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-        .logout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3); }
-
-        /* ===== ALERTS ===== */
-        .alert {
-            position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 3000; animation: slideInAlert 0.3s ease;
-            max-width: 300px; font-weight: 500; display: flex; align-items: center; gap: 10px;
-        }
-        .alert-success { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); color: white; }
-        .alert-error { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); color: white; }
-        .alert-info { background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); color: white; }
-        @keyframes slideInAlert { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        /* ===== DARK MODE ===== */
-        body.dark-mode { background: #1a1a2e; color: #e0e0e0; }
-        body.dark-mode .hero-section { background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0d2b4e 100%); }
-        body.dark-mode .chat-card { background: linear-gradient(145deg, #2a2a3e 0%, #1e1e2f 100%); box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); }
-        body.dark-mode .users-sidebar { border-right-color: rgba(255,255,255,0.05); }
-        body.dark-mode .sidebar-header { border-bottom-color: rgba(255,255,255,0.05); }
-        body.dark-mode .sidebar-header h2 { color: #e0e0e0; }
-        body.dark-mode .sidebar-subtitle { color: #a0a0a0; }
-        body.dark-mode .search-box { border-bottom-color: rgba(255,255,255,0.05); }
-        body.dark-mode .search-input { background: #2a2a3e; color: #e0e0e0; border-color: #444; }
-        body.dark-mode .user-item { border-bottom-color: rgba(255,255,255,0.03); }
-        body.dark-mode .user-item:hover:not(.offline) { background: rgba(255,255,255,0.05); }
-        body.dark-mode .user-item.active { background: linear-gradient(135deg, rgba(0,188,212,0.15) 0%, rgba(13,71,161,0.1) 100%); }
-        body.dark-mode .user-name { color: #e0e0e0; }
-        body.dark-mode .user-status { color: #a0a0a0; }
-        body.dark-mode .chat-main { background: #12121e; }
-        body.dark-mode .chat-header { background: rgba(30, 30, 46, 0.8); border-bottom-color: rgba(255,255,255,0.05); }
-        body.dark-mode .chat-status-banner { background: rgba(58, 42, 10, 0.5); color: #ffb74d; border-bottom-color: rgba(255,255,255,0.05); }
-        body.dark-mode .chat-status-banner.earned { background: rgba(27, 58, 28, 0.5); color: #81c784; }
-        body.dark-mode .chat-status-banner.timer-running { background: rgba(26, 47, 74, 0.5); color: #90caf9; }
-        body.dark-mode .message-bubble { background: #2a2a3e; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        body.dark-mode .message.sent .message-bubble { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; }
-        body.dark-mode .message-text { color: #e0e0e0; }
-        body.dark-mode .message:not(.sent) .voice-play-btn { background: var(--primary); }
-        body.dark-mode .message:not(.sent) .voice-waveform { background: rgba(255,255,255,0.05); }
-        body.dark-mode .message:not(.sent) .voice-bar { background: var(--primary); }
-        body.dark-mode .message-input-container { background: rgba(30, 30, 46, 0.8); border-top-color: rgba(255,255,255,0.05); }
-        body.dark-mode .message-input { background: #2a2a3e; color: #e0e0e0; border-color: #444; }
-        body.dark-mode .icon-btn { color: #a0a0a0; }
-        body.dark-mode .icon-btn:hover { background: rgba(255,255,255,0.1); color: var(--accent); }
-        body.dark-mode .emoji-panel, body.dark-mode .sticker-panel { background: #1e1e2f; border-color: #333; }
-        body.dark-mode .emoji-item:hover, body.dark-mode .sticker-item:hover { background: rgba(255,255,255,0.1); }
-        body.dark-mode .empty-state h3 { color: #e0e0e0; }
-
-        /* ===== RESPONSIVE ===== */
-        @media (min-width: 768px) {
-            .bottom-nav { display: none; }
-        }
-        @media (max-width: 768px) {
-            .hero-section { min-height: 20vh; padding: 90px 1rem 20px; }
-            .hero-content h1 { font-size: 1.8rem; }
-            .hero-content p { font-size: 1rem; }
-            .main-content { padding: 10px; height: calc(100vh - 20vh - 20px); }
-            .chat-card { border-radius: 15px; }
-            .users-sidebar { width: 100%; }
-            .chat-main { display: none; }
-            .chat-main.active-chat {
-                display: flex; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 100;
-                background: var(--off-white);
-            }
-            body.dark-mode .chat-main.active-chat { background: #12121e; }
-            .message { max-width: 85%; }
-            .messages-container { padding: 10px 4%; }
-            .emoji-grid { grid-template-columns: repeat(8, 1fr); }
-            .sticker-grid { grid-template-columns: repeat(6, 1fr); }
-            .back-btn-mobile { display: inline-flex !important; }
-            .emoji-panel, .sticker-panel { width: 260px; }
-            .username-header { display: none; }
-        }
+        html, body { height: 100%; margin: 0; overflow: hidden; background: var(--off-white); font-family: 'Inter', sans-serif; }
+        .chat-container { display: flex; flex-direction: column; height: 100vh; background: #e5ddd5; }
+        .top-header { background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(20px); padding: 15px 20px; display: flex; align-items: center; gap: 15px; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 10; }
+        .back-btn { color: white; text-decoration: none; font-size: 20px; }
+        .chat-partner-info { display: flex; align-items: center; gap: 10px; }
+        .chat-partner-info img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .chat-partner-name { font-weight: 600; font-size: 16px; }
+        .messages-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 80px; }
+        .message { max-width: 75%; padding: 10px 15px; border-radius: 12px; font-size: 14px; line-height: 1.4; position: relative; word-wrap: break-word; }
+        .message.sent { background: #dcf8c6; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .message.received { background: white; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .message-time { font-size: 10px; color: #999; margin-top: 4px; text-align: right; }
+        .input-area { position: fixed; bottom: 0; left: 0; width: 100%; background: #f0f0f0; padding: 10px 15px; display: flex; gap: 10px; align-items: center; border-top: 1px solid #ddd; z-index: 100; }
+        .input-area input { flex: 1; padding: 12px 15px; border: none; border-radius: 24px; font-size: 14px; outline: none; }
+        .send-btn { background: var(--primary); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .file-btn { background: transparent; border: none; color: #666; font-size: 20px; cursor: pointer; padding: 5px; }
+        .user-list-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column; }
+        .user-list-header { background: var(--primary-dark); color: white; padding: 15px 20px; font-weight: 700; font-size: 18px; }
+        .user-list { flex: 1; overflow-y: auto; }
+        .user-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
+        .user-item:hover { background: #f5f5f5; }
+        .user-item img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .user-name { font-weight: 500; }
+        .online-status { font-size: 12px; color: #999; }
+        .online-status.online { color: #4caf50; }
+        .no-users { text-align: center; padding: 40px; color: #999; }
+        .alert { position: fixed; top: 80px; right: 20px; padding: 12px 18px; border-radius: 8px; color: white; z-index: 10000; font-size: 14px; }
+        .alert-success { background: #4caf50; }
+        .alert-error { background: #f44336; }
+        .hidden { display: none !important; }
     </style>
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
-    <!-- Side Menu Overlay -->
-    <div id="myNav" class="overlay">
-        <a class="closebtn" onclick="closeNav()">&times;</a>
-        <div class="overlay-content">
-            <ul class="menu-list">
-                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
-                <li><a href="task.html"><i class="bi bi-check-circle-fill"></i> Tasks</a></li>
-                <li><a href="video.html"><i class="bi bi-play-circle-fill"></i> Videos</a></li>
-                <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
-                <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
-            </ul>
-            <button class="logout-btn" onclick="logout()">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
+    <div id="userListScreen" class="user-list-screen">
+        <div class="user-list-header">Select a user to chat</div>
+        <div class="user-list" id="userList"></div>
+    </div>
+    
+    <div id="chatScreen" class="chat-container hidden">
+        <div class="top-header">
+            <a href="#" class="back-btn" onclick="showUserList()"><i class="bi bi-arrow-left"></i></a>
+            <div class="chat-partner-info">
+                <img id="partnerPic" src="https://via.placeholder.com/40" alt="User">
+                <span class="chat-partner-name" id="partnerName">Select a user</span>
+            </div>
+        </div>
+        <div class="messages-area" id="messagesArea"></div>
+        <div class="input-area">
+            <button class="file-btn" onclick="document.getElementById('fileInput').click()"><i class="bi bi-paperclip"></i></button>
+            <input type="file" id="fileInput" hidden>
+            <input type="text" id="messageInput" placeholder="Type a message...">
+            <button class="send-btn" onclick="sendMessage()"><i class="bi bi-send-fill"></i></button>
         </div>
     </div>
 
-    <!-- Top Header -->
-    <header class="top-header" id="header">
-        <div class="nav-container">
-            <a href="dashboard.html" class="logo">
-                <img src="IMG-20260414-WA0002.jpg" alt="YenlletAfrica" class="logo-img">
-                <span>YenlletAfrica</span>
-            </a>
-            <div class="header-controls">
-                <i class="bi bi-list menu-icon" onclick="openNav()"></i>
-                <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
-                    <i class="bi bi-moon-stars-fill" id="darkModeIcon"></i>
-                </button>
-            </div>
-            <div class="header-profile">
-                <img src="/uploads/default-avatar.png" alt="Profile" class="profile-pic-small" id="profilePic">
-                <div class="username-header" id="usernameDisplay">Loading...</div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Alert Container -->
     <div id="alertContainer"></div>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-content">
-            <h1>Chat & <span>Earn</span></h1>
-            <p>Chat with friends, stay connected, and earn rewards daily!</p>
-        </div>
-    </section>
-
-    <!-- Main Chat Content -->
-    <div class="main-content">
-        <div class="chat-card">
-            <div class="users-sidebar" id="usersSidebar">
-                <div class="sidebar-header">
-                    <h2>Online Users</h2>
-                    <div class="sidebar-subtitle">Chat for 2 min to earn reward</div>
-                    <div class="online-count" id="onlineCount">Loading...</div>
-                </div>
-                <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Search users..." id="searchInput" onkeyup="filterUsers()">
-                </div>
-                <div class="users-list" id="usersList"></div>
-            </div>
-
-            <div class="chat-main" id="chatMain">
-                <div class="empty-state">
-                    <i class="bi bi-chat-dots"></i>
-                    <h3>Select a User to Chat</h3>
-                    <p>Chat with online users for 2 minutes and earn!</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        const API_URL = 'https://yenlletafrica.onrender.com'; 
-        let currentUserId = null;
-        let currentUsername = null;
-        let usersInterval = null;
-        let onlineStatusInterval = null;
-        let currentPlayingAudio = null;
-        let currentPlayingId = null;
+        const API_URL = 'https://yenlletafrica.onrender.com';
+        let currentPartner = null; 
+        let pollInterval = null;
 
-        const chatState = {
-            partnerId: null,
-            partnerName: null,
-            partnerPic: null,
-            timerStarted: false,
-            timerSeconds: 0,
-            timerInterval: null,
-            hasEarnedToday: false,
-            hasPartnerReplied: false,
-            messagesInterval: null,
-            renderedIds: new Set(),
-            maxRenderedId: 0,
-            isSending: false
-        };
-
-        let mediaRecorder = null;
-        let recordedChunks = [];
-        let isRecording = false;
-        let recordingStartTime = 0;
-        let recordingTimer = null;
-
-        // Full emoji set
-        const EMOJIS = [
-            '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
-            '🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
-            '😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸',
-            '🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️',
-            '😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡',
-            '🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓',
-            '🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄',
-            '😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵',
-            '🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠',
-            '👍','👎','👏','🙌','👐','🤝','🙏','✌️','🤞','🤟',
-            '🤘','👌','🤏','☝️','👆','👇','👉','👈','✋','🤚',
-            '❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔',
-            '🔥','⭐','✨','⚡','💯','💢','💥','💫','💦','💨',
-            '🎉','🎊','🎁','🎈','🎂','🍰','🧁','🍕','🍔','🍟',
-            '🌹','🌻','🌷','🌼','🌸','🌺','🌵','🌲','🌳','🌴',
-            '⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🏓','🏸',
-            '🎮','🎲','🎸','🎺','🎨','✈️','🚀','🛸','🚁','🚂',
-            '💰','💵','💴','💶','💷','💸','💳','🪙','💎','🔑'
-        ];
-
-        const STICKERS = [
-            '😀','😂','🥰','😎','🤔','😭','😡','👍','👎','🙏',
-            '🔥','❤️','💯','🎉','✅','❌','⭐','🎁','💰','🚀',
-            '🐶','🐱','🦊','🐼','🐨','🐯','🦁','🐷','🐸','🐵',
-            '🌹','🌻','🌵','🍎','🍕','🍔','🎂','🍦','☕','🍺',
-            '⚽','🏀','🏈','🎾','🎮','🎲','🎸','🎺','🎨','✈️'
-        ];
-
-        /* ================= UTILITIES ================= */
-        function openNav() { document.getElementById('myNav').style.width = '100%'; }
-        function closeNav() { document.getElementById('myNav').style.width = '0'; }
-
-        function escapeHtml(text) {
-            if (text == null) return '';
-            const div = document.createElement('div');
-            div.textContent = String(text);
-            return div.innerHTML;
+        async function checkAuth() { 
+            try { 
+                const res = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); 
+                if (res.status === 401) { window.location.href = 'login.html'; return false; } 
+                return true; 
+            } catch (e) { window.location.href = 'login.html'; return false; } 
         }
 
-        function formatDuration(seconds) {
-            const m = Math.floor(seconds / 60);
-            const s = Math.floor(seconds % 60);
-            return `${m}:${s.toString().padStart(2, '0')}`;
-        }
-
-        async function safeFetch(url, options = {}) {
-            try {
-                const response = await fetch(url, options);
-                const contentType = response.headers.get('content-type') || '';
-                let data = {};
-                if (contentType.includes('application/json')) {
-                    data = await response.json();
-                } else {
-                    const text = await response.text();
-                    data = { error: text || `HTTP ${response.status}` };
-                }
-                return { ok: response.ok, status: response.status, data };
-            } catch (err) {
-                return { ok: false, status: 0, data: { error: 'Network error. Please check your connection.' } };
-            }
-        }
-
-        function showAlert(message, type) {
-            document.querySelectorAll(`.alert-${type}`).forEach(el => el.remove());
-            const div = document.createElement('div');
-            div.className = `alert alert-${type}`;
-            div.textContent = message;
-            document.body.appendChild(div);
-            setTimeout(() => {
-                div.style.opacity = '0';
-                div.style.transform = 'translateX(400px)';
-                setTimeout(() => div.remove(), 300);
-            }, 4000);
-        }
-
-        function clearChatState() {
-            if (chatState.timerInterval) clearInterval(chatState.timerInterval);
-            if (chatState.messagesInterval) clearInterval(chatState.messagesInterval);
-            chatState.partnerId = null;
-            chatState.partnerName = null;
-            chatState.partnerPic = null;
-            chatState.timerStarted = false;
-            chatState.timerSeconds = 0;
-            chatState.timerInterval = null;
-            chatState.hasEarnedToday = false;
-            chatState.hasPartnerReplied = false;
-            chatState.messagesInterval = null;
-            chatState.renderedIds.clear();
-            chatState.maxRenderedId = 0;
-            chatState.isSending = false;
-        }
-
-        let userDarkMode = false;
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            userDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', userDarkMode);
-            const icon = document.getElementById('darkModeIcon');
-            if (icon) icon.className = userDarkMode ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
-
-            fetch(`${API_URL}/api/toggle-dark-mode`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                body: JSON.stringify({ dark_mode: userDarkMode })
-            }).catch(err => console.error('Dark mode sync error:', err));
-        }
-
-        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-        if (savedDarkMode) { document.body.classList.add('dark-mode'); }
-
-        async function checkAuth() {
-            try {
-                const res = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                if (res.status === 401) { window.location.href = 'login.html'; return false; }
-                const data = await res.json();
-                currentUserId = data.user_id;
-                currentUsername = data.username;
-
-                document.getElementById('usernameDisplay').textContent = data.username;
-                if (data.profile_picture) {
-                    document.getElementById('profilePic').src = `${API_URL}/uploads/${data.profile_picture}`;
-                }
-
-                userDarkMode = data.dark_mode || localStorage.getItem('darkMode') === 'true';
-                if (userDarkMode) {
-                    document.body.classList.add('dark-mode');
-                    const icon = document.getElementById('darkModeIcon');
-                    if (icon) icon.className = 'bi bi-sun-fill';
-                } else {
-                    document.body.classList.remove('dark-mode');
-                    const icon = document.getElementById('darkModeIcon');
-                    if (icon) icon.className = 'bi bi-moon-stars-fill';
-                }
-                localStorage.setItem('darkMode', userDarkMode);
-
-                await updateOnlineStatus();
-                return true;
-            } catch (err) {
-                window.location.href = 'login.html';
-                return false;
-            }
-        }
-
-        async function updateOnlineStatus() {
-            try {
-                await fetch(`${API_URL}/api/update-online-status`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ going_offline: false })
-                });
-            } catch (e) {}
-        }
-
-        /* ================= USERS LIST ================= */
         async function loadUsers() {
-            const result = await safeFetch(`${API_URL}/api/all-users`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-            if (result.ok && Array.isArray(result.data)) displayUsers(result.data);
-        }
-
-        function displayUsers(users) {
-            const list = document.getElementById('usersList');
-            const online = users.filter(u => u.is_online === 1 || u.is_online === true);
-            document.getElementById('onlineCount').textContent = `🟢 ${online.length} Online`;
-
-            if (!users.length) {
-                list.innerHTML = `<div class="no-users"><i class="bi bi-people"></i><p>No other users online</p></div>`;
-                return;
-            }
-
-            list.innerHTML = users.map(user => {
-                const initial = escapeHtml(user.username.charAt(0).toUpperCase());
-                const avatar = user.profile_picture
-                    ? `<img src="${API_URL}/uploads/${escapeHtml(user.profile_picture)}" alt="${escapeHtml(user.username)}">`
-                    : initial;
-                const isOnline = user.is_online === 1 || user.is_online === true;
-                const cls = isOnline ? '' : 'offline';
-                const txt = isOnline ? '🟢 Online' : '⚫ Offline';
-                const active = chatState.partnerId === user.id ? 'active' : '';
-                return `
-                    <div class="user-item ${cls} ${active}" 
-                         data-id="${user.id}" 
-                         data-username="${escapeHtml(user.username)}" 
-                         data-pic="${escapeHtml(user.profile_picture || '')}" 
-                         data-online="${isOnline ? '1' : '0'}">
-                        <div class="user-avatar">${avatar}
-                            <div class="online-indicator ${isOnline ? '' : 'offline-indicator'}"></div>
-                        </div>
-                        <div class="user-info">
-                            <div class="user-name">${escapeHtml(user.username)}</div>
-                            <div class="user-status ${isOnline ? 'online' : ''}">${txt}</div>
-                        </div>
-                    </div>`;
-            }).join('');
-
-            list.querySelectorAll('.user-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    if (item.dataset.online !== '1') {
-                        showAlert('This user is offline. You can only chat with online users.', 'error');
-                        return;
-                    }
-                    selectUser(parseInt(item.dataset.id), item.dataset.username, item.dataset.pic);
-                });
-            });
-        }
-
-        function filterUsers() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            document.querySelectorAll('.user-item').forEach(item => {
-                item.style.display = item.dataset.username.toLowerCase().includes(term) ? 'flex' : 'none';
-            });
-        }
-
-        function closeChat() {
-            document.getElementById('chatMain').classList.remove('active-chat');
-            document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
-            clearChatState();
-        }
-
-        function closeAllPanels() {
-            const sp = document.getElementById('stickerPanel');
-            const ep = document.getElementById('emojiPanel');
-            if (sp) sp.classList.remove('show');
-            if (ep) ep.classList.remove('show');
-        }
-
-        /* ================= CHAT SETUP ================= */
-        async function selectUser(userId, username, profilePic) {
-            if (!userId || isNaN(userId)) { showAlert('Invalid user', 'error'); return; }
-
-            if (chatState.timerStarted && chatState.timerSeconds > 0 && chatState.partnerId !== null && chatState.partnerId !== userId) {
-                if (!confirm(`You are earning with ${chatState.partnerName}. Switching will abandon progress. Continue?`)) return;
-            }
-
-            clearChatState();
-            chatState.partnerId = userId;
-            chatState.partnerName = username;
-            chatState.partnerPic = profilePic;
-
-            document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
-            const activeItem = document.querySelector(`.user-item[data-id="${userId}"]`);
-            if (activeItem) activeItem.classList.add('active');
-
-            const main = document.getElementById('chatMain');
-            main.classList.add('active-chat');
-
-            const initial = escapeHtml(username.charAt(0).toUpperCase());
-            const avatar = profilePic ? `<img src="${API_URL}/uploads/${escapeHtml(profilePic)}" alt="${escapeHtml(username)}">` : initial;
-
-            main.innerHTML = `
-                <div class="chat-header">
-                    <div class="chat-user-info">
-                        <button class="back-btn-mobile" onclick="closeChat()"><i class="bi bi-arrow-left"></i></button>
-                        <div class="user-avatar">${avatar}<div class="online-indicator"></div></div>
-                        <div>
-                            <div class="user-name">${escapeHtml(username)}</div>
-                            <div class="user-status online">🟢 Online</div>
-                        </div>
-                    </div>
-                    <div class="timer-display">
-                        <div class="timer-text" id="timerDisplay">⏳</div>
-                        <div class="timer-label" id="timerLabel">Loading...</div>
-                    </div>
-                </div>
-                <div class="chat-status-banner" id="chatStatusBanner"></div>
-                <div class="reward-notice" id="rewardNotice"></div>
-                <div class="messages-container" id="messagesContainer"></div>
-
-                <div class="voice-recording-indicator" id="voiceIndicator">🔴 Recording <span id="voiceTimer">0:00</span></div>
-
-                <div class="message-input-container">
-                    <div class="emoji-panel" id="emojiPanel">
-                        <div class="emoji-grid" id="emojiGrid"></div>
-                    </div>
-                    <div class="sticker-panel" id="stickerPanel">
-                        <div class="sticker-grid" id="stickerGrid"></div>
-                    </div>
-                    <form class="message-input-form" id="messageForm">
-                        <div class="input-actions">
-                            <button type="button" class="icon-btn" id="emojiBtn" title="Emoji"><i class="bi bi-emoji-smile"></i></button>
-                            <button type="button" class="icon-btn" id="stickerBtn" title="Stickers"><i class="bi bi-stars"></i></button>
-                            <button type="button" class="icon-btn" id="imageBtn" title="Photo"><i class="bi bi-image"></i></button>
-                            <button type="button" class="icon-btn" id="voiceBtn" title="Voice Note"><i class="bi bi-mic"></i></button>
-                        </div>
-                        <input type="text" class="message-input" id="messageInput" placeholder="Type a message" autocomplete="off">
-                        <button type="submit" class="send-btn" id="sendBtn"><i class="bi bi-send-fill"></i></button>
-                    </form>
-                    <input type="file" id="fileInput" accept="image/*" style="display:none">
-                </div>
-            `;
-
-            // Event bindings
-            document.getElementById('messageForm').addEventListener('submit', sendTextMessage);
-            document.getElementById('emojiBtn').addEventListener('click', (e) => { e.stopPropagation(); toggleEmojiPanel(); });
-            document.getElementById('stickerBtn').addEventListener('click', (e) => { e.stopPropagation(); toggleStickerPanel(); });
-            document.getElementById('imageBtn').addEventListener('click', (e) => { e.stopPropagation(); triggerImageSelect(); });
-            document.getElementById('voiceBtn').addEventListener('click', toggleVoiceRecord);
-            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
-
-            // Close panels on outside click
-            document.addEventListener('click', function handler(e) {
-                const ep = document.getElementById('emojiPanel');
-                const sp = document.getElementById('stickerPanel');
-                const eb = document.getElementById('emojiBtn');
-                const sb = document.getElementById('stickerBtn');
-                if (ep && !ep.contains(e.target) && e.target !== eb && !eb.contains(e.target)) ep.classList.remove('show');
-                if (sp && !sp.contains(e.target) && e.target !== sb && !sb.contains(e.target)) sp.classList.remove('show');
-            });
-
-            renderEmojiGrid();
-            renderStickerGrid();
-
-            // Check if already earned today
-            const sessionRes = await safeFetch(`${API_URL}/api/start-chat-session`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                body: JSON.stringify({ partner_id: userId })
-            });
-            if (sessionRes.ok) chatState.hasEarnedToday = sessionRes.data.already_completed === true;
-
-            // Load history
-            const messages = await loadMessages(userId);
-
-            // If partner already sent messages in history, start timer immediately
-            if (Array.isArray(messages) && messages.some(m => m.sender_id === userId) && !chatState.hasEarnedToday) {
-                chatState.hasPartnerReplied = true;
-                startTimer();
-            }
-
-            updateTimerDisplay();
-            updateStatusBanner();
-
-            // Poll for new messages every 3 seconds
-            chatState.messagesInterval = setInterval(() => loadNewMessages(userId), 3000);
-        }
-
-        /* ================= EMOJI PICKER ================= */
-        function renderEmojiGrid() {
-            const grid = document.getElementById('emojiGrid');
-            if (!grid) return;
-            grid.innerHTML = EMOJIS.map(emoji => 
-                `<div class="emoji-item" onclick="insertEmoji('${emoji}')">${emoji}</div>`
-            ).join('');
-        }
-
-        function toggleEmojiPanel() {
-            const panel = document.getElementById('emojiPanel');
-            const stickerPanel = document.getElementById('stickerPanel');
-            if (!panel) return;
-            if (stickerPanel) stickerPanel.classList.remove('show');
-            panel.classList.toggle('show');
-        }
-
-        function insertEmoji(emoji) {
-            const input = document.getElementById('messageInput');
-            if (!input) return;
-            const start = input.selectionStart;
-            const end = input.selectionEnd;
-            const text = input.value;
-            input.value = text.substring(0, start) + emoji + text.substring(end);
-            input.focus();
-            input.setSelectionRange(start + emoji.length, start + emoji.length);
-        }
-
-        /* ================= STICKERS ================= */
-        function renderStickerGrid() {
-            const grid = document.getElementById('stickerGrid');
-            if (!grid) return;
-            grid.innerHTML = STICKERS.map(s => `<div class="sticker-item" onclick="sendSticker('${s}')">${s}</div>`).join('');
-        }
-
-        function toggleStickerPanel() {
-            const panel = document.getElementById('stickerPanel');
-            const emojiPanel = document.getElementById('emojiPanel');
-            if (!panel) return;
-            if (emojiPanel) emojiPanel.classList.remove('show');
-            panel.classList.toggle('show');
-        }
-
-        async function sendSticker(emoji) {
-            const panel = document.getElementById('stickerPanel');
-            if (panel) panel.classList.remove('show');
-            await sendChatMessage({ message: emoji, message_type: 'sticker' });
-        }
-
-        /* ================= IMAGE ================= */
-        function triggerImageSelect() {
-            closeAllPanels();
-            const fi = document.getElementById('fileInput');
-            if (fi) fi.click();
-        }
-
-        async function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            event.target.value = '';
-
-            showAlert('Uploading image...', 'info');
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            const result = await safeFetch(`${API_URL}/api/upload-chat-file`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                body: formData
-            });
-
-            if (!result.ok || !result.data.file_url) {
-                showAlert(result.data.error || 'Failed to upload image', 'error');
-                return;
-            }
-
-            await sendChatMessage({
-                message: '',
-                message_type: 'image',
-                file_url: result.data.file_url,
-                file_name: result.data.file_name
-            });
-        }
-
-        /* ================= VOICE NOTE ================= */
-        function getSupportedMimeType() {
-            const types = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus','audio/ogg'];
-            if (!window.MediaRecorder) return '';
-            for (const t of types) {
-                if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) return t;
-            }
-            return window.MediaRecorder ? 'audio/webm' : '';
-        }
-
-        function getAudioExt(mime) {
-            if (mime.includes('mp4')) return 'mp4';
-            if (mime.includes('ogg')) return 'ogg';
-            return 'webm';
-        }
-
-        async function toggleVoiceRecord() {
-            if (isRecording) { stopVoiceRecord(); return; }
-
-            if (!window.MediaRecorder) {
-                showAlert('Voice recording is not supported in this browser. Use Chrome, Edge, or Firefox.', 'error');
-                return;
-            }
-
-            const mimeType = getSupportedMimeType();
-            if (!mimeType) {
-                showAlert('Your browser does not support any compatible audio recording format.', 'error');
-                return;
-            }
-
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream, { mimeType });
-                recordedChunks = [];
-
-                mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
-                mediaRecorder.onstop = () => {
-                    stream.getTracks().forEach(t => t.stop());
-                    if (recordedChunks.length === 0) {
-                        showAlert('No audio recorded. Please try again.', 'error');
-                        resetVoiceUI();
-                        return;
-                    }
-                    const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || mimeType });
-                    const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
-                    if (duration < 1) {
-                        showAlert('Recording too short.', 'error');
-                        resetVoiceUI();
-                        return;
-                    }
-                    uploadVoiceNote(blob, duration, getAudioExt(mediaRecorder.mimeType || mimeType));
-                    resetVoiceUI();
-                };
-                mediaRecorder.onerror = () => {
-                    showAlert('Recording error. Please try again.', 'error');
-                    stopVoiceRecord();
-                };
-
-                mediaRecorder.start(1000);
-                isRecording = true;
-                recordingStartTime = Date.now();
-
-                document.getElementById('voiceBtn').classList.add('recording');
-                document.getElementById('voiceIndicator').classList.add('show');
-
-                recordingTimer = setInterval(() => {
-                    const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
-                    document.getElementById('voiceTimer').textContent = formatDuration(elapsed);
-                }, 1000);
-
-            } catch (err) {
-                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                    showAlert('Microphone permission denied. Please allow access in browser settings.', 'error');
-                } else {
-                    showAlert('Could not access microphone: ' + err.message, 'error');
-                }
-            }
+                const res = await fetch(`${API_URL}/api/all-users`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                const users = await res.json(); 
+                const list = document.getElementById('userList');
+                if (users.length === 0) { list.innerHTML = '<div class="no-users">No other users found.</div>'; return; }
+                list.innerHTML = users.map(u => `
+                    <div class="user-item" onclick="openChat(${u.id}, '${escapeHtml(u.username)}', '${u.profile_picture || ''}')">
+                        <img src="${u.profile_picture || 'https://via.placeholder.com/45'}" onerror="this.src='https://via.placeholder.com/45'">
+                        <div><div class="user-name">${escapeHtml(u.username)}</div><div class="online-status ${u.is_online ? 'online' : ''}">${u.is_online ? 'Online' : 'Offline'}</div></div>
+                    </div>`).join('');
+            } catch (err) { console.error('Load users error:', err); }
         }
 
-        function stopVoiceRecord() {
-            if (!isRecording) return;
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                try { mediaRecorder.stop(); } catch (e) {}
-            }
-            isRecording = false;
-            resetVoiceUI();
+        function showUserList() { 
+            clearInterval(pollInterval); 
+            document.getElementById('userListScreen').classList.remove('hidden'); 
+            document.getElementById('chatScreen').classList.add('hidden'); 
+            currentPartner = null; 
         }
 
-        function resetVoiceUI() {
-            const btn = document.getElementById('voiceBtn');
-            const ind = document.getElementById('voiceIndicator');
-            if (btn) btn.classList.remove('recording');
-            if (ind) ind.classList.remove('show');
-            if (recordingTimer) { clearInterval(recordingTimer); recordingTimer = null; }
+        async function openChat(partnerId, partnerName, partnerPic) {
+            currentPartner = partnerId;
+            document.getElementById('userListScreen').classList.add('hidden'); 
+            document.getElementById('chatScreen').classList.remove('hidden');
+            document.getElementById('partnerName').textContent = partnerName;
+            document.getElementById('partnerPic').src = partnerPic || 'https://via.placeholder.com/40';
+            document.getElementById('messagesArea').innerHTML = '';
+            
+            await fetch(`${API_URL}/api/mark-messages-read/${partnerId}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            await fetch(`${API_URL}/api/start-chat-session`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ partner_id: partnerId }) });
+            
+            loadMessages(); 
+            pollInterval = setInterval(loadMessages, 2000);
         }
 
-        async function uploadVoiceNote(blob, duration, ext) {
-            const file = new File([blob], `voice-note.${ext}`, { type: blob.type || 'audio/webm' });
-            const formData = new FormData();
-            formData.append('file', file);
-
-            const result = await safeFetch(`${API_URL}/api/upload-chat-file`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                body: formData
-            });
-
-            if (!result.ok || !result.data.file_url) {
-                showAlert(result.data.error || 'Failed to upload voice note', 'error');
-                return;
-            }
-
-            await sendChatMessage({
-                message: '',
-                message_type: 'voice',
-                file_url: result.data.file_url,
-                file_name: 'Voice Note',
-                duration: duration
-            });
+        async function loadMessages() {
+            if (!currentPartner) return;
+            try {
+                const res = await fetch(`${API_URL}/api/chat-messages/${currentPartner}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                const messages = await res.json(); 
+                const area = document.getElementById('messagesArea');
+                const wasAtBottom = area.scrollHeight - area.scrollTop === area.clientHeight;
+                
+                area.innerHTML = messages.map(m => `
+                    <div class="message ${m.sender_id == localStorage.getItem('user_id') ? 'sent' : 'received'}">
+                        ${m.message_type === 'image' ? `<img src="${m.file_url}" style="max-width:100%; border-radius:8px; margin-bottom:5px;" onerror="this.style.display='none'">` : ''}
+                        ${m.message_type === 'voice' ? `<audio controls src="${m.file_url}"></audio>` : ''}
+                        ${escapeHtml(m.message)}
+                        <div class="message-time">${new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    </div>`).join('');
+                    
+                if (wasAtBottom) area.scrollTop = area.scrollHeight;
+            } catch (err) { console.error('Load messages error:', err); }
         }
 
-        /* ================= VOICE PLAYBACK ================= */
-        function toggleVoicePlay(msgId) {
-            const audio = document.getElementById(`audio-${msgId}`);
-            const icon = document.getElementById(`play-icon-${msgId}`);
-            if (!audio) return;
-
-            if (currentPlayingAudio && currentPlayingAudio !== audio) {
-                currentPlayingAudio.pause();
-                currentPlayingAudio.currentTime = 0;
-                if (currentPlayingId !== null) {
-                    const otherIcon = document.getElementById(`play-icon-${currentPlayingId}`);
-                    if (otherIcon) otherIcon.className = 'bi bi-play-fill';
-                    const otherFill = document.getElementById(`progress-fill-${currentPlayingId}`);
-                    if (otherFill) otherFill.style.width = '0%';
-                }
-            }
-
-            if (audio.paused) {
-                audio.play();
-                if (icon) icon.className = 'bi bi-pause-fill';
-                currentPlayingAudio = audio;
-                currentPlayingId = msgId;
-            } else {
-                audio.pause();
-                if (icon) icon.className = 'bi bi-play-fill';
-                currentPlayingAudio = null;
-                currentPlayingId = null;
-            }
-
-            audio.onended = () => {
-                if (icon) icon.className = 'bi bi-play-fill';
-                const fill = document.getElementById(`progress-fill-${msgId}`);
-                if (fill) fill.style.width = '0%';
-                currentPlayingAudio = null;
-                currentPlayingId = null;
-            };
-
-            audio.ontimeupdate = () => {
-                const pct = (audio.currentTime / (audio.duration || 1)) * 100;
-                const fill = document.getElementById(`progress-fill-${msgId}`);
-                if (fill) fill.style.width = `${pct}%`;
-                const cur = formatDuration(Math.floor(audio.currentTime));
-                const dur = formatDuration(Math.floor(audio.duration || 0));
-                const timeEl = document.getElementById(`time-${msgId}`);
-                if (timeEl) timeEl.textContent = `${cur} / ${dur}`;
-            };
-        }
-
-        function seekVoice(event, msgId) {
-            const audio = document.getElementById(`audio-${msgId}`);
-            const rect = event.currentTarget.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const pct = Math.max(0, Math.min(1, x / rect.width));
-            if (audio && audio.duration) {
-                audio.currentTime = pct * audio.duration;
-            }
-        }
-
-        /* ================= MESSAGING ================= */
-        async function sendTextMessage(event) {
-            event.preventDefault();
-            const input = document.getElementById('messageInput');
+        async function sendMessage() {
+            const input = document.getElementById('messageInput'); 
             const text = input.value.trim();
-            if (!text) return;
+            if (!text || !currentPartner) return; 
             input.value = '';
-            await sendChatMessage({ message: text, message_type: 'text' });
-        }
-
-        async function sendChatMessage(payload) {
-            if (!chatState.partnerId) { showAlert('No chat partner selected.', 'error'); return; }
-            if (chatState.isSending) return;
-            chatState.isSending = true;
-            const sendBtn = document.getElementById('sendBtn');
-            if (sendBtn) sendBtn.disabled = true;
-
-            const result = await safeFetch(`${API_URL}/api/send-message`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                body: JSON.stringify({
-                    receiver_id: chatState.partnerId,
-                    message: payload.message || '',
-                    message_type: payload.message_type || 'text',
-                    file_url: payload.file_url || null,
-                    file_name: payload.file_name || null,
-                    duration: payload.duration || null
-                })
-            });
-
-            if (result.ok) {
-                await loadNewMessages(chatState.partnerId);
-            } else {
-                if (result.status === 429) {
-                    showAlert('⏳ Too many requests. Please wait a moment before sending.', 'error');
-                } else {
-                    showAlert(`Failed to send: ${result.data.error || 'Server error'}`, 'error');
-                }
-                if (payload.message_type === 'text' && payload.message) {
-                    const input = document.getElementById('messageInput');
-                    if (input && !input.value) input.value = payload.message;
-                }
-            }
-
-            chatState.isSending = false;
-            if (sendBtn) sendBtn.disabled = false;
-        }
-
-        /* ================= TIMER & REWARD ================= */
-        function startTimer() {
-            if (chatState.timerStarted) return;
-            if (chatState.timerInterval) clearInterval(chatState.timerInterval);
-
-            chatState.timerStarted = true;
-            chatState.timerSeconds = 0;
-            updateTimerDisplay();
-            updateStatusBanner();
-
-            chatState.timerInterval = setInterval(() => {
-                chatState.timerSeconds++;
-                updateTimerDisplay();
-                updateStatusBanner();
-                if (chatState.timerSeconds >= 120) completeChatSession();
-            }, 1000);
-        }
-
-        async function completeChatSession(retryCount = 0) {
-            if (chatState.timerInterval) { clearInterval(chatState.timerInterval); chatState.timerInterval = null; }
-
-            const result = await safeFetch(`${API_URL}/api/complete-chat-session`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                body: JSON.stringify({ partner_id: chatState.partnerId, duration: chatState.timerSeconds })
-            });
-
-            if (result.ok && result.data.reward > 0) {
-                chatState.hasEarnedToday = true;
-                chatState.timerStarted = false;
-                const notice = document.getElementById('rewardNotice');
-                if (notice) {
-                    notice.textContent = `🎉 Congratulations! You've earned ¥${result.data.reward.toLocaleString()}!`;
-                    notice.style.display = 'block';
-                }
-                showAlert(`🎉 Success! ¥${result.data.reward.toLocaleString()} added to your wallet`, 'success');
-                updateTimerDisplay();
-                updateStatusBanner();
-            } else if (!result.ok && retryCount < 3 && (result.status === 0 || result.status === 429 || result.status >= 500)) {
-                showAlert(`Retrying reward claim (${retryCount + 1}/3)...`, 'info');
-                setTimeout(() => completeChatSession(retryCount + 1), 3000 * (retryCount + 1));
-            } else {
-                if (result.data.error && result.data.error.toLowerCase().includes('already earned')) {
-                    chatState.hasEarnedToday = true;
-                    chatState.timerStarted = false;
-                    updateTimerDisplay();
-                    updateStatusBanner();
-                } else {
-                    showAlert(`❌ ${result.data.error || 'Failed to claim reward'}`, 'error');
-                }
-            }
-        }
-
-        function updateTimerDisplay() {
-            const timerEl = document.getElementById('timerDisplay');
-            const labelEl = document.getElementById('timerLabel');
-            if (!timerEl || !labelEl) return;
-
-            if (chatState.hasEarnedToday) {
-                timerEl.textContent = '✅'; timerEl.style.color = '#4caf50';
-                labelEl.textContent = 'Earned (24h)';
-            } else if (!chatState.hasPartnerReplied) {
-                timerEl.textContent = '⏳'; timerEl.style.color = 'var(--gray)';
-                labelEl.textContent = 'Wait for reply';
-            } else if (chatState.timerStarted) {
-                const m = Math.floor(chatState.timerSeconds / 60);
-                const s = chatState.timerSeconds % 60;
-                timerEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
-                timerEl.style.color = 'var(--primary)';
-                labelEl.textContent = 'Chat time';
-            } else {
-                timerEl.textContent = '⏳'; timerEl.style.color = 'var(--gray)';
-                labelEl.textContent = 'Ready';
-            }
-        }
-
-        function updateStatusBanner() {
-            const banner = document.getElementById('chatStatusBanner');
-            if (!banner) return;
-
-            if (chatState.hasEarnedToday) {
-                banner.className = 'chat-status-banner earned';
-                banner.innerHTML = `✅ You've earned from <strong>${escapeHtml(chatState.partnerName)}</strong> in the last 24h. Chat freely or come back later!`;
-                banner.style.display = 'block';
-            } else if (!chatState.hasPartnerReplied) {
-                banner.className = 'chat-status-banner';
-                banner.innerHTML = `💬 Chat freely! <strong>${escapeHtml(chatState.partnerName)}</strong> needs to reply to start your earning timer.`;
-                banner.style.display = 'block';
-            } else if (chatState.timerStarted && chatState.timerSeconds < 120) {
-                banner.className = 'chat-status-banner timer-running';
-                const rem = 120 - chatState.timerSeconds;
-                const m = Math.floor(rem / 60);
-                const s = rem % 60;
-                banner.innerHTML = `⏱️ Keep chatting! <strong>${m}:${s.toString().padStart(2, '0')}</strong> remaining to earn`;
-                banner.style.display = 'block';
-            } else {
-                banner.style.display = 'none';
-            }
-        }
-
-        /* ================= LOAD MESSAGES ================= */
-        async function loadMessages(partnerId) {
-            const result = await safeFetch(`${API_URL}/api/chat-messages/${partnerId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-            const container = document.getElementById('messagesContainer');
-            if (!container) return [];
-            container.innerHTML = '';
-            chatState.renderedIds.clear();
-            chatState.maxRenderedId = 0;
-
-            if (!result.ok) {
-                if (result.status !== 429) console.error('Load messages error:', result.data.error);
-                return [];
-            }
-
-            const messages = Array.isArray(result.data) ? result.data : [];
-            renderMessages(messages);
-            markMessagesAsRead(partnerId);
-            return messages;
-        }
-
-        async function loadNewMessages(partnerId) {
-            const result = await safeFetch(`${API_URL}/api/chat-messages/${partnerId}?after=${chatState.maxRenderedId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-            if (!result.ok) {
-                if (result.status === 429) console.warn('Poll rate limited');
-                return;
-            }
-            const messages = Array.isArray(result.data) ? result.data : [];
-            if (messages.length === 0) return;
-
-            renderMessages(messages);
-            messages.forEach(msg => {
-                if (msg.sender_id === partnerId && !chatState.hasPartnerReplied && !chatState.hasEarnedToday && !chatState.timerStarted) {
-                    chatState.hasPartnerReplied = true;
-                    startTimer();
-                    showAlert(`${escapeHtml(chatState.partnerName)} replied! Earning timer started!`, 'success');
-                }
-            });
-            markMessagesAsRead(partnerId);
-        }
-
-        function renderMessages(messages) {
-            const container = document.getElementById('messagesContainer');
-            if (!container) return;
-            let added = false;
-
-            messages.forEach(msg => {
-                const id = msg.id;
-                if (!id || chatState.renderedIds.has(id)) return;
-                chatState.renderedIds.add(id);
-                if (id > chatState.maxRenderedId) chatState.maxRenderedId = id;
-                container.insertAdjacentHTML('beforeend', createMessageHTML(msg));
-                added = true;
-            });
-
-            if (added) container.scrollTop = container.scrollHeight;
-        }
-
-        function createMessageHTML(msg) {
-            const isSent = msg.sender_id === currentUserId;
-            const senderName = msg.sender_username || (isSent ? currentUsername : chatState.partnerName) || 'User';
-            const time = msg.created_at
-                ? new Date(msg.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-                : '';
-            const type = msg.message_type || 'text';
-            let content = '';
-
-            if (type === 'image' && msg.file_url) {
-                content = `<img class="message-image" src="${escapeHtml(msg.file_url)}" alt="Image" onclick="window.open('${escapeHtml(msg.file_url)}','_blank')">`;
-            } else if (type === 'voice' && msg.file_url) {
-                const dur = msg.duration ? formatDuration(msg.duration) : '0:00';
-                const bars = Array.from({length: 24}, () => `<div class="voice-bar" style="height:${Math.max(4, Math.random() * 24)}px"></div>`).join('');
-                content = `
-                    <div class="voice-message">
-                        <button class="voice-play-btn" onclick="toggleVoicePlay(${msg.id})">
-                            <i class="bi bi-play-fill" id="play-icon-${msg.id}"></i>
-                        </button>
-                        <div class="voice-waveform" onclick="seekVoice(event, ${msg.id})">
-                            <div class="voice-progress-fill" id="progress-fill-${msg.id}"></div>
-                            <div class="voice-bars">${bars}</div>
-                        </div>
-                        <span class="voice-time" id="time-${msg.id}">${dur}</span>
-                        <audio id="audio-${msg.id}" src="${escapeHtml(msg.file_url)}" preload="metadata"></audio>
-                    </div>`;
-            } else if (type === 'sticker') {
-                content = `<div class="message-sticker">${escapeHtml(msg.message)}</div>`;
-            } else {
-                content = `<div class="message-text">${escapeHtml(msg.message)}</div>`;
-            }
-
-            return `
-                <div class="message ${isSent ? 'sent' : ''}" data-id="${msg.id}">
-                    <div class="message-avatar">${escapeHtml(String(senderName).charAt(0).toUpperCase())}</div>
-                    <div class="message-bubble">
-                        ${content}
-                        <div class="message-meta">
-                            <span class="message-time">${escapeHtml(time)}</span>
-                            ${isSent ? '<span class="message-check"><i class="bi bi-check2-all"></i></span>' : ''}
-                        </div>
-                    </div>
-                </div>`;
-        }
-
-        async function markMessagesAsRead(partnerId) {
             try {
-                await fetch(`${API_URL}/api/mark-messages-read/${partnerId}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-            } catch (e) {}
+                await fetch(`${API_URL}/api/send-message`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, 
+                    body: JSON.stringify({ receiver_id: currentPartner, message: text }) 
+                });
+                loadMessages();
+            } catch (err) { showAlert('Failed to send', 'error'); }
         }
 
-        /* ================= LIFECYCLE ================= */
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && chatState.partnerId) loadNewMessages(chatState.partnerId);
+        document.getElementById('messageInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentPartner) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const uploadRes = await fetch(`${API_URL}/api/upload-chat-file`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: formData });
+                const uploadData = await uploadRes.json();
+                if (uploadRes.ok) {
+                    const isImage = file.type.startsWith('image/');
+                    await fetch(`${API_URL}/api/send-message`, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, 
+                        body: JSON.stringify({ receiver_id: currentPartner, message: '', message_type: isImage ? 'image' : 'voice', file_url: uploadData.file_url, file_name: uploadData.file_name }) 
+                    });
+                    loadMessages();
+                }
+            } catch (err) { showAlert('Upload failed', 'error'); }
+            e.target.value = '';
         });
 
-        window.addEventListener('beforeunload', () => {
-            if (chatState.timerInterval) clearInterval(chatState.timerInterval);
-            if (chatState.messagesInterval) clearInterval(chatState.messagesInterval);
-            if (usersInterval) clearInterval(usersInterval);
-            if (onlineStatusInterval) clearInterval(onlineStatusInterval);
-            if (isRecording) stopVoiceRecord();
-            navigator.sendBeacon(`${API_URL}/api/update-online-status`, new Blob([JSON.stringify({going_offline:true})], {type:'application/json'}));
-        });
-
-        async function logout() {
-            try {
-                await fetch(`${API_URL}/api/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-            } catch (error) {
-                console.warn("Logout error");
-            }
-            localStorage.removeItem('darkMode');
-            window.location.href = 'login.html';
-        }
-
-        checkAuth().then(ok => {
-            if (ok) {
+        (async () => {
+            if (await checkAuth()) {
+                const profileRes = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                const profile = await profileRes.json(); 
+                localStorage.setItem('user_id', profile.user_id); 
                 loadUsers();
-                usersInterval = setInterval(loadUsers, 10000);
-                onlineStatusInterval = setInterval(updateOnlineStatus, 30000);
             }
-        });
+        })();
+        
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text || ''; return div.innerHTML; }
+        function showAlert(msg, type) { const c = document.getElementById('alertContainer'); c.innerHTML = `<div class="alert alert-${type}">${msg}</div>`; setTimeout(() => c.innerHTML = '', 3000); }
     </script>
 </body>
 </html>
