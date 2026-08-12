@@ -352,73 +352,19 @@
             transform: translateY(-2px);
         }
 
-        .overlay {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.95);
-            overflow-x: hidden;
-            transition: 0.3s;
-        }
-
-        .overlay-content {
-            position: relative;
-            width: 100%;
-            padding: 60px 30px 30px 30px;
-        }
-
-        .closebtn {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 40px;
-            color: white;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .menu-list {
-            list-style: none;
-        }
-
-        .menu-list li {
-            margin-bottom: 15px;
-        }
-
-        .menu-list a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            transition: background 0.3s;
-        }
-
-        .menu-list a:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-list i {
-            font-size: 20px;
-        }
-
-        .logout-btn {
-            width: 100%;
-            padding: 12px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 30px;
-        }
+        
+        /* ===== OVERLAY MENU ===== */
+        .overlay { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background: linear-gradient(180deg, var(--primary-dark) 0%, #0d2b4e 100%); overflow-x: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 40px rgba(0,0,0,0.3); }
+        .overlay-content { position: relative; width: 100%; padding: 80px 30px 30px 30px; }
+        .closebtn { position: absolute; top: 20px; right: 30px; font-size: 40px; color: var(--white); text-decoration: none; cursor: pointer; transition: var(--transition); }
+        .closebtn:hover { color: var(--accent-light); }
+        .menu-list { list-style: none; }
+        .menu-list li { margin-bottom: 5px; }
+        .menu-list a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: 12px; transition: var(--transition); font-family: 'Inter', sans-serif; }
+        .menu-list a:hover { color: var(--accent-light); background: rgba(255, 255, 255, 0.05); padding-left: 20px; }
+        .menu-list i { font-size: 20px; color: var(--accent-light); }
+        .logout-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: var(--white); border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 30px; font-family: 'Inter', sans-serif; transition: var(--transition); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); }
+        .logout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4); }
 
         .alert {
             position: fixed;
@@ -554,15 +500,21 @@
     <div id="myNav" class="overlay">
         <a class="closebtn" onclick="closeNav()">&times;</a>
         <div class="overlay-content">
-            <ul class="menu-list">
+              <ul class="menu-list">
                 <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
-                <li><a href="quiz.html"><i class="bi bi-question-circle-fill"></i> Quiz</a></li>
+                <li><a href="transfer.html"><i class="bi bi-arrow-left-right"></i> Transfer</a></li>
+                <li><a href="tiktok.html"><i class="bi bi-tiktok"></i> Tiktok</a></li>
+                <li><a href="whatsapp.html"><i class="bi bi-whatsapp"></i> Whatsapp</a></li>
                 <li><a href="task.html"><i class="bi bi-check-circle-fill"></i> Tasks</a></li>
                 <li><a href="video.html"><i class="bi bi-play-circle-fill"></i> Videos</a></li>
+                <li><a href="support.html"><i class="bi bi-headset"></i> Support</a></li>
+                <li><a href="chat.html"><i class="bi bi-chat-dots"></i> Chat & Earn</a></li>
                 <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
                 <li><a href="bank-setup.html"><i class="bi bi-bank"></i> Bank Setup</a></li>
                 <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
+                <li><a href="upgrade.html"><i class="bi bi-stars"></i> Upgrade Plan</a></li>
             </ul>
+
             <button class="logout-btn" onclick="logout()">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </button>
@@ -610,7 +562,7 @@
         <a href="dashboard.html" class="nav-item-bottom">
             <i class="bi bi-house-door-fill"></i> Home
         </a>
-        <a href="task.html" class="nav-item-bottom active">
+        <a href="video.html" class="nav-item-bottom active">
             <i class="bi bi-check-circle-fill"></i> Tasks
         </a>
         <a href="withdraw.html" class="nav-item-bottom">
