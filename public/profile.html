@@ -579,89 +579,19 @@
         .nav-item-bottom:active i { transform: scale(0.85); }
         .nav-item-bottom.active i { transform: translateY(-2px); }
 
-        /* Overlay Menu */
-        .overlay {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            background-color: rgba(10, 22, 40, 0.98);
-            backdrop-filter: blur(20px);
-            overflow-x: hidden;
-            transition: 0.3s;
-        }
-
-        .overlay-content {
-            position: relative;
-            width: 100%;
-            padding: 80px 30px 30px 30px;
-        }
-
-        .closebtn {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 40px;
-            color: white;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .closebtn:hover {
-            color: var(--accent);
-        }
-
-        .menu-list {
-            list-style: none;
-        }
-
-        .menu-list li { margin-bottom: 8px; }
-
-        .menu-list a {
-            color: rgba(255,255,255,0.9);
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 14px;
-            border-radius: 12px;
-            transition: var(--transition);
-        }
-
-        .menu-list a:hover {
-            background: rgba(0, 188, 212, 0.1);
-            color: var(--accent);
-            padding-left: 20px;
-        }
-
-        .menu-list i {
-            font-size: 20px;
-            color: var(--accent);
-        }
-
-        .logout-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            margin-top: 30px;
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-        }
-
-        .logout-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
-        }
+        
+        /* ===== OVERLAY MENU ===== */
+        .overlay { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background: linear-gradient(180deg, var(--primary-dark) 0%, #0d2b4e 100%); overflow-x: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 40px rgba(0,0,0,0.3); }
+        .overlay-content { position: relative; width: 100%; padding: 80px 30px 30px 30px; }
+        .closebtn { position: absolute; top: 20px; right: 30px; font-size: 40px; color: var(--white); text-decoration: none; cursor: pointer; transition: var(--transition); }
+        .closebtn:hover { color: var(--accent-light); }
+        .menu-list { list-style: none; }
+        .menu-list li { margin-bottom: 5px; }
+        .menu-list a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: 12px; transition: var(--transition); font-family: 'Inter', sans-serif; }
+        .menu-list a:hover { color: var(--accent-light); background: rgba(255, 255, 255, 0.05); padding-left: 20px; }
+        .menu-list i { font-size: 20px; color: var(--accent-light); }
+        .logout-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: var(--white); border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 30px; font-family: 'Inter', sans-serif; transition: var(--transition); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); }
+        .logout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4); }
 
         /* Alerts */
         .alert {
