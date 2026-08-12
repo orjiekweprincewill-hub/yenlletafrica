@@ -35,19 +35,21 @@
             color: var(--primary-dark);
             overflow: hidden;
             min-height: 100vh;
+            display: flex; /* Flexbox ensures perfect height calculation */
+            flex-direction: column;
             transition: background-color 0.3s, color 0.3s;
         }
 
         /* ===== HEADER ===== */
         .top-header {
-            position: fixed;
-            top: 0; left: 0; width: 100%; z-index: 1000;
+            position: relative; /* Removed fixed to let flexbox handle layout */
+            width: 100%; z-index: 1000;
             background: rgba(10, 22, 40, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
             transition: var(--transition);
             padding: 0 20px;
-            height: 70px;
+            flex-shrink: 0;
         }
         .top-header.scrolled { box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
 
@@ -93,12 +95,12 @@
 
         /* ===== HERO SECTION ===== */
         .hero-section {
-            min-height: 30vh;
+            min-height: 120px;
             display: flex; align-items: center; justify-content: center;
             background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
             position: relative; overflow: hidden;
-            padding: 100px 2rem 40px;
-            margin-bottom: 0;
+            padding: 1rem 2rem;
+            flex-shrink: 0;
         }
         .hero-section::before {
             content: ''; position: absolute; top: 50%; left: 50%;
@@ -107,37 +109,28 @@
             background-size: contain; background-repeat: no-repeat; background-position: center;
             opacity: 0.08; filter: blur(2px); pointer-events: none;
         }
-        .hero-section::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%);
-            animation: pulse 8s ease-in-out infinite; pointer-events: none;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
         .hero-content { max-width: 1200px; width: 100%; text-align: center; position: relative; z-index: 1; }
         .hero-content h1 {
-            font-size: 2.5rem; font-weight: 800; color: var(--white);
-            line-height: 1.1; margin-bottom: 1rem; opacity: 0; animation: fadeInUp 1s ease forwards;
+            font-size: 2rem; font-weight: 800; color: var(--white);
+            line-height: 1.1; margin-bottom: 0.5rem;
         }
         .hero-content h1 span {
             background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
         .hero-content p {
-            font-size: 1.1rem; color: rgba(255,255,255,0.8); line-height: 1.7;
-            margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;
-            opacity: 0; animation: fadeInUp 1s ease 0.2s forwards;
+            font-size: 1rem; color: rgba(255,255,255,0.8); line-height: 1.5;
+            max-width: 600px; margin-left: auto; margin-right: auto;
         }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ===== CHAT CONTAINER ===== */
         .main-content {
             padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
-            height: calc(100vh - 30vh - 70px); /* Fixed: 70px header height */
+            width: 100%;
+            flex: 1; /* This makes the chat area take up exactly the remaining screen space */
+            min-height: 0; /* Crucial for flexbox scrolling */
             display: flex;
             flex-direction: column;
         }
@@ -150,16 +143,14 @@
             flex: 1;
             display: flex;
             overflow: hidden;
-            opacity: 0;
-            transform: translateY(40px);
-            animation: fadeInUp 0.6s ease forwards;
-            animation-delay: 0.3s;
+            min-height: 0; /* Crucial for flexbox scrolling */
         }
 
         /* ===== SIDEBAR ===== */
         .users-sidebar {
             width: 320px; border-right: 1px solid rgba(0,0,0,0.03);
             display: flex; flex-direction: column; background: transparent;
+            flex-shrink: 0;
         }
         .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(0,0,0,0.03); }
         .sidebar-header h2 { font-size: 18px; color: var(--primary-dark); margin-bottom: 4px; font-weight: 700; }
@@ -168,7 +159,7 @@
             display: inline-block; background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
             color: white; padding: 4px 12px; border-radius: 50px; font-size: 12px; margin-top: 8px; font-weight: 600;
         }
-        .search-box { padding: 15px 20px; border-bottom: 1px solid rgba(0,0,0,0.03); }
+        .search-box { padding: 15px 20px; border-bottom: 1px solid rgba(0,0,0,0.03); flex-shrink: 0; }
         .search-input {
             width: 100%; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 50px;
             font-size: 14px; outline: none; background: var(--off-white); transition: var(--transition);
@@ -176,7 +167,7 @@
         }
         .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1); }
 
-        .users-list { flex: 1; overflow-y: auto; }
+        .users-list { flex: 1; overflow-y: auto; min-height: 0; }
         .user-item {
             padding: 15px 20px; cursor: pointer; transition: var(--transition);
             display: flex; align-items: center; gap: 14px; position: relative; border-bottom: 1px solid rgba(0,0,0,0.02);
@@ -206,6 +197,7 @@
         .chat-main {
             flex: 1; display: flex; flex-direction: column;
             background: var(--off-white);
+            min-width: 0; /* Prevents flex blowout */
         }
         .chat-header {
             padding: 15px 20px; background: rgba(255, 255, 255, 0.8);
@@ -238,6 +230,7 @@
         .messages-container {
             flex: 1; overflow-y: auto; padding: 20px 8%;
             display: flex; flex-direction: column; gap: 2px;
+            min-height: 0; /* Crucial for scroll */
         }
         .message {
             display: flex; gap: 8px; max-width: 65%;
@@ -310,7 +303,7 @@
             padding: 15px 20px; background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             border-top: 1px solid rgba(0,0,0,0.03);
-            position: relative; flex-shrink: 0;
+            position: relative; flex-shrink: 0; /* Prevents input from being pushed off screen */
         }
         .message-input-form { display: flex; gap: 10px; align-items: center; }
         .message-input {
@@ -451,22 +444,23 @@
         body.dark-mode .empty-state h3 { color: #e0e0e0; }
 
         /* ===== RESPONSIVE ===== */
-        @media (min-width: 768px) {
-            .bottom-nav { display: none; }
-        }
         @media (max-width: 768px) {
-            .hero-section { min-height: 20vh; padding: 90px 1rem 20px; }
-            .hero-content h1 { font-size: 1.8rem; }
-            .hero-content p { font-size: 1rem; }
-            .main-content { padding: 10px; height: calc(100vh - 20vh - 70px); }
-            .chat-card { border-radius: 15px; }
+            .hero-section { display: none; } /* Hide hero on mobile to maximize chat space */
+            .main-content { padding: 0; }
+            .chat-card { border-radius: 0; }
             .users-sidebar { width: 100%; }
             .chat-main { display: none; }
+            
+            /* Full screen chat layout on mobile */
             .chat-main.active-chat {
-                display: flex; position: fixed; top: 70px; left: 0; right: 0; bottom: 0; z-index: 100;
+                display: flex; 
+                position: fixed; 
+                top: 0; left: 0; right: 0; bottom: 0; 
+                z-index: 1000;
                 background: var(--off-white);
             }
             body.dark-mode .chat-main.active-chat { background: #12121e; }
+            
             .message { max-width: 85%; }
             .messages-container { padding: 10px 4%; }
             .emoji-grid { grid-template-columns: repeat(8, 1fr); }
