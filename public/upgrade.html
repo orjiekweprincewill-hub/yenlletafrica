@@ -19,6 +19,8 @@
             --white: #ffffff;
             --off-white: #f0f4f8;
             --gray: #8892b0;
+            --danger: #ef5350;
+            --success: #81c784;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -124,13 +126,28 @@
             transition: var(--transition);
             margin-bottom: 18px;
             box-shadow: 0 8px 25px rgba(0, 188, 212, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .upgrade-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(0, 188, 212, 0.4); }
         .upgrade-btn:disabled { background: #334155; cursor: not-allowed; transform: none; box-shadow: none; }
 
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: var(--white);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         .alert { padding: 14px; border-radius: 12px; margin-bottom: 22px; display: none; font-size: 0.9rem; font-weight: 500; }
-        .alert-success { background: rgba(46, 125, 50, 0.15); color: #81c784; border: 1px solid rgba(46, 125, 50, 0.3); }
-        .alert-error { background: rgba(198, 40, 40, 0.15); color: #ef5350; border: 1px solid rgba(198, 40, 40, 0.3); }
+        .alert-success { background: rgba(46, 125, 50, 0.15); color: var(--success); border: 1px solid rgba(46, 125, 50, 0.3); }
+        .alert-error { background: rgba(198, 40, 40, 0.15); color: var(--danger); border: 1px solid rgba(198, 40, 40, 0.3); }
 
         .back-link { text-align: center; margin-top: 22px; color: var(--gray); font-size: 0.9rem; }
         .back-link a { color: var(--accent-light); text-decoration: none; font-weight: 600; }
@@ -156,7 +173,10 @@
                 </div>
             </div>
 
-            <button type="submit" class="upgrade-btn" id="upgradeBtn">Upgrade Now</button>
+            <button type="submit" class="upgrade-btn" id="upgradeBtn">
+                <div class="spinner" id="spinner"></div>
+                <span id="btnText">Upgrade Now</span>
+            </button>
         </form>
 
         <div class="back-link">
@@ -170,11 +190,11 @@
         function showAlert(message, type) {
             const alertBox = document.getElementById('alertBox');
             alertBox.className = `alert alert-${type}`;
-            alertBox.textContent = message;
+            alertBox.innerHTML = message;
             alertBox.style.display = 'block';
 
             if (type === 'error') {
-                setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
+                setTimeout(() => { alertBox.style.display = 'none'; }, 6000);
             }
         }
 
@@ -183,46 +203,66 @@
 
             const couponCode = document.getElementById('couponCode').value.trim();
             const upgradeBtn = document.getElementById('upgradeBtn');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('spinner');
 
             upgradeBtn.disabled = true;
-            upgradeBtn.textContent = 'Upgrading...';
+            btnText.textContent = 'Upgrading...';
+            spinner.style.display = 'block';
 
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000); // Wait up to 60s for Render to wake up
+
                 const response = await fetch(`${API_URL}/api/apply-upgrade-coupon`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
-                    body: JSON.stringify({ coupon_code: couponCode })
+                    body: JSON.stringify({ coupon_code: couponCode }),
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
                 const data = await response.json();
 
                 if (!response.ok) {
-                    showAlert('❌ ' + (data.error || 'Upgrade failed'), 'error');
+                    let errorMsg = data.error || 'Upgrade failed. Please check your coupon code.';
+                    // Make error messages more user-friendly
+                    errorMsg = errorMsg.replace("Invalid upgrade. You are on ", "You are currently on ");
+                    showAlert('❌ ' + errorMsg, 'error');
+                    
+                    btnText.textContent = 'Upgrade Now';
+                    spinner.style.display = 'none';
                     upgradeBtn.disabled = false;
-                    upgradeBtn.textContent = 'Upgrade Now';
                     return;
                 }
 
                 if (data.success) {
-                    showAlert(`✅ ${data.message}`, 'success');
+                    showAlert(`✅ ${data.message} Redirecting to dashboard...`, 'success');
                     document.getElementById('upgradeForm').reset();
 
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
-                    }, 2000);
+                    }, 2500);
                 } else {
-                    showAlert('❌ Upgrade failed', 'error');
+                    showAlert('❌ Upgrade failed. Please try again.', 'error');
+                    btnText.textContent = 'Upgrade Now';
+                    spinner.style.display = 'none';
                     upgradeBtn.disabled = false;
-                    upgradeBtn.textContent = 'Upgrade Now';
                 }
             } catch (error) {
                 console.error('Upgrade error:', error);
-                showAlert('❌ Network error! Please try again.', 'error');
+                let msg = '❌ Network error! Server might be sleeping. Please try again in a moment.';
+                if (error.name === 'AbortError') {
+                    msg = '❌ Server is taking too long to respond. Please try again.';
+                }
+                showAlert(msg, 'error');
+                
+                btnText.textContent = 'Upgrade Now';
+                spinner.style.display = 'none';
                 upgradeBtn.disabled = false;
-                upgradeBtn.textContent = 'Upgrade Now';
             }
         });
     </script>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0d47a1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Courses - YENLLET AFRICA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--off-white);
+            color: var(--primary-dark);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode { background: var(--primary-dark); color: var(--white); }
+
+        #authLoader {
+            position: fixed; inset: 0;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
+            z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        #authLoader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-text { color: var(--white); font-size: 14px; opacity: 0.8; }
+
+        .top-header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0 20px; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-icon { font-size: 24px; color: var(--white); cursor: pointer; transition: var(--transition); }
+        .menu-icon:hover { color: var(--accent-light); }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; }
+        .logo img { height: 35px; width: auto; border-radius: 8px; }
+        .logo span { background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header-controls { display: flex; align-items: center; gap: 10px; }
+        .back-btn { background: rgba(255,255,255,0.1); border: none; color: var(--white); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: var(--transition); text-decoration: none; }
+        .back-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+
+        .hero-bg { min-height: 100vh; background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%); position: relative; overflow: hidden; padding-top: 90px; padding-bottom: 100px; }
+        .hero-bg::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%); animation: pulse 8s ease-in-out infinite; pointer-events: none; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
+
+        .main-content { position: relative; z-index: 1; padding: 20px; max-width: 600px; margin: 0 auto; }
+
+        .page-title { font-size: 28px; font-weight: 800; color: var(--white); margin-bottom: 8px; }
+        .page-subtitle { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 25px; }
+
+        .courses-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        
+        .course-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .course-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0, 188, 212, 0.2); }
+
+        .course-image { width: 100%; height: 200px; object-fit: cover; background: rgba(255,255,255,0.05); }
+        .course-image-placeholder { width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(0,188,212,0.2) 0%, rgba(13,71,161,0.3) 100%); font-size: 64px; color: rgba(255,255,255,0.3); }
+
+        .course-body { padding: 20px; }
+        .course-name { font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+        .course-description { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 15px; line-height: 1.5; }
+        .join-btn {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: var(--white); border: none; border-radius: 12px;
+            cursor: pointer; font-size: 15px; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .join-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4); }
+        .join-btn:active { transform: scale(0.97); }
+        .join-btn.joined { background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3); }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
+        .empty-state i { font-size: 64px; margin-bottom: 15px; opacity: 0.3; display: block; }
+
+        /* Join Form Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-card {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 450px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 5px; }
+        .modal-subtitle { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 500; }
+        .form-group input {
+            width: 100%; padding: 12px 15px;
+            border: 2px solid rgba(255,255,255,0.15); border-radius: 12px;
+            font-size: 14px; background: rgba(255,255,255,0.05);
+            color: var(--white); font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+        .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2); }
+        .form-group input::placeholder { color: rgba(255,255,255,0.3); }
+        .modal-btn {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif;
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .modal-btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); color: var(--white); box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3); }
+        .modal-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4); }
+        .modal-btn-success { background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: var(--white); }
+        .modal-btn-success:hover { transform: translateY(-2px); }
+        .modal-close { background: rgba(255,255,255,0.1); color: var(--white); }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-btn-row { display: flex; gap: 10px; margin-top: 15px; }
+
+        .telegram-link-box {
+            background: rgba(0, 136, 204, 0.15); border: 1px solid rgba(0, 136, 204, 0.3);
+            border-radius: 12px; padding: 15px; margin: 15px 0; text-align: center;
+        }
+        .telegram-link-box p { color: rgba(255,255,255,0.7); font-size: 13px; margin-bottom: 10px; }
+        .telegram-link-display {
+            color: var(--accent-light); font-size: 14px; font-weight: 600;
+            word-break: break-all; padding: 8px; background: rgba(255,255,255,0.05);
+            border-radius: 8px; margin-bottom: 10px;
+        }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -4px 15px rgba(0,0,0,0.4); }
+        .nav-item-bottom { text-align: center; text-decoration: none; color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 500; flex: 1; transition: var(--transition); display: flex; flex-direction: column; align-items: center; font-family: 'Inter', sans-serif; }
+        .nav-item-bottom i { font-size: 22px; margin-bottom: 2px; }
+        .nav-item-bottom.active { color: var(--accent); filter: drop-shadow(0 0 5px rgba(0, 188, 212, 0.4)); }
+
+        .overlay { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background: linear-gradient(180deg, var(--primary-dark) 0%, #0d2b4e 100%); overflow-x: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 40px rgba(0,0,0,0.3); }
+        .overlay-content { position: relative; width: 100%; padding: 80px 30px 30px 30px; }
+        .closebtn { position: absolute; top: 20px; right: 30px; font-size: 40px; color: var(--white); text-decoration: none; cursor: pointer; }
+        .menu-list { list-style: none; }
+        .menu-list li { margin-bottom: 5px; }
+        .menu-list a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: 12px; transition: var(--transition); font-family: 'Inter', sans-serif; }
+        .menu-list a:hover { color: var(--accent-light); background: rgba(255, 255, 255, 0.05); padding-left: 20px; }
+        .menu-list i { font-size: 20px; color: var(--accent-light); }
+        .logout-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: var(--white); border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 30px; font-family: 'Inter', sans-serif; }
+
+        .alert { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 3000; animation: slideIn 0.3s ease; font-weight: 600; }
+        .alert-success { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); color: white; }
+        .alert-error { background: linear-gradient(135deg, #f44336 0%, #c62828 100%); color: white; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (min-width: 768px) { .bottom-nav { display: none; } .courses-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .logo span { font-size: 1.1rem; } }
+    </style>
+</head>
+<body>
+    <div id="authLoader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Loading courses...</div>
+    </div>
+
+    <div id="myNav" class="overlay">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="overlay-content">
+            <ul class="menu-list">
+                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li><a href="course.html"><i class="bi bi-mortarboard"></i> Courses</a></li>
+                <li><a href="transfer.html"><i class="bi bi-arrow-left-right"></i> Transfer</a></li>
+                <li><a href="tiktok.html"><i class="bi bi-tiktok"></i> Tiktok</a></li>
+                <li><a href="whatsapp.html"><i class="bi bi-whatsapp"></i> Whatsapp</a></li>
+                <li><a href="task.html"><i class="bi bi-check-circle-fill"></i> Tasks</a></li>
+                <li><a href="video.html"><i class="bi bi-play-circle-fill"></i> Videos</a></li>
+                <li><a href="support.html"><i class="bi bi-headset"></i> Support</a></li>
+                <li><a href="chat.html"><i class="bi bi-chat-dots"></i> Chat & Earn</a></li>
+                <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
+                <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
+            </ul>
+            <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="top-header">
+        <div class="header-left">
+            <i class="bi bi-list menu-icon" onclick="openNav()"></i>
+            <a href="dashboard.html" class="logo">
+                <img src="IMG-20260414-WA0002.jpg" alt="YenlletAfrica" onerror="this.style.display='none'">
+                <span>YenlletAfrica</span>
+            </a>
+        </div>
+        <div class="header-controls">
+            <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i></a>
+        </div>
+    </div>
+
+    <div class="hero-bg">
+        <div class="main-content">
+            <div class="page-title">📚 Courses</div>
+            <div class="page-subtitle">Browse and join available courses to start learning</div>
+            <div class="courses-grid" id="coursesGrid">
+                <div class="empty-state">
+                    <i class="bi bi-hourglass-split"></i>
+                    <p>Loading courses...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Course Modal -->
+    <div class="modal-overlay" id="joinModal">
+        <div class="modal-card">
+            <div id="modalContent">
+                <div class="modal-title" id="modalTitle">Join Course</div>
+                <div class="modal-subtitle" id="modalSubtitle">Fill in your details to get the Telegram link</div>
+                <form id="joinCourseForm" onsubmit="submitJoinCourse(event)">
+                    <input type="hidden" id="joinCourseId" value="">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="joinName" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="joinEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="joinPhone" required placeholder="Enter your phone number">
+                    </div>
+                    <div class="modal-btn-row">
+                        <button type="button" class="modal-btn modal-close" onclick="closeJoinModal()">Cancel</button>
+                        <button type="submit" class="modal-btn modal-btn-primary"><i class="bi bi-telegram"></i> Get Link</button>
+                    </div>
+                </form>
+            </div>
+            <div id="successContent" style="display: none;">
+                <div class="modal-title" style="color: #4caf50;">✅ Joined Successfully!</div>
+                <div class="modal-subtitle">Click the button below to join the Telegram group</div>
+                <div class="telegram-link-box">
+                    <p><i class="bi bi-telegram"></i> Your Telegram Invite Link:</p>
+                    <div class="telegram-link-display" id="telegramLinkDisplay"></div>
+                </div>
+                <div class="modal-btn-row">
+                    <a href="#" id="openTelegramBtn" target="_blank" class="modal-btn modal-btn-success" style="text-decoration: none;">
+                        <i class="bi bi-box-arrow-up-right"></i> Open Telegram
+                    </a>
+                </div>
+                <div class="modal-btn-row">
+                    <button class="modal-btn modal-close" onclick="closeJoinModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item-bottom">
+            <i class="bi bi-house-door-fill"></i> Home
+        </a>
+        <a href="withdraw.html" class="nav-item-bottom">
+            <i class="bi bi-cash-coin"></i> Withdraw
+        </a>
+        <a href="course.html" class="nav-item-bottom active">
+            <i class="bi bi-mortarboard"></i> Courses
+        </a>
+        <a href="profile.html" class="nav-item-bottom">
+            <i class="bi bi-person-circle"></i> Profile
+        </a>
+    </div>
+
+    <script>
+        const API_URL = 'https://yenlletafrica.onrender.com';
+        let joinedCourses = new Set();
+
+        function openNav() { document.getElementById("myNav").style.width = "80%"; }
+        function closeNav() { document.getElementById("myNav").style.width = "0%"; }
+
+        async function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) { window.location.href = 'login.html'; return; }
+            try {
+                const response = await fetch(`${API_URL}/api/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) { window.location.href = 'login.html'; return; }
+                const data = await response.json();
+                // Pre-fill form with user data
+                if (data.email) document.getElementById('joinEmail').value = data.email;
+                if (data.phone_number) document.getElementById('joinPhone').value = data.phone_number;
+                if (data.username) document.getElementById('joinName').value = data.username;
+                document.getElementById('authLoader').classList.add('hidden');
+                loadCourses();
+            } catch (error) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function loadCourses() {
+            const container = document.getElementById('coursesGrid');
+            try {
+                const response = await fetch(`${API_URL}/api/courses`);
+                if (!response.ok) throw new Error('Failed to load courses');
+                const courses = await response.json();
+
+                if (!courses || courses.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-mortarboard"></i>
+                            <p>No courses available yet</p>
+                            <p style="font-size: 13px; margin-top: 5px;">Check back soon for new courses!</p>
+                        </div>`;
+                    return;
+                }
+
+                // Check join status for each course
+                const token = localStorage.getItem('token');
+                const statusPromises = courses.map(c =>
+                    fetch(`${API_URL}/api/course-status/${c.id}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }).then(r => r.json()).catch(() => ({ joined: false }))
+                );
+                const statuses = await Promise.all(statusPromises);
+
+                container.innerHTML = courses.map((c, i) => {
+                    const status = statuses[i];
+                    const joined = status.joined;
+                    if (joined) joinedCourses.add(c.id);
+                    const telegramLink = joined ? status.telegram_link : '';
+
+                    return `
+                    <div class="course-card">
+                        ${c.image_url
+                            ? `<img src="${escapeHtml(c.image_url)}" alt="${escapeHtml(c.name)}" class="course-image">`
+                            : `<div class="course-image-placeholder"><i class="bi bi-mortarboard"></i></div>`
+                        }
+                        <div class="course-body">
+                            <div class="course-name">${escapeHtml(c.name)}</div>
+                            ${c.description ? `<div class="course-description">${escapeHtml(c.description)}</div>` : ''}
+                            ${joined
+                                ? `<button class="join-btn joined" onclick="openTelegram('${escapeHtml(telegramLink)}')"><i class="bi bi-telegram"></i> Open Telegram Group</button>`
+                                : `<button class="join-btn" onclick="openJoinModal(${c.id}, '${escapeHtml(c.name)}')"><i class="bi bi-box-arrow-in-right"></i> Join Course</button>`
+                            }
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <p>Failed to load courses</p>
+                        <p style="font-size: 13px; margin-top: 5px;">Please refresh the page</p>
+                    </div>`;
+            }
+        }
+
+        function openJoinModal(courseId, courseName) {
+            document.getElementById('joinCourseId').value = courseId;
+            document.getElementById('modalTitle').textContent = `Join: ${courseName}`;
+            document.getElementById('modalContent').style.display = 'block';
+            document.getElementById('successContent').style.display = 'none';
+            document.getElementById('joinModal').classList.add('active');
+        }
+
+        function closeJoinModal() {
+            document.getElementById('joinModal').classList.remove('active');
+        }
+
+        async function submitJoinCourse(e) {
+            e.preventDefault();
+            const courseId = document.getElementById('joinCourseId').value;
+            const name = document.getElementById('joinName').value.trim();
+            const email = document.getElementById('joinEmail').value.trim();
+            const phone = document.getElementById('joinPhone').value.trim();
+
+            if (!name || !email || !phone) {
+                showAlert('Please fill all fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/join-course`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ course_id: parseInt(courseId), name, email, phone })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success with telegram link
+                    document.getElementById('modalContent').style.display = 'none';
+                    document.getElementById('successContent').style.display = 'block';
+                    document.getElementById('telegramLinkDisplay').textContent = data.telegram_link;
+                    document.getElementById('openTelegramBtn').href = data.telegram_link;
+                    showAlert('✅ ' + data.message, 'success');
+                    // Reload courses to update button
+                    loadCourses();
+                } else {
+                    showAlert(data.error || 'Failed to join course', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to join course', 'error');
+            }
+        }
+
+        function openTelegram(link) {
+            if (link) window.open(link, '_blank');
+        }
+
+        function escapeHtml(str) {
+            if (str == null) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            if (!container) return;
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+            setTimeout(() => div.remove(), 4000);
+        }
+
+        async function logout() {
+            try {
+                await fetch(`${API_URL}/api/logout`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+            } catch (e) {}
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkAuth);
+        } else {
+            checkAuth();
+        }
+    </script>
+</body>
+</html>
