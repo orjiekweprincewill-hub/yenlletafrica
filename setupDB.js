@@ -1,10 +1,12 @@
 const { Pool } = require('pg');
 const crypto = require('crypto');
 require('dotenv').config();
-// ============================================================ // 🔌 POOL CONFIGURATION (Updated for Neon Serverless) // ============================================================
+
+// ============================================================
+// 🔌 POOL CONFIGURATION (Updated for Neon Serverless)
+// ============================================================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Automatically relaxes SSL checks to prevent connection drops on Render/Vercel
   ssl: { rejectUnauthorized: false },
   max: 20,
   idleTimeoutMillis: 30000,
@@ -290,7 +292,7 @@ async function buildArticleCompletions(client) {
             id SERIAL PRIMARY KEY,
             user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             article_id INTEGER NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(user_id, article_id)
         );
     `);
@@ -615,6 +617,42 @@ async function buildSupportMessages(client) {
 }
 
 // ============================================================
+// 📚 COURSES TABLE BUILDERS
+// ============================================================
+
+async function buildCourses(client) {
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS courses (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            image_url TEXT,
+            telegram_link TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    `);
+    console.log('✅ courses table ready');
+}
+
+async function buildCourseJoins(client) {
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS course_joins (
+            id SERIAL PRIMARY KEY,
+            course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+            user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            phone VARCHAR(50) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(course_id, user_id)
+        );
+    `);
+    await createIndex(client, 'idx_course_joins_course', 'course_joins', 'course_id');
+    await createIndex(client, 'idx_course_joins_user', 'course_joins', 'user_id');
+    console.log('✅ course_joins table ready');
+}
+
+// ============================================================
 // 👤 SEED DATA
 // ============================================================
 
@@ -741,6 +779,10 @@ async function setupDatabase() {
         await buildSupportTickets(client);
         await buildSupportMessages(client);
 
+        // Build Courses Tables
+        await buildCourses(client);
+        await buildCourseJoins(client);
+
         console.log('\n🌱 Seeding database...');
         await seedAdmins(client);
         await seedCoupons(client);
@@ -755,6 +797,7 @@ async function setupDatabase() {
 ║  📦 All tables created & auto-migrated                    ║
 ║  ⚡ Performance indexes added                             ║
 ║  🎧 Support Tickets system ready                          ║
+║  📚 Courses system ready                                  ║
 ║  🔄 Safe to re-run anytime — data is preserved            ║
 ╚═══════════════════════════════════════════════════════════╝
         `);

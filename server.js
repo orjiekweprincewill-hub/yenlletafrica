@@ -1806,6 +1806,221 @@ app.delete('/api/admin/delete-social-link/:id', isAdmin, async (req, res) => {
 });
 
 // ============================================================
+// 🗑️ ADMIN: DELETE USER & RESET PAYOUTS
+// ============================================================
+
+app.get('/api/admin/search-user-for-delete', isAdmin, async (req, res) => {
+    const { q } = req.query;
+    if (!q || !q.trim()) return res.status(400).json({ error: 'Search query required' });
+    try {
+        const result = await pool.query(
+            `SELECT id, username, email, phone_number, plan, country, is_banned, created_at,
+                    activity_wallet, referral_wallet, tiktok_wallet
+             FROM users 
+             WHERE LOWER(username) LIKE LOWER($1) AND is_admin = false 
+             LIMIT 20`,
+            [`%${q.trim()}%`]
+        );
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Search user for delete error:', err);
+        res.status(500).json({ error: 'Search failed' });
+    }
+});
+
+app.delete('/api/admin/delete-user/:id', isAdmin, async (req, res) => {
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can delete users' });
+    const userId = parseInt(req.params.id);
+    if (!userId) return res.status(400).json({ error: 'Invalid user ID' });
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
+        // Delete all related records
+        await client.query('DELETE FROM task_completions WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM video_completions WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM quiz_completions WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM article_completions WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM withdrawals WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM activity_feed WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM notifications WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM chat_messages WHERE sender_id = $1 OR receiver_id = $1', [userId]);
+        await client.query('DELETE FROM chat_sessions WHERE user_id = $1 OR partner_id = $1', [userId]);
+        await client.query('DELETE FROM transfers WHERE sender_id = $1 OR recipient_id = $1', [userId]);
+        await client.query('DELETE FROM whatsapp_posts WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM tiktok_submissions WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM support_messages WHERE sender_id = $1', [userId]);
+        await client.query('DELETE FROM support_tickets WHERE user_id = $1 OR vendor_id = $1', [userId]);
+        await client.query('DELETE FROM user_online_status WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM course_joins WHERE user_id = $1', [userId]);
+        // Nullify referrer references
+        await client.query('UPDATE users SET referrer_id = NULL WHERE referrer_id = $1', [userId]);
+        // Delete the user
+        const result = await client.query('DELETE FROM users WHERE id = $1 AND is_admin = false RETURNING username', [userId]);
+        if (result.rowCount === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'User not found or is an admin (cannot delete)' });
+        }
+        await client.query('COMMIT');
+        res.json({ success: true, message: `User @${result.rows[0].username} deleted successfully` });
+    } catch (err) {
+        if (client) await client.query('ROLLBACK');
+        console.error('Delete user error:', err);
+        res.status(500).json({ error: 'Failed to delete user' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+app.post('/api/admin/reset-payouts', isAdmin, async (req, res) => {
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Only Super Admin can reset payouts' });
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
+        const result = await client.query('DELETE FROM withdrawals RETURNING id');
+        await client.query('COMMIT');
+        res.json({ 
+            success: true, 
+            message: `Payout tracking reset. ${result.rowCount} withdrawal records deleted. Counter will show ¥0.`, 
+            deleted_count: result.rowCount 
+        });
+    } catch (err) {
+        if (client) await client.query('ROLLBACK');
+        console.error('Reset payouts error:', err);
+        res.status(500).json({ error: 'Failed to reset payouts' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+// ============================================================
+// 📚 COURSE ENDPOINTS
+// ============================================================
+
+// Admin: Post new course (with image upload)
+app.post('/api/admin/post-course', isAdmin, upload.single('image'), async (req, res) => {
+    const { name, description, telegram_link } = req.body;
+    if (!name || !telegram_link) return res.status(400).json({ error: 'Course name and Telegram link are required' });
+    try {
+        let imageUrl = null;
+        if (req.file) {
+            const result = await uploadToCloudinary(req.file.buffer, 'courses');
+            imageUrl = result.secure_url;
+        }
+        const result = await pool.query(
+            'INSERT INTO courses (name, description, image_url, telegram_link) VALUES ($1, $2, $3, $4) RETURNING id',
+            [name.trim(), (description || '').trim(), imageUrl, telegram_link.trim()]
+        );
+        res.status(201).json({ success: true, message: 'Course posted successfully', course_id: result.rows[0].id });
+    } catch (err) {
+        console.error('Post course error:', err);
+        res.status(500).json({ error: 'Failed to post course' });
+    }
+});
+
+// Admin: Get all courses with join count
+app.get('/api/admin/courses', isAdmin, async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT c.*, COUNT(cj.id)::int as join_count 
+            FROM courses c 
+            LEFT JOIN course_joins cj ON c.id = cj.course_id 
+            GROUP BY c.id 
+            ORDER BY c.created_at DESC
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Admin courses list error:', err);
+        res.status(500).json({ error: 'Failed to load courses' });
+    }
+});
+
+// Admin: Delete course
+app.delete('/api/admin/delete-course/:id', isAdmin, async (req, res) => {
+    const courseId = parseInt(req.params.id);
+    if (!courseId) return res.status(400).json({ error: 'Invalid course ID' });
+    try {
+        await pool.query('DELETE FROM course_joins WHERE course_id = $1', [courseId]);
+        const result = await pool.query('DELETE FROM courses WHERE id = $1 RETURNING id', [courseId]);
+        if (result.rowCount === 0) return res.status(404).json({ error: 'Course not found' });
+        res.json({ success: true, message: 'Course deleted successfully' });
+    } catch (err) {
+        console.error('Delete course error:', err);
+        res.status(500).json({ error: 'Failed to delete course' });
+    }
+});
+
+// Public: Get all courses (for course.html)
+app.get('/api/courses', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, name, description, image_url FROM courses ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Public courses error:', err);
+        res.status(500).json({ error: 'Failed to load courses' });
+    }
+});
+
+// User: Join a course
+app.post('/api/join-course', isAuthenticated, async (req, res) => {
+    const userId = req.user.user_id;
+    const { course_id, name, email, phone } = req.body;
+    if (!course_id || !name || !email || !phone) {
+        return res.status(400).json({ error: 'Course ID, name, email, and phone are required' });
+    }
+    try {
+        const courseResult = await pool.query('SELECT id, name, telegram_link FROM courses WHERE id = $1', [course_id]);
+        if (courseResult.rows.length === 0) return res.status(404).json({ error: 'Course not found' });
+        
+        const existing = await pool.query('SELECT id FROM course_joins WHERE course_id = $1 AND user_id = $2', [course_id, userId]);
+        if (existing.rows.length > 0) {
+            return res.json({ 
+                success: true, 
+                telegram_link: courseResult.rows[0].telegram_link, 
+                course_name: courseResult.rows[0].name,
+                message: 'You already joined this course' 
+            });
+        }
+        
+        await pool.query(
+            'INSERT INTO course_joins (course_id, user_id, name, email, phone) VALUES ($1, $2, $3, $4, $5)',
+            [course_id, userId, name.trim(), email.trim(), phone.trim()]
+        );
+        
+        await createNotification(userId, `📚 You joined the course: ${courseResult.rows[0].name}!`);
+        
+        res.json({ 
+            success: true, 
+            telegram_link: courseResult.rows[0].telegram_link, 
+            course_name: courseResult.rows[0].name,
+            message: 'Successfully joined the course!' 
+        });
+    } catch (err) {
+        console.error('Join course error:', err);
+        res.status(500).json({ error: 'Failed to join course' });
+    }
+});
+
+// User: Check if already joined a course
+app.get('/api/course-status/:courseId', isAuthenticated, async (req, res) => {
+    const userId = req.user.user_id;
+    const courseId = parseInt(req.params.courseId);
+    if (!courseId) return res.status(400).json({ error: 'Invalid course ID' });
+    try {
+        const result = await pool.query('SELECT telegram_link FROM course_joins cj JOIN courses c ON cj.course_id = c.id WHERE cj.course_id = $1 AND cj.user_id = $2', [courseId, userId]);
+        if (result.rows.length > 0) {
+            res.json({ joined: true, telegram_link: result.rows[0].telegram_link });
+        } else {
+            res.json({ joined: false });
+        }
+    } catch (err) {
+        console.error('Course status error:', err);
+        res.status(500).json({ error: 'Failed to check course status' });
+    }
+});
+
+// ============================================================
 // 👤 ASSISTANT ADMIN ENDPOINTS (CONSOLIDATED)
 // ============================================================
 app.get('/api/assistant/country-stats', isAdmin, async (req, res) => {
