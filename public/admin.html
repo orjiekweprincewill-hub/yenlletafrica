@@ -759,30 +759,89 @@
             } catch (error) { showAlert('Batch failed', 'error'); loadWithdrawals(); }
         }
 
-        function downloadWithdrawalsPDF() {
-            if (currentPendingWithdrawals.length === 0) return showAlert('❌ No pending withdrawals', 'error');
+                function downloadWithdrawalsPDF() {
+            if (currentPendingWithdrawals.length === 0) return showAlert('❌ No pending withdrawals to export', 'error');
+
             let yenTotal = 0, dollarTotal = 0;
             const rows = currentPendingWithdrawals.map((w, i) => {
                 const amt = parseFloat(w.amount) || 0;
                 const isTiktok = w.wallet_type === 'tiktok';
                 const currency = isTiktok ? '$' : '¥';
                 if (isTiktok) dollarTotal += amt; else yenTotal += amt;
-                return `<tr><td>${i+1}</td><td>@${escapeHtml(w.username)}</td><td>${escapeHtml(w.wallet_type).toUpperCase()}</td><td>${escapeHtml(w.bank_name)}</td><td>${escapeHtml(w.account_number)}</td><td>${COUNTRY_MAP[w.country] || escapeHtml(w.country)}</td><td>${currency}${formatNumber(amt)}</td></tr>`;
+
+                const friendlyCountry = COUNTRY_MAP[w.country] || escapeHtml(w.country) || 'Unknown';
+                const amountStr = `${currency}${formatNumber(amt)}`;
+
+                return `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 8px; font-size: 12px; text-align: center;">${i + 1}</td>
+                        <td style="padding: 8px; font-size: 12px; font-weight: 600; color: #1f2937;">@${escapeHtml(w.username)}</td>
+                        <td style="padding: 8px; font-size: 12px; color: #374151;">${escapeHtml(w.wallet_type).toUpperCase()}</td>
+                        <td style="padding: 8px; font-size: 12px; color: #374151;">${escapeHtml(w.bank_name)}</td>
+                        <td style="padding: 8px; font-size: 12px; color: #374151; font-family: monospace;">${escapeHtml(w.account_number)}</td>
+                        <td style="padding: 8px; font-size: 12px; color: #374151;">${friendlyCountry}</td>
+                        <td style="padding: 8px; font-size: 12px; color: #0d47a1; font-weight: 700; text-align: right;">${amountStr}</td>
+                    </tr>
+                `;
             }).join('');
             
             const element = document.createElement('div');
             element.style.padding = '30px';
+            element.style.fontFamily = "'Inter', Arial, sans-serif";
+            element.style.background = '#ffffff';
+            element.style.color = '#1f2937';
             element.innerHTML = `
-                <h1 style="text-align:center; color:#0d47a1;">YENLLET PAYOUT SHEET</h1>
-                <p style="text-align:center; color:#666;">Generated: ${new Date().toLocaleString()}</p>
-                <hr>
-                <table style="width:100%; border-collapse:collapse; margin-top:20px;">
-                    <thead><tr style="background:#0d47a1; color:white;"><th>#</th><th>User</th><th>Wallet</th><th>Bank</th><th>Account</th><th>Country</th><th>Amount</th></tr></thead>
-                    <tbody>${rows}</tbody>
-                </table>`;
-            html2pdf().from(element).save(`Yenllet_Payouts_${new Date().toISOString().slice(0,10)}.pdf`);
-        }
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0d47a1; padding-bottom: 15px;">
+                    <h1 style="font-size: 24px; color: #0d47a1; margin: 0;">YENLLET AFRICA</h1>
+                    <p style="font-size: 14px; color: #6b7280; margin: 5px 0 0 0;">Pending Payout Sheet</p>
+                    <p style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Generated: ${new Date().toLocaleString()}</p>
+                </div>
 
+                <div style="margin-bottom: 15px; background: #f9fafb; padding: 10px 15px; border-radius: 6px; border: 1px solid #e5e7eb; display: flex; justify-content: space-between;">
+                    <div>
+                        <p style="font-size: 11px; color: #6b7280; margin: 0; text-transform: uppercase;">Total Requests</p>
+                        <p style="font-size: 18px; font-weight: 700; color: #1f2937; margin: 0;">${currentPendingWithdrawals.length}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="font-size: 11px; color: #6b7280; margin: 0; text-transform: uppercase;">Total Amount</p>
+                        <p style="font-size: 18px; font-weight: 700; color: #0d47a1; margin: 0;">¥${formatNumber(yenTotal)} | $${formatNumber(dollarTotal)}</p>
+                    </div>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                        <tr style="background: #0d47a1; color: white;">
+                            <th style="padding: 10px 8px; text-align: center; font-size: 11px; width: 5%;">#</th>
+                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 15%;">User</th>
+                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 10%;">Wallet</th>
+                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 20%;">Bank Name</th>
+                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 20%;">Account Number</th>
+                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 15%;">Country</th>
+                            <th style="padding: 10px 8px; text-align: right; font-size: 11px; width: 15%;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #e5e7eb; text-align: center;">
+                    <p style="font-size: 10px; color: #9ca3af;">This is a system generated report from YENLLET Admin Panel.</p>
+                </div>
+            `;
+
+            // Configure html2pdf to use Landscape mode so all 7 columns fit perfectly
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `Yenllet_Payouts_${new Date().toISOString().slice(0,10)}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+        
         async function searchUserForDelete(e) {
             e.preventDefault();
             const q = document.getElementById('deleteUserSearchInput').value.trim();
