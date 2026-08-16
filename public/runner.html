@@ -4,25 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0d47a1">
-    <title>Yenllet Runner - YENLLET</title>
+    <title>Yen Runner - YENLLET AFRICA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         :root {
             --primary-dark: #0a1628;
             --primary: #0d47a1;
+            --primary-light: #1565c0;
             --accent: #00bcd4;
             --accent-light: #4fc3f7;
             --white: #ffffff;
+            --gray: #8892b0;
             --danger: #e74c3c;
             --success: #4caf50;
             --warning: #f39c12;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--primary-dark);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
             color: var(--white);
             min-height: 100vh;
             display: flex;
@@ -31,68 +37,121 @@
             justify-content: center;
             overflow: hidden;
             user-select: none;
+            position: relative;
         }
+
+        body::before {
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0,188,212,0.08) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
+
         .game-header {
             position: fixed; top: 0; left: 0; width: 100%; padding: 15px 20px;
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(10, 22, 40, 0.8); backdrop-filter: blur(10px); z-index: 10;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .back-btn { color: var(--white); text-decoration: none; font-size: 24px; }
-        .score-display { font-size: 24px; font-weight: 800; color: var(--accent-light); }
+        
+        .back-btn { color: var(--white); text-decoration: none; font-size: 24px; display: flex; align-items: center; gap: 5px; }
+        .score-display { font-size: 20px; font-weight: 800; color: var(--accent-light); letter-spacing: 1px; }
+        
+        .plays-left {
+            font-size: 12px; color: var(--gray); background: rgba(255,255,255,0.05);
+            padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+        }
 
         canvas {
             background: linear-gradient(180deg, #0d2b4e 0%, #0a1628 100%);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
+            border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             max-width: 100%;
             height: auto;
+            margin-top: 80px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .overlay {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: center; z-index: 20;
             flex-direction: column; padding: 20px; text-align: center;
+            transition: opacity 0.3s ease;
         }
-        .overlay h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--white); }
-        .overlay p { font-size: 1.1rem; color: var(--accent-light); margin-bottom: 30px; max-width: 300px; }
+        
+        .overlay h1 { 
+            font-size: 2.5rem; margin-bottom: 10px; 
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        
+        .overlay p { font-size: 0.95rem; color: var(--gray); margin-bottom: 30px; max-width: 320px; line-height: 1.5; }
         
         .btn {
-            padding: 15px 40px; font-size: 1.2rem; font-weight: 700;
+            padding: 15px 40px; font-size: 1.1rem; font-weight: 700;
             color: white; border: none; border-radius: 12px; cursor: pointer;
             transition: transform 0.2s; margin-bottom: 15px; width: 100%;
             display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-family: 'Inter', sans-serif;
         }
-        .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%); box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4); }
-        .btn-ai { background: linear-gradient(135deg, var(--warning) 0%, #d35400 100%); box-shadow: 0 8px 25px rgba(243, 156, 18, 0.4); }
-        .btn:active { transform: scale(0.95); }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4); }
+        
+        .btn-ai { background: linear-gradient(135deg, var(--warning) 0%, #d35400 100%); box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3); }
+        .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(243, 156, 18, 0.4); }
+        
+        .btn:active { transform: scale(0.97); }
         .btn:disabled { background: #334155; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7; }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         
         .reward-box {
-            background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px;
-            margin-bottom: 20px; border: 1px solid var(--accent); width: 100%;
+            background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px;
+            margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%;
         }
-        .reward-box h2 { color: var(--success); font-size: 2rem; }
-        .badge-warning { background: var(--warning); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .reward-box h2 { color: var(--success); font-size: 2.5rem; font-weight: 800; margin-bottom: 5px; }
+        .reward-box p { color: var(--white); font-size: 1.1rem; margin: 0; }
+        
+        .badge-plan {
+            display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;
+        }
+        .badge-lite { background: rgba(255,255,255,0.1); color: var(--gray); }
+        .badge-pro { background: rgba(0, 188, 212, 0.2); color: var(--accent-light); }
+        .badge-vite { background: linear-gradient(45deg, rgba(243, 156, 18, 0.2), rgba(211, 84, 0, 0.2)); color: var(--warning); }
+
+        #loadingSpinner {
+            width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="game-header">
         <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i></a>
-        <div class="score-display">Score: <span id="scoreText">0</span></div>
+        <div class="score-display">SCORE: <span id="scoreText">0</span></div>
+        <div class="plays-left">Plays Left: <span id="playsLeftText">-</span></div>
     </div>
 
     <canvas id="gameCanvas" width="400" height="600"></canvas>
 
+    <!-- Loading Screen -->
+    <div class="overlay" id="loadingScreen">
+        <div id="loadingSpinner"></div>
+    </div>
+
     <!-- Start Screen -->
-    <div class="overlay" id="startScreen">
-        <h1>🏃‍♂️ Yenllet Runner</h1>
-        <p id="startMsg">Tap or Press Space to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>3 plays per day.</p>
+    <div class="overlay hidden" id="startScreen">
+        <span class="badge-plan" id="planBadge">LOADING</span>
+        <h1>Yen Runner</h1>
+        <p id="startMsg">Loading game rules...</p>
         <button class="btn btn-primary" id="startBtn">START GAME</button>
-        <button class="btn btn-ai hidden" id="aiBtn">🤖 ACTIVATE AI AUTO-PLAY</button>
+        <button class="btn btn-ai hidden" id="aiBtn">🤖 ACTIVATE AI AUTO-PLAY (+¥20)</button>
     </div>
 
     <!-- Game Over Screen -->
@@ -103,7 +162,7 @@
             <p>Score: <span id="finalScore">0</span></p>
         </div>
         <button class="btn btn-primary" id="restartBtn">PLAY AGAIN</button>
-        <button class="btn btn-ai hidden" id="aiBtnOver">🤖 ACTIVATE AI AUTO-PLAY</button>
+        <button class="btn btn-ai hidden" id="aiBtnOver">🤖 ACTIVATE AI AUTO-PLAY (+¥20)</button>
     </div>
 
     <script>
@@ -116,7 +175,7 @@
         let score = 0;
         let speed = 5;
         let animationId;
-        let userStatus = { plan: 'YENLITE', ai_ready: false, plays_today: 0 };
+        let userStatus = { plan: 'YENLITE', ai_ready: false, plays_today: 0, max_plays: 0 };
 
         // Player
         const player = {
@@ -140,19 +199,30 @@
         }
 
         function update() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            
+            // Draw Ground
             ctx.fillStyle = '#1e3c72';
             ctx.fillRect(0, 540, canvas.width, 60);
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, 540);
+            ctx.lineTo(canvas.width, 540);
+            ctx.stroke();
 
+            // Player physics
             player.vy += player.gravity;
             player.y += player.vy;
             if (player.y >= 500) {
                 player.y = 500; player.vy = 0; player.jumping = false;
             }
 
+            // Draw Player
             ctx.font = '32px Arial';
             ctx.fillText('🏃‍♂️', player.x, player.y + 32);
 
+            // Obstacles logic
             obstacleTimer++;
             if (obstacleTimer > 60 + Math.random() * 40) {
                 spawnObstacle();
@@ -161,9 +231,15 @@
 
             obstacles.forEach((obs, index) => {
                 obs.x -= speed;
+                // Draw obstacle
                 ctx.fillStyle = '#e74c3c';
                 ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                
+                // Add styling to obstacle
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.fillRect(obs.x, obs.y, obs.width, 5);
 
+                // Collision detection
                 if (player.x < obs.x + obs.width &&
                     player.x + player.width > obs.x &&
                     player.y < obs.y + obs.height &&
@@ -174,9 +250,10 @@
                 if (obs.x + obs.width < 0) obstacles.splice(index, 1);
             });
 
+            // Update Score & Speed
             score++;
             document.getElementById('scoreText').textContent = Math.floor(score / 10);
-            if (score % 200 === 0) speed += 0.5;
+            if (score % 200 === 0) speed += 0.5; // Increase speed over time
 
             if (isPlaying) animationId = requestAnimationFrame(update);
         }
@@ -189,6 +266,7 @@
             document.getElementById('finalScore').textContent = finalScore;
             document.getElementById('gameOverScreen').classList.remove('hidden');
 
+            // Submit score to backend
             try {
                 const res = await fetch(`${API_URL}/api/submit-runner-score`, {
                     method: 'POST',
@@ -199,6 +277,7 @@
                 
                 if (res.ok) {
                     document.getElementById('rewardText').textContent = `+¥${data.reward}`;
+                    checkStatus(); // Refresh status to update plays left
                 } else {
                     document.getElementById('rewardText').textContent = `❌ ${data.error}`;
                 }
@@ -208,6 +287,12 @@
         }
 
         function startGame() {
+            // Check if user has plays left (LITE users have 0 max_plays)
+            if (userStatus.plays_today >= userStatus.max_plays) {
+                alert('No plays left for today! Come back in 24 hours.');
+                return;
+            }
+
             isPlaying = true;
             score = 0; speed = 5; obstacles = []; obstacleTimer = 0;
             player.y = 500; player.vy = 0; player.jumping = false;
@@ -234,7 +319,7 @@
 
                 if (res.ok) {
                     alert(`🤖 AI Success! ${data.message}`);
-                    checkStatus(); // Refresh UI
+                    checkStatus(); // Refresh UI to hide AI button
                 } else {
                     alert(`❌ ${data.error}`);
                 }
@@ -254,28 +339,70 @@
                 const aiBtn = document.getElementById('aiBtn');
                 const aiBtnOver = document.getElementById('aiBtnOver');
                 const startMsg = document.getElementById('startMsg');
+                const planBadge = document.getElementById('planBadge');
+                const playsLeftText = document.getElementById('playsLeftText');
+                const startBtn = document.getElementById('startBtn');
+                const restartBtn = document.getElementById('restartBtn');
+                
+                // Update Plays Left UI
+                const playsLeft = userStatus.max_plays - userStatus.plays_today;
+                playsLeftText.textContent = playsLeft;
 
-                // LITE users get warning
+                // Hide AI buttons by default
+                aiBtn.classList.add('hidden');
+                aiBtnOver.classList.add('hidden');
+
+                // LITE users (0 plays, 0 max_plays)
                 if (userStatus.plan === 'YENLITE') {
-                    startMsg.innerHTML = '<span class="badge-warning">YENLITE</span><br>You cannot earn from this game.<br>Upgrade to YENPRO to earn.';
+                    planBadge.textContent = 'YENLITE';
+                    planBadge.className = 'badge-plan badge-lite';
+                    startMsg.innerHTML = '<span style="color: var(--danger);">You cannot earn from this game.</span><br>Upgrade to YENPRO to earn.';
+                    startBtn.disabled = true;
+                    restartBtn.disabled = true;
                 } 
-                // PRO users can play, but no AI
+                // PRO users (2 plays, Max ¥40)
                 else if (userStatus.plan === 'YENPRO') {
-                    aiBtn.classList.add('hidden');
-                    aiBtnOver.classList.add('hidden');
+                    planBadge.textContent = 'YENPRO';
+                    planBadge.className = 'badge-plan badge-pro';
+                    startMsg.innerHTML = 'Tap/Space to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>2 plays per day (Max ¥40).';
+                    
+                    if (playsLeft <= 0) {
+                        startBtn.disabled = true;
+                        restartBtn.disabled = true;
+                        startMsg.innerHTML = '<span style="color: var(--danger);">Daily limit (2 plays) reached!</span><br>Come back in 24 hours.';
+                    } else {
+                        startBtn.disabled = false;
+                        restartBtn.disabled = false;
+                    }
                 } 
-                // VITE users get AI button if ready
+                // VITE users (3 plays, Max ¥60)
                 else if (userStatus.plan === 'YENVITE') {
+                    planBadge.textContent = 'YENVITE';
+                    planBadge.className = 'badge-plan badge-vite';
+                    startMsg.innerHTML = 'Tap/Space to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>3 plays per day (Max ¥60).';
+                    
+                    if (playsLeft <= 0) {
+                        startBtn.disabled = true;
+                        restartBtn.disabled = true;
+                        startMsg.innerHTML = '<span style="color: var(--danger);">Daily limit (3 plays) reached!</span><br>Come back in 24 hours.';
+                    } else {
+                        startBtn.disabled = false;
+                        restartBtn.disabled = false;
+                    }
+                    
+                    // Show AI button if ready
                     if (userStatus.ai_ready) {
                         aiBtn.classList.remove('hidden');
                         aiBtnOver.classList.remove('hidden');
-                    } else {
-                        aiBtn.classList.add('hidden');
-                        aiBtnOver.classList.add('hidden');
                     }
                 }
+
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('startScreen').classList.remove('hidden');
+                
             } catch (err) {
-                console.error('Status check failed');
+                console.error('Status check failed', err);
+                document.getElementById('loadingScreen').innerHTML = '<p style="color: red;">Failed to load game data.</p>';
             }
         }
 
