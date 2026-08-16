@@ -3,7 +3,7 @@ const crypto = require('crypto');
 require('dotenv').config();
 
 // ============================================================
-// 🔌 POOL CONFIGURATION (Updated for Neon Serverless)
+// 🔌 POOL CONFIGURATION
 // ============================================================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -96,7 +96,7 @@ async function buildUsers(client) {
             withdrawal_pin TEXT,
             profile_picture TEXT,
             plan TEXT DEFAULT 'YENLITE',
-            last_spin DATE,
+            last_spin TIMESTAMP,
             is_banned BOOLEAN DEFAULT false,
             is_admin BOOLEAN DEFAULT false,
             role TEXT DEFAULT 'user',
@@ -124,7 +124,7 @@ async function buildUsers(client) {
         ['withdrawal_pin', 'TEXT'],
         ['profile_picture', 'TEXT'],
         ['plan', "TEXT DEFAULT 'YENLITE'"],
-        ['last_spin', 'DATE'],
+        ['last_spin', 'TIMESTAMP'],
         ['is_banned', 'BOOLEAN DEFAULT false'],
         ['is_admin', 'BOOLEAN DEFAULT false'],
         ['role', "TEXT DEFAULT 'user'"],
@@ -573,10 +573,6 @@ async function buildPasswordResets(client) {
     console.log('✅ password_resets table ready');
 }
 
-// ============================================================
-// 🎧 SUPPORT TICKETS TABLE BUILDERS
-// ============================================================
-
 async function buildSupportTickets(client) {
     await client.query(`
         CREATE TABLE IF NOT EXISTS support_tickets (
@@ -775,11 +771,9 @@ async function setupDatabase() {
         await buildTransfers(client);
         await buildPasswordResets(client);
         
-        // Build Support Chat Tables
         await buildSupportTickets(client);
         await buildSupportMessages(client);
 
-        // Build Courses Tables
         await buildCourses(client);
         await buildCourseJoins(client);
 

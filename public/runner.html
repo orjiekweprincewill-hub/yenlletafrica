@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d47a1">
+    <title>Yenllet Runner - YENLLET</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --danger: #e74c3c;
+            --success: #4caf50;
+            --warning: #f39c12;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-dark);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            user-select: none;
+        }
+        .game-header {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(10, 22, 40, 0.8); backdrop-filter: blur(10px); z-index: 10;
+        }
+        .back-btn { color: var(--white); text-decoration: none; font-size: 24px; }
+        .score-display { font-size: 24px; font-weight: 800; color: var(--accent-light); }
+
+        canvas {
+            background: linear-gradient(180deg, #0d2b4e 0%, #0a1628 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-width: 100%;
+            height: auto;
+        }
+
+        .overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center; z-index: 20;
+            flex-direction: column; padding: 20px; text-align: center;
+        }
+        .overlay h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--white); }
+        .overlay p { font-size: 1.1rem; color: var(--accent-light); margin-bottom: 30px; max-width: 300px; }
+        
+        .btn {
+            padding: 15px 40px; font-size: 1.2rem; font-weight: 700;
+            color: white; border: none; border-radius: 12px; cursor: pointer;
+            transition: transform 0.2s; margin-bottom: 15px; width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%); box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4); }
+        .btn-ai { background: linear-gradient(135deg, var(--warning) 0%, #d35400 100%); box-shadow: 0 8px 25px rgba(243, 156, 18, 0.4); }
+        .btn:active { transform: scale(0.95); }
+        .btn:disabled { background: #334155; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7; }
+
+        .hidden { display: none; }
+        
+        .reward-box {
+            background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px;
+            margin-bottom: 20px; border: 1px solid var(--accent); width: 100%;
+        }
+        .reward-box h2 { color: var(--success); font-size: 2rem; }
+        .badge-warning { background: var(--warning); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="game-header">
+        <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i></a>
+        <div class="score-display">Score: <span id="scoreText">0</span></div>
+    </div>
+
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+    <!-- Start Screen -->
+    <div class="overlay" id="startScreen">
+        <h1>🏃‍♂️ Yenllet Runner</h1>
+        <p id="startMsg">Tap or Press Space to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>3 plays per day.</p>
+        <button class="btn btn-primary" id="startBtn">START GAME</button>
+        <button class="btn btn-ai hidden" id="aiBtn">🤖 ACTIVATE AI AUTO-PLAY</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="overlay hidden" id="gameOverScreen">
+        <h1>Game Over!</h1>
+        <div class="reward-box">
+            <h2 id="rewardText">+¥0</h2>
+            <p>Score: <span id="finalScore">0</span></p>
+        </div>
+        <button class="btn btn-primary" id="restartBtn">PLAY AGAIN</button>
+        <button class="btn btn-ai hidden" id="aiBtnOver">🤖 ACTIVATE AI AUTO-PLAY</button>
+    </div>
+
+    <script>
+        const API_URL = 'https://yenlletafrica.onrender.com';
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game State
+        let isPlaying = false;
+        let score = 0;
+        let speed = 5;
+        let animationId;
+        let userStatus = { plan: 'YENLITE', ai_ready: false, plays_today: 0 };
+
+        // Player
+        const player = {
+            x: 50, y: 500, width: 40, height: 40,
+            vy: 0, gravity: 0.8, jumpPower: -15, jumping: false
+        };
+
+        let obstacles = [];
+        let obstacleTimer = 0;
+
+        function jump() {
+            if (!player.jumping) {
+                player.vy = player.jumpPower;
+                player.jumping = true;
+            }
+        }
+
+        function spawnObstacle() {
+            const height = 30 + Math.random() * 40;
+            obstacles.push({ x: canvas.width, y: 540 - height, width: 20, height: height });
+        }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1e3c72';
+            ctx.fillRect(0, 540, canvas.width, 60);
+
+            player.vy += player.gravity;
+            player.y += player.vy;
+            if (player.y >= 500) {
+                player.y = 500; player.vy = 0; player.jumping = false;
+            }
+
+            ctx.font = '32px Arial';
+            ctx.fillText('🏃‍♂️', player.x, player.y + 32);
+
+            obstacleTimer++;
+            if (obstacleTimer > 60 + Math.random() * 40) {
+                spawnObstacle();
+                obstacleTimer = 0;
+            }
+
+            obstacles.forEach((obs, index) => {
+                obs.x -= speed;
+                ctx.fillStyle = '#e74c3c';
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+
+                if (player.x < obs.x + obs.width &&
+                    player.x + player.width > obs.x &&
+                    player.y < obs.y + obs.height &&
+                    player.y + player.height > obs.y) {
+                    gameOver();
+                }
+
+                if (obs.x + obs.width < 0) obstacles.splice(index, 1);
+            });
+
+            score++;
+            document.getElementById('scoreText').textContent = Math.floor(score / 10);
+            if (score % 200 === 0) speed += 0.5;
+
+            if (isPlaying) animationId = requestAnimationFrame(update);
+        }
+
+        async function gameOver() {
+            isPlaying = false;
+            cancelAnimationFrame(animationId);
+            
+            const finalScore = Math.floor(score / 10);
+            document.getElementById('finalScore').textContent = finalScore;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+
+            try {
+                const res = await fetch(`${API_URL}/api/submit-runner-score`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    body: JSON.stringify({ score: finalScore })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    document.getElementById('rewardText').textContent = `+¥${data.reward}`;
+                } else {
+                    document.getElementById('rewardText').textContent = `❌ ${data.error}`;
+                }
+            } catch (err) {
+                document.getElementById('rewardText').textContent = 'Network Error';
+            }
+        }
+
+        function startGame() {
+            isPlaying = true;
+            score = 0; speed = 5; obstacles = []; obstacleTimer = 0;
+            player.y = 500; player.vy = 0; player.jumping = false;
+            
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            
+            update();
+        }
+
+        // AI Auto-Play Logic
+        document.getElementById('aiBtn').addEventListener('click', activateAI);
+        document.getElementById('aiBtnOver').addEventListener('click', activateAI);
+
+        async function activateAI() {
+            if (!confirm('Activate AI to play for you? This will instantly grant ¥20 but disable AI for 24 hours.')) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/api/runner/activate-ai`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert(`🤖 AI Success! ${data.message}`);
+                    checkStatus(); // Refresh UI
+                } else {
+                    alert(`❌ ${data.error}`);
+                }
+            } catch (err) {
+                alert('Network Error');
+            }
+        }
+
+        // Check user plan and AI cooldown on load
+        async function checkStatus() {
+            try {
+                const res = await fetch(`${API_URL}/api/runner/status`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                userStatus = await res.json();
+                
+                const aiBtn = document.getElementById('aiBtn');
+                const aiBtnOver = document.getElementById('aiBtnOver');
+                const startMsg = document.getElementById('startMsg');
+
+                // LITE users get warning
+                if (userStatus.plan === 'YENLITE') {
+                    startMsg.innerHTML = '<span class="badge-warning">YENLITE</span><br>You cannot earn from this game.<br>Upgrade to YENPRO to earn.';
+                } 
+                // PRO users can play, but no AI
+                else if (userStatus.plan === 'YENPRO') {
+                    aiBtn.classList.add('hidden');
+                    aiBtnOver.classList.add('hidden');
+                } 
+                // VITE users get AI button if ready
+                else if (userStatus.plan === 'YENVITE') {
+                    if (userStatus.ai_ready) {
+                        aiBtn.classList.remove('hidden');
+                        aiBtnOver.classList.remove('hidden');
+                    } else {
+                        aiBtn.classList.add('hidden');
+                        aiBtnOver.classList.add('hidden');
+                    }
+                }
+            } catch (err) {
+                console.error('Status check failed');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('restartBtn').addEventListener('click', startGame);
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && isPlaying) { e.preventDefault(); jump(); }
+        });
+        
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (isPlaying) jump();
+        }, { passive: false });
+        
+        canvas.addEventListener('click', () => { if (isPlaying) jump(); });
+
+        // Init
+        checkStatus();
+    </script>
+</body>
+</html>

@@ -1182,7 +1182,7 @@ app.post('/api/forgot-password', async (req, res) => {
 });
 
 // ============================================================
-// 🎫 COUPON UPGRADE
+// 🎫 COUPON UPGRADE (FIXED)
 // ============================================================
 app.post('/api/apply-upgrade-coupon', isAuthenticated, async (req, res) => {
     const userId = req.user.user_id;
@@ -1192,36 +1192,190 @@ app.post('/api/apply-upgrade-coupon', isAuthenticated, async (req, res) => {
     try {
         client = await pool.connect();
         await client.query('BEGIN');
+        
         const user = (await client.query('SELECT username, plan, referrer_id FROM users WHERE id = $1 FOR UPDATE', [userId])).rows[0];
         if (!user) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'User not found' }); }
+        
         const coupon = (await client.query('SELECT code, plan, used FROM coupon_codes WHERE UPPER(code) = UPPER($1) FOR UPDATE', [coupon_code.trim()])).rows[0];
         if (!coupon) { await client.query('ROLLBACK'); return res.status(400).json({ error: 'Coupon code not found' }); }
         if (coupon.used) { await client.query('ROLLBACK'); return res.status(400).json({ error: 'Coupon code has already been used' }); }
+        
         const validUpgrades = { 'YENLITE': ['YENPRO', 'YENVITE'], 'YENPRO': ['YENVITE'], 'YENVITE': [] };
-        if (!validUpgrades[user.plan] || !validUpgrades[user.plan].includes(coupon.plan)) { await client.query('ROLLBACK'); return res.status(400).json({ error: `Invalid upgrade. You are on ${user.plan} and cannot upgrade to ${coupon.plan}` }); }
+        if (!validUpgrades[user.plan] || !validUpgrades[user.plan].includes(coupon.plan)) { 
+            await client.query('ROLLBACK'); 
+            return res.status(400).json({ error: `Invalid upgrade. You are on ${user.plan} and cannot upgrade to ${coupon.plan}` }); 
+        }
+        
         const newRewards = getRewardsForPlan(coupon.plan);
+        
+        // Update user plan and wallet
         await client.query('UPDATE users SET plan = $1 WHERE id = $2', [coupon.plan, userId]);
         await client.query('UPDATE users SET activity_wallet = activity_wallet + $1 WHERE id = $2', [newRewards.WELCOME_BONUS, userId]);
         await client.query('UPDATE coupon_codes SET used = true, used_by = $1 WHERE code = $2', [userId, coupon_code.trim()]);
-        await addActivityFeed(userId, 'Plan Upgrade', newRewards.WELCOME_BONUS, `Upgraded from ${user.plan} to ${coupon.plan}`);
-        await createNotification(userId, `🎉 Plan upgraded to ${coupon.plan}! You received ¥${newRewards.WELCOME_BONUS.toLocaleString()} bonus!`);
-        if (user.referrer_id) {
+        
+        // Handle Referrals inside the transaction safely
+        let referrerId = user.referrer_id;
+        let indirectId = null;
+        
+        if (referrerId) {
             const directBonus = newRewards.DIRECT_REFERRAL;
-            await client.query(`UPDATE users SET referral_wallet = referral_wallet + $1, total_referral_earnings = total_referral_earnings + $2 WHERE id = $3`, [directBonus, directBonus, user.referrer_id]);
-            await addActivityFeed(user.referrer_id, 'Referral Upgrade Bonus', directBonus, `Bonus from ${user.username}'s upgrade to ${coupon.plan}`);
-            await createNotification(user.referrer_id, `💰 You earned ¥${directBonus.toLocaleString()} because ${user.username} upgraded to ${coupon.plan}!`);
-            const indirectId = (await client.query('SELECT referrer_id FROM users WHERE id = $1', [user.referrer_id])).rows[0]?.referrer_id;
+            await client.query(`UPDATE users SET referral_wallet = referral_wallet + $1, total_referral_earnings = total_referral_earnings + $2 WHERE id = $3`, [directBonus, directBonus, referrerId]);
+            
+            const indirectResult = await client.query('SELECT referrer_id FROM users WHERE id = $1', [referrerId]);
+            indirectId = indirectResult.rows[0]?.referrer_id;
             if (indirectId) {
                 const indirectBonus = newRewards.INDIRECT_REFERRAL;
                 await client.query(`UPDATE users SET referral_wallet = referral_wallet + $1, total_referral_earnings = total_referral_earnings + $2 WHERE id = $3`, [indirectBonus, indirectBonus, indirectId]);
-                await addActivityFeed(indirectId, 'Indirect Referral Upgrade', indirectBonus, `Bonus from downline ${user.username}'s upgrade to ${coupon.plan}`);
-                await createNotification(indirectId, `💰 You earned ¥${indirectBonus.toLocaleString()} from an indirect downline upgrade!`);
             }
         }
+        
+        // COMMIT FIRST! This releases the database locks.
         await client.query('COMMIT');
+        
+        // NOW send notifications and activity feed safely (no lock conflicts)
+        await addActivityFeed(userId, 'Plan Upgrade', newRewards.WELCOME_BONUS, `Upgraded from ${user.plan} to ${coupon.plan}`);
+        await createNotification(userId, `🎉 Plan upgraded to ${coupon.plan}! You received ¥${newRewards.WELCOME_BONUS.toLocaleString()} bonus!`);
+        
+        if (referrerId) {
+            const directBonus = newRewards.DIRECT_REFERRAL;
+            await addActivityFeed(referrerId, 'Referral Upgrade Bonus', directBonus, `Bonus from ${user.username}'s upgrade to ${coupon.plan}`);
+            await createNotification(referrerId, `💰 You earned ¥${directBonus.toLocaleString()} because ${user.username} upgraded to ${coupon.plan}!`);
+        }
+        if (indirectId) {
+            const indirectBonus = newRewards.INDIRECT_REFERRAL;
+            await addActivityFeed(indirectId, 'Indirect Referral Upgrade', indirectBonus, `Bonus from downline ${user.username}'s upgrade to ${coupon.plan}`);
+            await createNotification(indirectId, `💰 You earned ¥${indirectBonus.toLocaleString()} from an indirect downline upgrade!`);
+        }
+        
         res.json({ success: true, message: 'Plan upgraded successfully', new_plan: coupon.plan, welcome_bonus: newRewards.WELCOME_BONUS });
-    } catch (err) { if (client) await client.query('ROLLBACK'); console.error('Upgrade coupon error:', err); res.status(500).json({ error: 'Failed to apply coupon' }); }
-    finally { if (client) client.release(); }
+    } catch (err) { 
+        if (client) await client.query('ROLLBACK'); 
+        console.error('Upgrade coupon error:', err); 
+        res.status(500).json({ error: 'Failed to apply coupon' }); 
+    } finally { 
+        if (client) client.release(); 
+    }
+});
+
+// ============================================================
+// 🏃‍♂️ ENDLESS RUNNER GAME (WITH AI AUTO-PLAY)
+// ============================================================
+
+// 1. Get Game Status (Check if AI is ready, cooldowns, etc.)
+app.get('/api/runner/status', isAuthenticated, async (req, res) => {
+    const userId = req.user.user_id;
+    try {
+        const userRes = await pool.query('SELECT plan, last_spin FROM users WHERE id = $1', [userId]);
+        const user = userRes.rows[0];
+        
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        // Check AI 24hr cooldown
+        let aiReady = true;
+        if (user.last_spin) {
+            const lastSpinTime = new Date(user.last_spin).getTime();
+            const twentyFourHrs = 24 * 60 * 60 * 1000;
+            if (Date.now() - lastSpinTime < twentyFourHrs) {
+                aiReady = false;
+            }
+        }
+
+        // Check plays today
+        const playsRes = await pool.query(
+            "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND action = 'Runner Game' AND DATE(created_at) = CURRENT_DATE",
+            [userId]
+        );
+
+        res.json({
+            plan: user.plan,
+            ai_ready: aiReady,
+            plays_today: playsRes.rows[0].count,
+            max_plays: 3
+        });
+    } catch (err) {
+        console.error('Runner status error:', err);
+        res.status(500).json({ error: 'Failed to load status' });
+    }
+});
+
+// 2. Submit Manual Score
+app.post('/api/submit-runner-score', isAuthenticated, async (req, res) => {
+    const userId = req.user.user_id;
+    const { score } = req.body;
+    
+    if (isNaN(score) || score < 0) return res.status(400).json({ error: 'Invalid score' });
+
+    try {
+        const userRes = await pool.query('SELECT plan FROM users WHERE id = $1', [userId]);
+        const user = userRes.rows[0];
+
+        // RESTRICTION: Only PRO and VITE can earn
+        if (user.plan !== 'YENPRO' && user.plan !== 'YENVITE') {
+            return res.status(403).json({ error: 'Only YENPRO and YENVITE users can earn from the Runner game.' });
+        }
+
+        // Check plays today (Limit to 3 plays per day)
+        const playsRes = await pool.query(
+            "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND action = 'Runner Game' AND DATE(created_at) = CURRENT_DATE",
+            [userId]
+        );
+
+        if (playsRes.rows[0].count >= 3) {
+            return res.status(403).json({ error: 'Daily manual play limit (3 plays) reached! Try AI Auto-Play.' });
+        }
+
+        // Calculate reward: 1 Yencoin per 50 points, MAX 20 Yencoin per play
+        const reward = Math.min(Math.floor(score / 50), 20);
+
+        if (reward > 0) {
+            await pool.query('UPDATE users SET activity_wallet = activity_wallet + $1 WHERE id = $2', [reward, userId]);
+            await createNotification(userId, `🎮 You earned ¥${reward.toLocaleString()} from Yenllet Runner!`);
+        }
+        
+        await addActivityFeed(userId, 'Runner Game', reward, `Scored ${score} points (Manual)`);
+
+        res.json({ success: true, reward, message: `You earned ¥${reward}!` });
+    } catch (err) { 
+        console.error('Runner game error:', err); 
+        res.status(500).json({ error: 'Failed to submit score' }); 
+    }
+});
+
+// 3. Activate AI Auto-Play (VITE ONLY)
+app.post('/api/runner/activate-ai', isAuthenticated, async (req, res) => {
+    const userId = req.user.user_id;
+    try {
+        const userRes = await pool.query('SELECT plan, last_spin FROM users WHERE id = $1', [userId]);
+        const user = userRes.rows[0];
+
+        // RESTRICTION: VITE ONLY
+        if (user.plan !== 'YENVITE') {
+            return res.status(403).json({ error: 'AI Auto-Play is exclusive to YENVITE users only.' });
+        }
+
+        // Check 24hr cooldown
+        if (user.last_spin) {
+            const lastSpinTime = new Date(user.last_spin).getTime();
+            const twentyFourHrs = 24 * 60 * 60 * 1000;
+            if (Date.now() - lastSpinTime < twentyFourHrs) {
+                const timeLeft = twentyFourHrs - (Date.now() - lastSpinTime);
+                const hoursLeft = Math.ceil(timeLeft / (60 * 60 * 1000));
+                return res.status(403).json({ error: `AI on cooldown. Ready in ${hoursLeft} hour(s).` });
+            }
+        }
+
+        // Grant immediate max reward (20 Yen) and set last_spin to trigger 24hr cooldown
+        const reward = 20;
+        await pool.query('UPDATE users SET activity_wallet = activity_wallet + $1, last_spin = CURRENT_TIMESTAMP WHERE id = $2', [reward, userId]);
+        
+        await addActivityFeed(userId, 'AI Runner Game', reward, `AI Auto-Play completed`);
+        await createNotification(userId, `🤖 AI Auto-Play complete! You earned ¥${reward.toLocaleString()}. AI is now cooling down for 24hrs.`);
+
+        res.json({ success: true, reward, message: 'AI played for you and won ¥20!' });
+    } catch (err) {
+        console.error('AI activate error:', err);
+        res.status(500).json({ error: 'Failed to activate AI' });
+    }
 });
 
 // ============================================================
