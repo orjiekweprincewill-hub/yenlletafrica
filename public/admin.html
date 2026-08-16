@@ -790,6 +790,11 @@
             element.style.fontFamily = "'Inter', Arial, sans-serif";
             element.style.background = '#ffffff';
             element.style.color = '#1f2937';
+            element.style.position = 'fixed';
+            element.style.top = '-10000px';
+            element.style.left = '-10000px';
+            element.style.width = '1000px'; // Force width so it doesn't collapse
+            
             element.innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0d47a1; padding-bottom: 15px;">
                     <h1 style="font-size: 24px; color: #0d47a1; margin: 0;">YENLLET AFRICA</h1>
@@ -830,16 +835,26 @@
                 </div>
             `;
 
-            // Configure html2pdf to use Landscape mode so all 7 columns fit perfectly
+            // Append to body temporarily (off-screen)
+            document.body.appendChild(element);
+
+            // Configure html2pdf
             const opt = {
                 margin: [10, 10, 10, 10],
                 filename: `Yenllet_Payouts_${new Date().toISOString().slice(0,10)}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
-            html2pdf().set(opt).from(element).save();
+            // Generate PDF and remove the element afterwards
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.removeChild(element);
+            }).catch(err => {
+                console.error("PDF Error:", err);
+                document.body.removeChild(element);
+                showAlert('Failed to generate PDF', 'error');
+            });
         }
         
         async function searchUserForDelete(e) {
