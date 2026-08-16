@@ -759,7 +759,7 @@
             } catch (error) { showAlert('Batch failed', 'error'); loadWithdrawals(); }
         }
 
-        function downloadWithdrawalsPDF() {
+                        function downloadWithdrawalsPDF() {
             if (currentPendingWithdrawals.length === 0) return showAlert('❌ No pending withdrawals to export', 'error');
 
             let yenTotal = 0, dollarTotal = 0;
@@ -784,60 +784,69 @@
                     </tr>
                 `;
             }).join('');
-            
-            const element = document.createElement('div');
-            element.style.position = 'absolute';
-            element.style.left = '0';
-            element.style.top = '0';
-            element.style.opacity = '0'; 
-            element.style.zIndex = '-1';
-            element.style.width = '1000px'; 
-            element.style.padding = '30px';
-            element.style.background = '#ffffff'; 
-            element.style.color = '#1f2937'; 
-            element.style.fontFamily = "'Inter', Arial, sans-serif";
-            
-            element.innerHTML = `
-                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0d47a1; padding-bottom: 15px;">
-                    <h1 style="font-size: 24px; color: #0d47a1; margin: 0;">YENLLET AFRICA</h1>
-                    <p style="font-size: 14px; color: #6b7280; margin: 5px 0 0 0;">Pending Payout Sheet</p>
-                    <p style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Generated: ${new Date().toLocaleString()}</p>
-                </div>
 
-                <div style="margin-bottom: 15px; background: #f9fafb; padding: 10px 15px; border-radius: 6px; border: 1px solid #e5e7eb; display: flex; justify-content: space-between;">
-                    <div>
-                        <p style="font-size: 11px; color: #6b7280; margin: 0; text-transform: uppercase;">Total Requests</p>
-                        <p style="font-size: 18px; font-weight: 700; color: #1f2937; margin: 0;">${currentPendingWithdrawals.length}</p>
+            // Create a hidden iframe to bypass html2canvas rendering bugs
+            const iframe = document.createElement('iframe');
+            iframe.style.position = 'absolute';
+            iframe.style.left = '-9999px';
+            iframe.style.top = '-9999px';
+            iframe.style.width = '1000px';
+            iframe.style.height = '800px';
+            iframe.style.border = 'none';
+            document.body.appendChild(iframe);
+
+            // Write the HTML directly into the iframe
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(`
+                <html>
+                <head>
+                    <title>Yenllet Payout Sheet</title>
+                </head>
+                <body style="font-family: 'Inter', Arial, sans-serif; background: #ffffff; color: #1f2937; margin: 0; padding: 30px;">
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0d47a1; padding-bottom: 15px;">
+                        <h1 style="font-size: 24px; color: #0d47a1; margin: 0;">YENLLET AFRICA</h1>
+                        <p style="font-size: 14px; color: #6b7280; margin: 5px 0 0 0;">Pending Payout Sheet</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Generated: ${new Date().toLocaleString()}</p>
                     </div>
-                    <div style="text-align: right;">
-                        <p style="font-size: 11px; color: #6b7280; margin: 0; text-transform: uppercase;">Total Amount</p>
-                        <p style="font-size: 18px; font-weight: 700; color: #0d47a1; margin: 0;">¥${formatNumber(yenTotal)} | $${formatNumber(dollarTotal)}</p>
+
+                    <div style="margin-bottom: 15px; background: #f9fafb; padding: 10px 15px; border-radius: 6px; border: 1px solid #e5e7eb; display: flex; justify-content: space-between;">
+                        <div>
+                            <p style="font-size: 11px; color: #6b7280; margin: 0; text-transform: uppercase;">Total Requests</p>
+                            <p style="font-size: 18px; font-weight: 700; color: #1f2937; margin: 0;">${currentPendingWithdrawals.length}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="font-size: 11px; color: #6b7280; margin: 0; text-transform: uppercase;">Total Amount</p>
+                            <p style="font-size: 18px; font-weight: 700; color: #0d47a1; margin: 0;">¥${formatNumber(yenTotal)} | $${formatNumber(dollarTotal)}</p>
+                        </div>
                     </div>
-                </div>
 
-                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                    <thead>
-                        <tr style="background: #0d47a1; color: white;">
-                            <th style="padding: 10px 8px; text-align: center; font-size: 11px; width: 5%;">#</th>
-                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 15%;">User</th>
-                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 10%;">Wallet</th>
-                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 20%;">Bank Name</th>
-                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 20%;">Account Number</th>
-                            <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 15%;">Country</th>
-                            <th style="padding: 10px 8px; text-align: right; font-size: 11px; width: 15%;">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rows}
-                    </tbody>
-                </table>
-                
-                <div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #e5e7eb; text-align: center;">
-                    <p style="font-size: 10px; color: #9ca3af;">This is a system generated report from YENLLET Admin Panel.</p>
-                </div>
-            `;
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <thead>
+                            <tr style="background: #0d47a1; color: white;">
+                                <th style="padding: 10px 8px; text-align: center; font-size: 11px; width: 5%;">#</th>
+                                <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 15%;">User</th>
+                                <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 10%;">Wallet</th>
+                                <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 20%;">Bank Name</th>
+                                <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 20%;">Account Number</th>
+                                <th style="padding: 10px 8px; text-align: left; font-size: 11px; width: 15%;">Country</th>
+                                <th style="padding: 10px 8px; text-align: right; font-size: 11px; width: 15%;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #e5e7eb; text-align: center;">
+                        <p style="font-size: 10px; color: #9ca3af;">This is a system generated report from YENLLET Admin Panel.</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            doc.close();
 
-            document.body.appendChild(element);
+            const element = doc.body;
 
             const opt = {
                 margin: [10, 10, 10, 10],
@@ -847,16 +856,17 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
+            // Generate PDF and remove the iframe afterwards
             html2pdf().set(opt).from(element).save().then(() => {
-                document.body.removeChild(element);
+                document.body.removeChild(iframe);
                 showAlert('✅ PDF Downloaded successfully!', 'success');
             }).catch(err => {
                 console.error("PDF Error:", err);
-                document.body.removeChild(element);
+                document.body.removeChild(iframe);
                 showAlert('Failed to generate PDF', 'error');
             });
         }
-
+        
         async function searchUserForDelete(e) {
             e.preventDefault();
             const q = document.getElementById('deleteUserSearchInput').value.trim();
@@ -905,6 +915,7 @@
             } catch (err) { showAlert('Failed to delete user', 'error'); }
         }
 
+        // Courses
         async function postCourse(e) {
             e.preventDefault();
             const formData = new FormData();
@@ -960,6 +971,7 @@
             } catch (error) { showAlert('Failed', 'error'); }
         }
 
+        // Tiktok
         async function searchTiktokUser(e) {
             e.preventDefault();
             const search = document.getElementById('tiktokSearchInput').value.trim();
@@ -1021,6 +1033,7 @@
             } catch (error) { showAlert('Failed to load TikTok users', 'error'); }
         }
 
+        // Coupons
         async function generateCoupon(e) {
             e.preventDefault();
             const plan = document.getElementById('planSelect').value;
@@ -1045,117 +1058,119 @@
         }
 
         async function searchUserByCoupon(e) {
-            e.preventDefault();
-            const coupon = document.getElementById('searchCouponInput').value.trim();
-            try {
-                const response = await fetch(`${API_URL}/api/admin/search-user-by-coupon?coupon=${encodeURIComponent(coupon)}`, {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                });
-                const data = await response.json();
+    e.preventDefault();
+    const coupon = document.getElementById('searchCouponInput').value.trim();
+    try {
+        const response = await fetch(`${API_URL}/api/admin/search-user-by-coupon?coupon=${encodeURIComponent(coupon)}`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        const data = await response.json();
+        
+        if (!response.ok) {
+            showAlert(data.error || 'Search failed', 'error');
+            document.getElementById('couponSearchResult').innerHTML = '';
+            return;
+        }
+        
+        if (!data.used) {
+            showAlert('Coupon not used yet', 'error');
+            document.getElementById('couponSearchResult').innerHTML = '';
+            return;
+        }
+
+        // Display User Info + Credit/Debit Forms
+        document.getElementById('couponSearchResult').innerHTML = `
+            <div class="item-card">
+                <div class="item-header">
+                    <span class="item-title">@${escapeHtml(data.username)}</span>
+                    <span class="badge bg-light">${escapeHtml(data.coupon_plan)}</span>
+                </div>
+                <div class="item-meta">Email: ${escapeHtml(data.email)}</div>
+                <div class="item-meta">User ID: ${data.user_id}</div>
+                <div class="item-meta" style="color: var(--accent-light); font-weight: 600; margin-top: 10px;">
+                    Balances:<br>
+                    Activity Wallet: ¥${formatNumber(data.activity_wallet)}<br>
+                    Referral Wallet: ¥${formatNumber(data.referral_wallet)}
+                </div>
+
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
                 
-                if (!response.ok) {
-                    showAlert(data.error || 'Search failed', 'error');
-                    document.getElementById('couponSearchResult').innerHTML = '';
-                    return;
-                }
-                
-                if (!data.used) {
-                    showAlert('Coupon not used yet', 'error');
-                    document.getElementById('couponSearchResult').innerHTML = '';
-                    return;
-                }
-
-                document.getElementById('couponSearchResult').innerHTML = `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <span class="item-title">@${escapeHtml(data.username)}</span>
-                            <span class="badge bg-light">${escapeHtml(data.coupon_plan)}</span>
-                        </div>
-                        <div class="item-meta">Email: ${escapeHtml(data.email)}</div>
-                        <div class="item-meta">User ID: ${data.user_id}</div>
-                        <div class="item-meta" style="color: var(--accent-light); font-weight: 600; margin-top: 10px;">
-                            Balances:<br>
-                            Activity Wallet: ¥${formatNumber(data.activity_wallet)}<br>
-                            Referral Wallet: ¥${formatNumber(data.referral_wallet)}
-                        </div>
-
-                        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
-                        
-                        <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'credit')" style="margin-bottom: 15px;">
-                            <h4 style="font-size: 14px; color: var(--success); margin-bottom: 10px;">Add Money (Credit)</h4>
-                            <div class="form-group" style="margin-bottom: 10px;">
-                                <select id="creditWalletType-${data.user_id}" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                    <option value="activity">Activity Wallet</option>
-                                    <option value="referral">Referral Wallet</option>
-                                </select>
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="number" id="creditAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                <input type="text" id="creditReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-plus-circle"></i> Add</button>
-                            </div>
-                        </form>
-
-                        <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'debit')">
-                            <h4 style="font-size: 14px; color: var(--danger); margin-bottom: 10px;">Remove Money (Debit)</h4>
-                            <div class="form-group" style="margin-bottom: 10px;">
-                                <select id="debitWalletType-${data.user_id}" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                    <option value="activity">Activity Wallet</option>
-                                    <option value="referral">Referral Wallet</option>
-                                </select>
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="number" id="debitAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                <input type="text" id="debitReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i> Remove</button>
-                            </div>
-                        </form>
+                <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'credit')" style="margin-bottom: 15px;">
+                    <h4 style="font-size: 14px; color: var(--success); margin-bottom: 10px;">Add Money (Credit)</h4>
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <select id="creditWalletType-${data.user_id}" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                            <option value="activity">Activity Wallet</option>
+                            <option value="referral">Referral Wallet</option>
+                        </select>
                     </div>
-                `;
-            } catch (error) {
-                showAlert('Search failed', 'error');
-            }
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="creditAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                        <input type="text" id="creditReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                        <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-plus-circle"></i> Add</button>
+                    </div>
+                </form>
+
+                <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'debit')">
+                    <h4 style="font-size: 14px; color: var(--danger); margin-bottom: 10px;">Remove Money (Debit)</h4>
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <select id="debitWalletType-${data.user_id}" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                            <option value="activity">Activity Wallet</option>
+                            <option value="referral">Referral Wallet</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="debitAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                        <input type="text" id="debitReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i> Remove</button>
+                    </div>
+                </form>
+            </div>
+        `;
+    } catch (error) {
+        showAlert('Search failed', 'error');
+    }
+}
+
+async function handleWalletAdjust(e, userId, action) {
+    e.preventDefault();
+    
+    const walletType = document.getElementById(`${action}WalletType-${userId}`).value;
+    const amount = parseFloat(document.getElementById(`${action}Amount-${userId}`).value);
+    const reason = document.getElementById(`${action}Reason-${userId}`).value;
+
+    if (!amount || amount <= 0) return showAlert('Invalid amount', 'error');
+
+    const endpoint = action === 'credit' ? 'credit-wallet' : 'debit-wallet';
+    const confirmMsg = action === 'credit' 
+        ? `Add ¥${amount} to ${walletType} wallet?` 
+        : `Remove ¥${amount} from ${walletType} wallet?`;
+
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        const response = await fetch(`${API_URL}/api/admin/${endpoint}`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': `Bearer ${localStorage.getItem('token')}` 
+            },
+            body: JSON.stringify({ user_id: userId, wallet_type: walletType, amount, reason })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showAlert(`✅ ${action === 'credit' ? 'Credited' : 'Debited'} ¥${amount} successfully!`, 'success');
+            // Re-search the user to refresh the balances on screen
+            document.getElementById('searchCouponForm').dispatchEvent(new Event('submit'));
+        } else {
+            showAlert(data.error || 'Failed to adjust wallet', 'error');
         }
-
-        async function handleWalletAdjust(e, userId, action) {
-            e.preventDefault();
-            
-            const walletType = document.getElementById(`${action}WalletType-${userId}`).value;
-            const amount = parseFloat(document.getElementById(`${action}Amount-${userId}`).value);
-            const reason = document.getElementById(`${action}Reason-${userId}`).value;
-
-            if (!amount || amount <= 0) return showAlert('Invalid amount', 'error');
-
-            const endpoint = action === 'credit' ? 'credit-wallet' : 'debit-wallet';
-            const confirmMsg = action === 'credit' 
-                ? `Add ¥${amount} to ${walletType} wallet?` 
-                : `Remove ¥${amount} from ${walletType} wallet?`;
-
-            if (!confirm(confirmMsg)) return;
-
-            try {
-                const response = await fetch(`${API_URL}/api/admin/${endpoint}`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'Authorization': `Bearer ${localStorage.getItem('token')}` 
-                    },
-                    body: JSON.stringify({ user_id: userId, wallet_type: walletType, amount, reason })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    showAlert(`✅ ${action === 'credit' ? 'Credited' : 'Debited'} ¥${amount} successfully!`, 'success');
-                    document.getElementById('searchCouponForm').dispatchEvent(new Event('submit'));
-                } else {
-                    showAlert(data.error || 'Failed to adjust wallet', 'error');
-                }
-            } catch (error) {
-                showAlert('Network error', 'error');
-            }
-        }
-
+    } catch (error) {
+        showAlert('Network error', 'error');
+    }
+}
+        // Content
         async function postTask(e) {
             e.preventDefault();
             try {
@@ -1276,6 +1291,7 @@
             } catch (error) { showAlert('Failed', 'error'); }
         }
 
+        // Social Links
         async function addSocialLink(e) {
             e.preventDefault();
             try {
@@ -1316,6 +1332,7 @@
             } catch (error) { showAlert('Failed', 'error'); }
         }
 
+        // Vendors
         async function searchUserForVendor(e) {
             e.preventDefault();
             const q = document.getElementById('vendorSearchInput').value.trim();
