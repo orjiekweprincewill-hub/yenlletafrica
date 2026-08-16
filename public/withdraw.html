@@ -667,10 +667,12 @@ const COUNTRY_INFO = {
             const icon = document.getElementById('darkModeIcon');
             icon.className = userDarkMode ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
 
-            fetch(`${API_URL}/api/toggle-dark-mode`, {
+                   fetch(`${API_URL}/api/toggle-dark-mode`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
                 body: JSON.stringify({ dark_mode: userDarkMode })
             }).catch(err => console.error('Dark mode sync error:', err));
         }
@@ -933,10 +935,12 @@ const COUNTRY_INFO = {
             withdrawBtn.innerHTML = '<i class="bi bi-hourglass"></i> Processing...';
 
             try {
-                const response = await fetch(`${API_URL}/api/withdraw`, {
+                              const response = await fetch(`${API_URL}/api/withdraw`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                    },
                     body: JSON.stringify({ wallet_type: walletType, amount: amount, pin: pin })
                 });
                 const data = await response.json();
