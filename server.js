@@ -1352,6 +1352,43 @@ app.post('/api/submit-runner-score', isAuthenticated, async (req, res) => {
     }
 });
 
+// 3. Activate AI Auto-Play (VITE ONLY)
+app.post('/api/runner/activate-ai', isAuthenticated, async (req, res) => {
+    const userId = req.user.user_id;
+    try {
+        const userRes = await pool.query('SELECT plan, last_spin FROM users WHERE id = $1', [userId]);
+        const user = userRes.rows[0];
+
+        // RESTRICTION: VITE ONLY
+        if (user.plan !== 'YENVITE') {
+            return res.status(403).json({ error: 'AI Auto-Play is exclusive to YENVITE users only.' });
+        }
+
+        // Check 24hr cooldown
+        if (user.last_spin) {
+            const lastSpinTime = new Date(user.last_spin).getTime();
+            const twentyFourHrs = 24 * 60 * 60 * 1000;
+            if (Date.now() - lastSpinTime < twentyFourHrs) {
+                const timeLeft = twentyFourHrs - (Date.now() - lastSpinTime);
+                const hoursLeft = Math.ceil(timeLeft / (60 * 60 * 1000));
+                return res.status(403).json({ error: `AI on cooldown. Ready in ${hoursLeft} hour(s).` });
+            }
+        }
+
+        // Grant immediate max reward (20 Yen) and set last_spin to trigger 24hr cooldown
+        const reward = 20;
+        await pool.query('UPDATE users SET activity_wallet = activity_wallet + $1, last_spin = CURRENT_TIMESTAMP WHERE id = $2', [reward, userId]);
+        
+        await addActivityFeed(userId, 'AI Runner Game', reward, `AI Auto-Play completed`);
+        await createNotification(userId, `🤖 AI Auto-Play complete! You earned ¥${reward.toLocaleString()}. AI is now cooling down for 24hrs.`);
+
+        res.json({ success: true, reward, message: 'AI played for you and won ¥20!' });
+    } catch (err) {
+        console.error('AI activate error:', err);
+        res.status(500).json({ error: 'Failed to activate AI' });
+    }
+});
+
 // ============================================================
 // 🎧 SUPPORT CHAT ENDPOINTS
 // ============================================================

@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0d47a1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a1628">
     <title>Yen Runner - YENLLET AFRICA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         :root {
@@ -24,44 +24,66 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        body {
+        html, body {
+            height: 100%;
+            overflow: hidden;
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
+            background: var(--primary-dark);
             color: var(--white);
-            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            user-select: none;
             position: relative;
         }
 
+        /* Background Gradient */
         body::before {
-            content: ''; position: absolute; top: -50%; left: -50%;
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
             width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(0,188,212,0.08) 0%, transparent 60%);
             animation: pulse 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
         }
 
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
 
+        /* ===== HEADER ===== */
         .game-header {
-            position: fixed; top: 0; left: 0; width: 100%; padding: 15px 20px;
+            position: relative; z-index: 10;
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(10, 22, 40, 0.8); backdrop-filter: blur(10px); z-index: 10;
+            padding: 15px 20px;
+            padding-top: max(15px, env(safe-area-inset-top));
+            background: rgba(10, 22, 40, 0.8); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         
-        .back-btn { color: var(--white); text-decoration: none; font-size: 24px; display: flex; align-items: center; gap: 5px; }
+        .back-btn { color: var(--white); text-decoration: none; font-size: 24px; display: flex; align-items: center; }
+        .header-center { text-align: center; }
         .score-display { font-size: 20px; font-weight: 800; color: var(--accent-light); letter-spacing: 1px; }
+        .plays-left { font-size: 11px; color: var(--gray); margin-top: 2px; }
         
-        .plays-left {
-            font-size: 12px; color: var(--gray); background: rgba(255,255,255,0.05);
-            padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+        .header-right { min-width: 40px; text-align: right; }
+
+        /* ===== CANVAS WRAPPER ===== */
+        .canvas-wrapper {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            padding: 10px;
         }
 
         canvas {
@@ -69,21 +91,24 @@
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             max-width: 100%;
-            height: auto;
-            margin-top: 80px;
-            border: 1px solid rgba(255,255,255,0.05);
+            max-height: 100%;
+            aspect-ratio: 2/3; /* Maintains proportion on all phones */
+            touch-action: none;
         }
 
+        /* ===== OVERLAYS ===== */
         .overlay {
             position: fixed; inset: 0;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: center; z-index: 20;
-            flex-direction: column; padding: 20px; text-align: center;
+            flex-direction: column; padding: 25px; text-align: center;
             transition: opacity 0.3s ease;
+            padding-top: max(25px, env(safe-area-inset-top));
+            padding-bottom: max(25px, env(safe-area-inset-bottom));
         }
         
         .overlay h1 { 
-            font-size: 2.5rem; margin-bottom: 10px; 
+            font-size: 2.2rem; margin-bottom: 10px; 
             background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
@@ -91,20 +116,20 @@
         .overlay p { font-size: 0.95rem; color: var(--gray); margin-bottom: 30px; max-width: 320px; line-height: 1.5; }
         
         .btn {
-            padding: 15px 40px; font-size: 1.1rem; font-weight: 700;
+            padding: 15px 30px; font-size: 1rem; font-weight: 700;
             color: white; border: none; border-radius: 12px; cursor: pointer;
             transition: transform 0.2s; margin-bottom: 15px; width: 100%;
+            max-width: 320px;
             display: flex; align-items: center; justify-content: center; gap: 10px;
             font-family: 'Inter', sans-serif;
         }
         
         .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4); }
+        .btn-primary:active { transform: scale(0.97); }
         
         .btn-ai { background: linear-gradient(135deg, var(--warning) 0%, #d35400 100%); box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3); }
-        .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(243, 156, 18, 0.4); }
+        .btn-ai:active { transform: scale(0.97); }
         
-        .btn:active { transform: scale(0.97); }
         .btn:disabled { background: #334155; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7; }
 
         .hidden { display: none !important; }
@@ -112,8 +137,9 @@
         .reward-box {
             background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px;
             margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%;
+            max-width: 320px;
         }
-        .reward-box h2 { color: var(--success); font-size: 2.5rem; font-weight: 800; margin-bottom: 5px; }
+        .reward-box h2 { color: var(--success); font-size: 2.2rem; font-weight: 800; margin-bottom: 5px; }
         .reward-box p { color: var(--white); font-size: 1.1rem; margin: 0; }
         
         .badge-plan {
@@ -129,16 +155,39 @@
             border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Mobile tap hint */
+        .tap-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            pointer-events: none;
+            z-index: 5;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); } 40% { transform: translateX(-50%) translateY(-10px); } }
     </style>
 </head>
 <body>
     <div class="game-header">
         <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i></a>
-        <div class="score-display">SCORE: <span id="scoreText">0</span></div>
-        <div class="plays-left">Plays Left: <span id="playsLeftText">-</span></div>
+        <div class="header-center">
+            <div class="score-display">SCORE: <span id="scoreText">0</span></div>
+            <div class="plays-left">Plays Left: <span id="playsLeftText">-</span></div>
+        </div>
+        <div class="header-right"></div>
     </div>
 
-    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <div class="tap-hint" id="tapHint">Tap anywhere to jump</div>
+    </div>
 
     <!-- Loading Screen -->
     <div class="overlay" id="loadingScreen">
@@ -190,6 +239,9 @@
             if (!player.jumping) {
                 player.vy = player.jumpPower;
                 player.jumping = true;
+                // Hide tap hint after first jump
+                const hint = document.getElementById('tapHint');
+                if (hint) hint.style.display = 'none';
             }
         }
 
@@ -235,7 +287,7 @@
                 ctx.fillStyle = '#e74c3c';
                 ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
                 
-                // Add styling to obstacle
+                // Add some styling to obstacle
                 ctx.fillStyle = 'rgba(0,0,0,0.2)';
                 ctx.fillRect(obs.x, obs.y, obs.width, 5);
 
@@ -299,6 +351,9 @@
             
             document.getElementById('startScreen').classList.add('hidden');
             document.getElementById('gameOverScreen').classList.add('hidden');
+            
+            const hint = document.getElementById('tapHint');
+            if (hint) hint.style.display = 'block';
             
             update();
         }
@@ -364,7 +419,7 @@
                 else if (userStatus.plan === 'YENPRO') {
                     planBadge.textContent = 'YENPRO';
                     planBadge.className = 'badge-plan badge-pro';
-                    startMsg.innerHTML = 'Tap/Space to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>2 plays per day (Max ¥40).';
+                    startMsg.innerHTML = 'Tap anywhere to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>2 plays per day (Max ¥40).';
                     
                     if (playsLeft <= 0) {
                         startBtn.disabled = true;
@@ -379,7 +434,7 @@
                 else if (userStatus.plan === 'YENVITE') {
                     planBadge.textContent = 'YENVITE';
                     planBadge.className = 'badge-plan badge-vite';
-                    startMsg.innerHTML = 'Tap/Space to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>3 plays per day (Max ¥60).';
+                    startMsg.innerHTML = 'Tap anywhere to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>3 plays per day (Max ¥60).';
                     
                     if (playsLeft <= 0) {
                         startBtn.disabled = true;
@@ -406,7 +461,7 @@
             }
         }
 
-        // Event Listeners
+        // Event Listeners - Made the ENTIRE SCREEN tappable for mobile UX!
         document.getElementById('startBtn').addEventListener('click', startGame);
         document.getElementById('restartBtn').addEventListener('click', startGame);
         
@@ -414,12 +469,16 @@
             if (e.code === 'Space' && isPlaying) { e.preventDefault(); jump(); }
         });
         
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (isPlaying) jump();
-        }, { passive: false });
+        // Detect if click/touch is on a button or the game area
+        function handleTap(e) {
+            if (isPlaying && !e.target.closest('button') && !e.target.closest('.overlay')) {
+                e.preventDefault();
+                jump();
+            }
+        }
         
-        canvas.addEventListener('click', () => { if (isPlaying) jump(); });
+        document.addEventListener('touchstart', handleTap, { passive: false });
+        document.addEventListener('click', handleTap);
 
         // Init
         checkStatus();
