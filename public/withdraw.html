@@ -763,10 +763,13 @@ const COUNTRY_INFO = {
                 const response = await fetch(`${API_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
                 if (response.status === 401) { window.location.href = 'register.html'; return; }
 
-                userProfile = await response.json();
+                               userProfile = await response.json();
                 document.getElementById('usernameDisplay').textContent = userProfile.username;
-                if (userProfile.profile_picture) {
-                    document.getElementById('profilePic').src = `${API_URL}/uploads/${userProfile.profile_picture}`;
+                const profilePicEl = document.getElementById('profilePic');
+                if (profilePicEl && userProfile.profile_picture) {
+                    // data.profile_picture is already a full Cloudinary URL, so we use it directly!
+                    profilePicEl.src = userProfile.profile_picture;
+                    profilePicEl.onerror = () => { profilePicEl.src = 'https://via.placeholder.com/40'; };
                 }
 
                 userDarkMode = userProfile.dark_mode || localStorage.getItem('darkMode') === 'true';
