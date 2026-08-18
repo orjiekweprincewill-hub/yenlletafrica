@@ -37,74 +37,44 @@
             touch-action: manipulation;
         }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
+        body { display: flex; flex-direction: column; position: relative; }
 
-        /* Background Gradient */
         body::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(0,188,212,0.08) 0%, transparent 60%);
-            animation: pulse 8s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
+            animation: pulse 8s ease-in-out infinite; pointer-events: none; z-index: 0;
         }
 
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
 
-        /* ===== HEADER ===== */
         .game-header {
-            position: relative; z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 20px;
-            padding-top: max(15px, env(safe-area-inset-top));
-            background: rgba(10, 22, 40, 0.8); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative; z-index: 10; display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top));
+            background: rgba(10, 22, 40, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         
         .back-btn { color: var(--white); text-decoration: none; font-size: 24px; display: flex; align-items: center; }
         .header-center { text-align: center; }
         .score-display { font-size: 20px; font-weight: 800; color: var(--accent-light); letter-spacing: 1px; }
         .plays-left { font-size: 11px; color: var(--gray); margin-top: 2px; }
-        
         .header-right { min-width: 40px; text-align: right; }
 
-        /* ===== CANVAS WRAPPER ===== */
         .canvas-wrapper {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-            padding: 10px;
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            position: relative; z-index: 1; overflow: hidden; padding: 10px;
         }
 
         canvas {
             background: linear-gradient(180deg, #0d2b4e 0%, #0a1628 100%);
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            max-width: 100%;
-            max-height: 100%;
-            aspect-ratio: 2/3; /* Maintains proportion on all phones */
-            touch-action: none;
+            border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-width: 100%; max-height: 100%; aspect-ratio: 2/3; touch-action: none;
         }
 
-        /* ===== OVERLAYS ===== */
         .overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: center; z-index: 20;
-            flex-direction: column; padding: 25px; text-align: center;
-            transition: opacity 0.3s ease;
-            padding-top: max(25px, env(safe-area-inset-top));
-            padding-bottom: max(25px, env(safe-area-inset-bottom));
+            flex-direction: column; padding: 25px; text-align: center; transition: opacity 0.3s ease;
+            padding-top: max(25px, env(safe-area-inset-top)); padding-bottom: max(25px, env(safe-area-inset-bottom));
         }
         
         .overlay h1 { 
@@ -116,12 +86,9 @@
         .overlay p { font-size: 0.95rem; color: var(--gray); margin-bottom: 30px; max-width: 320px; line-height: 1.5; }
         
         .btn {
-            padding: 15px 30px; font-size: 1rem; font-weight: 700;
-            color: white; border: none; border-radius: 12px; cursor: pointer;
-            transition: transform 0.2s; margin-bottom: 15px; width: 100%;
-            max-width: 320px;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            font-family: 'Inter', sans-serif;
+            padding: 15px 30px; font-size: 1rem; font-weight: 700; color: white; border: none; border-radius: 12px; cursor: pointer;
+            transition: transform 0.2s; margin-bottom: 15px; width: 100%; max-width: 320px;
+            display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Inter', sans-serif;
         }
         
         .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3); }
@@ -130,48 +97,28 @@
         .btn-ai { background: linear-gradient(135deg, var(--warning) 0%, #d35400 100%); box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3); }
         .btn-ai:active { transform: scale(0.97); }
         
-        .btn:disabled { background: #334155; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7; }
+        .btn-danger { background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); }
+        .btn-danger:active { transform: scale(0.97); }
 
+        .btn:disabled { background: #334155; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7; }
         .hidden { display: none !important; }
         
-        .reward-box {
-            background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px;
-            margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%;
-            max-width: 320px;
-        }
+        .reward-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 320px; }
         .reward-box h2 { color: var(--success); font-size: 2.2rem; font-weight: 800; margin-bottom: 5px; }
         .reward-box p { color: var(--white); font-size: 1.1rem; margin: 0; }
         
-        .badge-plan {
-            display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;
-        }
+        .badge-plan { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
         .badge-lite { background: rgba(255,255,255,0.1); color: var(--gray); }
         .badge-pro { background: rgba(0, 188, 212, 0.2); color: var(--accent-light); }
         .badge-vite { background: linear-gradient(45deg, rgba(243, 156, 18, 0.2), rgba(211, 84, 0, 0.2)); color: var(--warning); }
 
-        #loadingSpinner {
-            width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite;
-        }
+        #loadingSpinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Mobile tap hint */
-        .tap-hint {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.5);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: rgba(255,255,255,0.6);
-            pointer-events: none;
-            z-index: 5;
-            animation: bounce 2s infinite;
-        }
+        .tap-hint { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 20px; font-size: 12px; color: rgba(255,255,255,0.6); pointer-events: none; z-index: 5; animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); } 40% { transform: translateX(-50%) translateY(-10px); } }
+
+        #aiLog { margin: 20px 0; max-height: 200px; overflow-y: auto; width: 100%; max-width: 300px; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -200,7 +147,7 @@
         <h1>Yen Runner</h1>
         <p id="startMsg">Loading game rules...</p>
         <button class="btn btn-primary" id="startBtn">START GAME</button>
-        <button class="btn btn-ai hidden" id="aiBtn">🤖 ACTIVATE AI AUTO-PLAY (+¥20)</button>
+        <button class="btn btn-ai hidden" id="aiBtn">🤖 ACTIVATE AI AUTO-PLAY</button>
     </div>
 
     <!-- Game Over Screen -->
@@ -211,7 +158,16 @@
             <p>Score: <span id="finalScore">0</span></p>
         </div>
         <button class="btn btn-primary" id="restartBtn">PLAY AGAIN</button>
-        <button class="btn btn-ai hidden" id="aiBtnOver">🤖 ACTIVATE AI AUTO-PLAY (+¥20)</button>
+        <button class="btn btn-ai hidden" id="aiBtnOver">🤖 ACTIVATE AI AUTO-PLAY</button>
+    </div>
+
+    <!-- AI Playing Screen -->
+    <div class="overlay hidden" id="aiPlayingScreen">
+        <h1>🤖 AI Auto-Playing</h1>
+        <div id="loadingSpinner"></div>
+        <div id="aiLog"></div>
+        <p style="font-size: 0.9rem; color: var(--gray);">AI will play your remaining games automatically every 10 seconds.</p>
+        <button class="btn btn-danger" id="aiDisableBtn">Disable AI & Play Manually</button>
     </div>
 
     <script>
@@ -219,19 +175,17 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Game State
         let isPlaying = false;
         let score = 0;
         let speed = 5;
         let animationId;
         let userStatus = { plan: 'YENLITE', ai_ready: false, plays_today: 0, max_plays: 0 };
 
-        // Player
-        const player = {
-            x: 50, y: 500, width: 40, height: 40,
-            vy: 0, gravity: 0.8, jumpPower: -15, jumping: false
-        };
+        // AI State
+        let aiPlaying = false;
+        let aiTimeoutId = null;
 
+        const player = { x: 50, y: 500, width: 40, height: 40, vy: 0, gravity: 0.8, jumpPower: -15, jumping: false };
         let obstacles = [];
         let obstacleTimer = 0;
 
@@ -239,7 +193,6 @@
             if (!player.jumping) {
                 player.vy = player.jumpPower;
                 player.jumping = true;
-                // Hide tap hint after first jump
                 const hint = document.getElementById('tapHint');
                 if (hint) hint.style.display = 'none';
             }
@@ -252,8 +205,6 @@
 
         function update() {
             ctx.clearRect(0,0, canvas.width, canvas.height);
-            
-            // Draw Ground
             ctx.fillStyle = '#1e3c72';
             ctx.fillRect(0, 540, canvas.width, 60);
             ctx.strokeStyle = 'rgba(255,255,255,0.1)';
@@ -263,49 +214,33 @@
             ctx.lineTo(canvas.width, 540);
             ctx.stroke();
 
-            // Player physics
             player.vy += player.gravity;
             player.y += player.vy;
-            if (player.y >= 500) {
-                player.y = 500; player.vy = 0; player.jumping = false;
-            }
+            if (player.y >= 500) { player.y = 500; player.vy = 0; player.jumping = false; }
 
-            // Draw Player
             ctx.font = '32px Arial';
             ctx.fillText('🏃‍♂️', player.x, player.y + 32);
 
-            // Obstacles logic
             obstacleTimer++;
-            if (obstacleTimer > 60 + Math.random() * 40) {
-                spawnObstacle();
-                obstacleTimer = 0;
-            }
+            if (obstacleTimer > 60 + Math.random() * 40) { spawnObstacle(); obstacleTimer = 0; }
 
             obstacles.forEach((obs, index) => {
                 obs.x -= speed;
-                // Draw obstacle
                 ctx.fillStyle = '#e74c3c';
                 ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-                
-                // Add some styling to obstacle
                 ctx.fillStyle = 'rgba(0,0,0,0.2)';
                 ctx.fillRect(obs.x, obs.y, obs.width, 5);
 
-                // Collision detection
-                if (player.x < obs.x + obs.width &&
-                    player.x + player.width > obs.x &&
-                    player.y < obs.y + obs.height &&
-                    player.y + player.height > obs.y) {
+                if (player.x < obs.x + obs.width && player.x + player.width > obs.x && player.y < obs.y + obs.height && player.y + player.height > obs.y) {
                     gameOver();
                 }
 
                 if (obs.x + obs.width < 0) obstacles.splice(index, 1);
             });
 
-            // Update Score & Speed
             score++;
             document.getElementById('scoreText').textContent = Math.floor(score / 10);
-            if (score % 200 === 0) speed += 0.5; // Increase speed over time
+            if (score % 200 === 0) speed += 0.5;
 
             if (isPlaying) animationId = requestAnimationFrame(update);
         }
@@ -318,7 +253,6 @@
             document.getElementById('finalScore').textContent = finalScore;
             document.getElementById('gameOverScreen').classList.remove('hidden');
 
-            // Submit score to backend
             try {
                 const res = await fetch(`${API_URL}/api/submit-runner-score`, {
                     method: 'POST',
@@ -329,7 +263,7 @@
                 
                 if (res.ok) {
                     document.getElementById('rewardText').textContent = `+¥${data.reward}`;
-                    checkStatus(); // Refresh status to update plays left
+                    checkStatus();
                 } else {
                     document.getElementById('rewardText').textContent = `❌ ${data.error}`;
                 }
@@ -339,7 +273,6 @@
         }
 
         function startGame() {
-            // Check if user has plays left (LITE users have 0 max_plays)
             if (userStatus.plays_today >= userStatus.max_plays) {
                 alert('No plays left for today! Come back in 24 hours.');
                 return;
@@ -358,13 +291,33 @@
             update();
         }
 
-        // AI Auto-Play Logic
-        document.getElementById('aiBtn').addEventListener('click', activateAI);
-        document.getElementById('aiBtnOver').addEventListener('click', activateAI);
+        // ============================================
+        // AI AUTO-PLAY LOGIC
+        // ============================================
+        document.getElementById('aiBtn').addEventListener('click', startAIPlay);
+        document.getElementById('aiBtnOver').addEventListener('click', startAIPlay);
+        document.getElementById('aiDisableBtn').addEventListener('click', stopAI);
 
-        async function activateAI() {
-            if (!confirm('Activate AI to play for you? This will instantly grant ¥20 but disable AI for 24 hours.')) return;
+        async function startAIPlay() {
+            if (!confirm('Activate AI? It will automatically play your remaining games (earning ¥20 each) every 10 seconds. You can disable it anytime to play manually.')) return;
             
+            aiPlaying = true;
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('aiPlayingScreen').classList.remove('hidden');
+            document.getElementById('aiLog').innerHTML = '';
+            document.getElementById('aiDisableBtn').textContent = 'Disable AI & Play Manually';
+            
+            await runAIGame();
+        }
+
+        async function runAIGame() {
+            if (!aiPlaying) return;
+
+            const log = document.getElementById('aiLog');
+            log.innerHTML += `<p style="color: var(--accent-light); margin-bottom: 5px;">🤖 AI starting game...</p>`;
+            log.scrollTop = log.scrollHeight;
+
             try {
                 const res = await fetch(`${API_URL}/api/runner/activate-ai`, {
                     method: 'POST',
@@ -373,17 +326,40 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    alert(`🤖 AI Success! ${data.message}`);
-                    checkStatus(); // Refresh UI to hide AI button
+                    log.innerHTML += `<p style="color: var(--success); margin-bottom: 10px;">✅ Game complete! Earned ¥${data.reward}</p>`;
+                    log.scrollTop = log.scrollHeight;
+                    
+                    if (data.plays_today >= data.max_plays) {
+                        aiPlaying = false;
+                        log.innerHTML += `<p style="color: var(--warning); margin-top: 10px;">🏁 AI finished all daily plays!</p>`;
+                        document.getElementById('aiDisableBtn').textContent = 'Close';
+                    } else {
+                        log.innerHTML += `<p style="color: var(--gray); margin-bottom: 10px;">⏳ Next AI game in 10 seconds...</p>`;
+                        log.scrollTop = log.scrollHeight;
+                        aiTimeoutId = setTimeout(() => {
+                            runAIGame();
+                        }, 10000);
+                    }
                 } else {
-                    alert(`❌ ${data.error}`);
+                    log.innerHTML += `<p style="color: var(--danger); margin-bottom: 10px;">❌ ${data.error}</p>`;
+                    stopAI();
                 }
             } catch (err) {
-                alert('Network Error');
+                log.innerHTML += `<p style="color: var(--danger); margin-bottom: 10px;">❌ Network Error</p>`;
+                stopAI();
             }
         }
 
-        // Check user plan and AI cooldown on load
+        function stopAI() {
+            aiPlaying = false;
+            if (aiTimeoutId) clearTimeout(aiTimeoutId);
+            document.getElementById('aiPlayingScreen').classList.add('hidden');
+            checkStatus();
+        }
+
+        // ============================================
+        // STATUS CHECKER
+        // ============================================
         async function checkStatus() {
             try {
                 const res = await fetch(`${API_URL}/api/runner/status`, {
@@ -399,15 +375,12 @@
                 const startBtn = document.getElementById('startBtn');
                 const restartBtn = document.getElementById('restartBtn');
                 
-                // Update Plays Left UI
                 const playsLeft = userStatus.max_plays - userStatus.plays_today;
                 playsLeftText.textContent = playsLeft;
 
-                // Hide AI buttons by default
                 aiBtn.classList.add('hidden');
                 aiBtnOver.classList.add('hidden');
 
-                // LITE users (0 plays, 0 max_plays)
                 if (userStatus.plan === 'YENLITE') {
                     planBadge.textContent = 'YENLITE';
                     planBadge.className = 'badge-plan badge-lite';
@@ -415,7 +388,6 @@
                     startBtn.disabled = true;
                     restartBtn.disabled = true;
                 } 
-                // PRO users (2 plays, Max ¥40)
                 else if (userStatus.plan === 'YENPRO') {
                     planBadge.textContent = 'YENPRO';
                     planBadge.className = 'badge-plan badge-pro';
@@ -430,7 +402,6 @@
                         restartBtn.disabled = false;
                     }
                 } 
-                // VITE users (3 plays, Max ¥60)
                 else if (userStatus.plan === 'YENVITE') {
                     planBadge.textContent = 'YENVITE';
                     planBadge.className = 'badge-plan badge-vite';
@@ -444,12 +415,12 @@
                         startBtn.disabled = false;
                         restartBtn.disabled = false;
                     }
-                    
-                    // Show AI button if ready
-                    if (userStatus.ai_ready) {
-                        aiBtn.classList.remove('hidden');
-                        aiBtnOver.classList.remove('hidden');
-                    }
+                }
+
+                // Show AI button if ready (has plays left and is PRO/VITE)
+                if (userStatus.ai_ready) {
+                    aiBtn.classList.remove('hidden');
+                    aiBtnOver.classList.remove('hidden');
                 }
 
                 document.getElementById('loadingScreen').classList.add('hidden');
@@ -461,7 +432,7 @@
             }
         }
 
-        // Event Listeners - Made the ENTIRE SCREEN tappable for mobile UX!
+        // Event Listeners
         document.getElementById('startBtn').addEventListener('click', startGame);
         document.getElementById('restartBtn').addEventListener('click', startGame);
         
@@ -469,7 +440,6 @@
             if (e.code === 'Space' && isPlaying) { e.preventDefault(); jump(); }
         });
         
-        // Detect if click/touch is on a button or the game area
         function handleTap(e) {
             if (isPlaying && !e.target.closest('button') && !e.target.closest('.overlay')) {
                 e.preventDefault();

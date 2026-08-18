@@ -1265,20 +1265,10 @@ app.post('/api/apply-upgrade-coupon', isAuthenticated, async (req, res) => {
 app.get('/api/runner/status', isAuthenticated, async (req, res) => {
     const userId = req.user.user_id;
     try {
-        const userRes = await pool.query('SELECT plan, last_spin FROM users WHERE id = $1', [userId]);
+        const userRes = await pool.query('SELECT plan FROM users WHERE id = $1', [userId]);
         const user = userRes.rows[0];
         
         if (!user) return res.status(404).json({ error: 'User not found' });
-
-        // Check AI 24hr cooldown
-        let aiReady = true;
-        if (user.last_spin) {
-            const lastSpinTime = new Date(user.last_spin).getTime();
-            const twentyFourHrs = 24 * 60 * 60 * 1000;
-            if (Date.now() - lastSpinTime < twentyFourHrs) {
-                aiReady = false;
-            }
-        }
 
         // Check plays today
         const playsRes = await pool.query(
@@ -1290,6 +1280,12 @@ app.get('/api/runner/status', isAuthenticated, async (req, res) => {
         let maxPlays = 0;
         if (user.plan === 'YENPRO') maxPlays = 2;   // PRO gets 2 plays (Max ¥40)
         if (user.plan === 'YENVITE') maxPlays = 3;  // VITE gets 3 plays (Max ¥60)
+
+        // AI is ready if they have plays left and are PRO/VITE
+        let aiReady = false;
+        if ((user.plan === 'YENPRO' || user.plan === 'YENVITE') && playsRes.rows[0].count < maxPlays) {
+            aiReady = true;
+        }
 
         res.json({
             plan: user.plan,
@@ -1314,28 +1310,22 @@ app.post('/api/submit-runner-score', isAuthenticated, async (req, res) => {
         const userRes = await pool.query('SELECT plan FROM users WHERE id = $1', [userId]);
         const user = userRes.rows[0];
 
-        // RESTRICTION: Only PRO and VITE can earn
         if (user.plan !== 'YENPRO' && user.plan !== 'YENVITE') {
             return res.status(403).json({ error: 'Only YENPRO and YENVITE users can earn from the Runner game.' });
         }
 
-        // Check plays today
         const playsRes = await pool.query(
             "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND action = 'Runner Game' AND DATE(created_at) = CURRENT_DATE",
             [userId]
         );
 
         const playsToday = playsRes.rows[0].count;
+        let maxPlays = user.plan === 'YENPRO' ? 2 : 3;
 
-        // Enforce limits: PRO = 2, VITE = 3
-        if (user.plan === 'YENPRO' && playsToday >= 2) {
-            return res.status(403).json({ error: 'Daily play limit (2 plays) reached! Come back in 24 hours.' });
-        }
-        if (user.plan === 'YENVITE' && playsToday >= 3) {
-            return res.status(403).json({ error: 'Daily play limit (3 plays) reached! Come back in 24 hours.' });
+        if (playsToday >= maxPlays) {
+            return res.status(403).json({ error: `Daily play limit (${maxPlays} plays) reached! Come back in 24 hours.` });
         }
 
-        // Calculate reward: 1 Yencoin per 50 points, MAX 20 Yencoin per play
         const reward = Math.min(Math.floor(score / 50), 20);
 
         if (reward > 0) {
@@ -1352,37 +1342,47 @@ app.post('/api/submit-runner-score', isAuthenticated, async (req, res) => {
     }
 });
 
-// 3. Activate AI Auto-Play (VITE ONLY)
+// 3. Activate AI Auto-Play (PRO & VITE ONLY)
 app.post('/api/runner/activate-ai', isAuthenticated, async (req, res) => {
     const userId = req.user.user_id;
     try {
-        const userRes = await pool.query('SELECT plan, last_spin FROM users WHERE id = $1', [userId]);
+        const userRes = await pool.query('SELECT plan FROM users WHERE id = $1', [userId]);
         const user = userRes.rows[0];
 
-        // RESTRICTION: VITE ONLY
-        if (user.plan !== 'YENVITE') {
-            return res.status(403).json({ error: 'AI Auto-Play is exclusive to YENVITE users only.' });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        // RESTRICTION: PRO and VITE can use AI
+        if (user.plan !== 'YENPRO' && user.plan !== 'YENVITE') {
+            return res.status(403).json({ error: 'AI Auto-Play is for PRO and VITE users only.' });
         }
 
-        // Check 24hr cooldown
-        if (user.last_spin) {
-            const lastSpinTime = new Date(user.last_spin).getTime();
-            const twentyFourHrs = 24 * 60 * 60 * 1000;
-            if (Date.now() - lastSpinTime < twentyFourHrs) {
-                const timeLeft = twentyFourHrs - (Date.now() - lastSpinTime);
-                const hoursLeft = Math.ceil(timeLeft / (60 * 60 * 1000));
-                return res.status(403).json({ error: `AI on cooldown. Ready in ${hoursLeft} hour(s).` });
-            }
+        let maxPlays = user.plan === 'YENPRO' ? 2 : 3;
+
+        const playsRes = await pool.query(
+            "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND action = 'Runner Game' AND DATE(created_at) = CURRENT_DATE",
+            [userId]
+        );
+        const playsToday = playsRes.rows[0].count;
+
+        if (playsToday >= maxPlays) {
+            return res.status(403).json({ error: 'Daily play limit reached! AI cannot play anymore.' });
         }
 
-        // Grant immediate max reward (20 Yen) and set last_spin to trigger 24hr cooldown
-        const reward = 20;
-        await pool.query('UPDATE users SET activity_wallet = activity_wallet + $1, last_spin = CURRENT_TIMESTAMP WHERE id = $2', [reward, userId]);
-        
-        await addActivityFeed(userId, 'AI Runner Game', reward, `AI Auto-Play completed`);
-        await createNotification(userId, `🤖 AI Auto-Play complete! You earned ¥${reward.toLocaleString()}. AI is now cooling down for 24hrs.`);
+        // AI always gets a perfect score (1000) to earn the max 20 Yen
+        const aiScore = 1000;
+        const reward = Math.min(Math.floor(aiScore / 50), 20);
 
-        res.json({ success: true, reward, message: 'AI played for you and won ¥20!' });
+        await pool.query('UPDATE users SET activity_wallet = activity_wallet + $1 WHERE id = $2', [reward, userId]);
+        await addActivityFeed(userId, 'AI Runner Game', reward, `AI Auto-Play scored ${aiScore} points`);
+        await createNotification(userId, `🤖 AI played for you and earned ¥${reward.toLocaleString()}!`);
+
+        res.json({ 
+            success: true, 
+            reward, 
+            plays_today: playsToday + 1,
+            max_plays: maxPlays,
+            message: `AI played and earned ¥${reward}!` 
+        });
     } catch (err) {
         console.error('AI activate error:', err);
         res.status(500).json({ error: 'Failed to activate AI' });
