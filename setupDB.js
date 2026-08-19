@@ -182,6 +182,8 @@ async function buildCouponCodes(client) {
     await createIndex(client, 'idx_coupon_codes_code', 'coupon_codes', 'UPPER(code)', true);
     await createIndex(client, 'idx_coupon_codes_used', 'coupon_codes', 'used');
     console.log('✅ coupon_codes table ready');
+
+    
 }
 
 async function buildTasks(client) {

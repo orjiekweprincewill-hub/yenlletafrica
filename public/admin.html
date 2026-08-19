@@ -39,7 +39,6 @@
             overflow-x: hidden;
         }
 
-        /* ===== LOADING OVERLAY ===== */
         #authLoader {
             position: fixed; inset: 0;
             background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%);
@@ -51,7 +50,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loader-text { color: var(--white); font-size: 14px; opacity: 0.8; }
 
-        /* ===== TOP HEADER ===== */
         .top-header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
             background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(20px);
@@ -68,14 +66,12 @@
         .logout-btn { background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%); color: var(--white); border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 8px; }
         .logout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4); }
 
-        /* ===== HERO BG ===== */
         .hero-bg { min-height: 100vh; background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%); position: relative; overflow: hidden; padding-top: 90px; padding-bottom: 40px; }
         .hero-bg::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%); animation: pulse 8s ease-in-out infinite; pointer-events: none; }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
 
         .main-content { position: relative; z-index: 1; padding: 20px; max-width: 1200px; margin: 0 auto; }
 
-        /* ===== STATS GRID ===== */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card {
             background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px);
@@ -88,7 +84,6 @@
         .stat-value { font-size: 28px; font-weight: 800; margin-bottom: 5px; background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .stat-label { font-size: 12px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* ===== SECTIONS & TABS ===== */
         .glass-section {
             background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px);
             border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
@@ -106,7 +101,6 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ===== FORMS & INPUTS ===== */
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; color: rgba(255,255,255,0.8); font-weight: 500; font-size: 14px; }
         .form-group input, .form-group textarea, .form-group select {
@@ -131,7 +125,6 @@
         .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4); }
         .btn-sm { padding: 8px 16px; font-size: 12px; }
 
-        /* ===== TOGGLES ===== */
         .toggle-switch { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -140,7 +133,6 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(26px); }
 
-        /* ===== ITEM CARDS ===== */
         .item-card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 16px; margin-bottom: 15px; border-left: 4px solid var(--accent); transition: var(--transition); }
         .item-card:hover { background: rgba(255,255,255,0.08); transform: translateX(5px); }
         .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
@@ -164,13 +156,11 @@
         .summary-label { font-size: 12px; text-transform: uppercase; opacity: 0.9; letter-spacing: 1px; margin-bottom: 8px; }
         .summary-value { font-size: 24px; font-weight: 800; }
         
-        /* ===== ALERT ===== */
         .alert { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 3000; animation: slideIn 0.3s ease; font-weight: 600; color: white; }
         .alert-success { background: linear-gradient(135deg, var(--success) 0%, #388e3c 100%); }
         .alert-error { background: linear-gradient(135deg, var(--danger) 0%, #c62828 100%); }
         @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* ===== SIDE OVERLAY MENU ===== */
         .overlay { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background: linear-gradient(180deg, var(--primary-dark) 0%, #0d2b4e 100%); overflow-x: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 40px rgba(0,0,0,0.3); }
         .overlay-content { position: relative; width: 100%; padding: 80px 30px 30px 30px; }
         .closebtn { position: absolute; top: 20px; right: 30px; font-size: 40px; color: var(--white); text-decoration: none; cursor: pointer; }
@@ -211,7 +201,6 @@
 
     <div class="hero-bg">
         <div class="main-content">
-            <!-- STATS -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon">👥</div>
@@ -235,13 +224,11 @@
                 </div>
             </div>
 
-            <!-- COUNTRIES -->
             <div class="glass-section">
                 <div class="section-title"><i class="bi bi-geo-alt"></i> Users by Country</div>
                 <div class="stats-grid" id="countryStats" style="margin-bottom: 0;"></div>
             </div>
 
-            <!-- MAIN TABS -->
             <div class="glass-section">
                 <div class="tabs" id="mainTabs">
                     <button class="tab active" onclick="switchTab('withdrawals', event)"><i class="bi bi-wallet2"></i> Withdrawals</button>
@@ -356,6 +343,11 @@
                 <!-- COUPONS TAB -->
                 <div id="coupons-tab" class="tab-content">
                     <div class="section-title"><i class="bi bi-ticket-perforated"></i> Coupon Management</div>
+                    
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--white);"><i class="bi bi-clock-history"></i> Pending Vendor Requests</h3>
+                    <div id="vendorRequestsList"></div>
+                    <hr style="margin: 30px 0; border: 1px solid rgba(255,255,255,0.1);">
+
                     <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--white);"><i class="bi bi-plus-circle"></i> Generate New Coupon Code</h3>
                     <form id="couponForm" onsubmit="generateCoupon(event)">
                         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
@@ -539,6 +531,7 @@
                 case 'withdrawals': loadWithdrawals(); break;
                 case 'tiktok': loadTiktokUsers(); break;
                 case 'courses': loadCourses(); break;
+                case 'coupons': loadVendorRequests(); break;
                 case 'content': loadContentTab('tasks'); break;
                 case 'social': loadSocialLinks(); break;
                 case 'vendors': loadVendors(); break;
@@ -759,7 +752,7 @@
             } catch (error) { showAlert('Batch failed', 'error'); loadWithdrawals(); }
         }
 
-                        function downloadWithdrawalsPDF() {
+        function downloadWithdrawalsPDF() {
             if (currentPendingWithdrawals.length === 0) return showAlert('❌ No pending withdrawals to export', 'error');
 
             let yenTotal = 0, dollarTotal = 0;
@@ -784,7 +777,7 @@
                     </tr>
                 `;
             }).join('');
-
+            
             // Create a hidden iframe to bypass html2canvas rendering bugs
             const iframe = document.createElement('iframe');
             iframe.style.position = 'absolute';
@@ -795,7 +788,6 @@
             iframe.style.border = 'none';
             document.body.appendChild(iframe);
 
-            // Write the HTML directly into the iframe
             const doc = iframe.contentWindow.document;
             doc.open();
             doc.write(`
@@ -856,7 +848,6 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
-            // Generate PDF and remove the iframe afterwards
             html2pdf().set(opt).from(element).save().then(() => {
                 document.body.removeChild(iframe);
                 showAlert('✅ PDF Downloaded successfully!', 'success');
@@ -866,7 +857,7 @@
                 showAlert('Failed to generate PDF', 'error');
             });
         }
-        
+
         async function searchUserForDelete(e) {
             e.preventDefault();
             const q = document.getElementById('deleteUserSearchInput').value.trim();
@@ -915,7 +906,6 @@
             } catch (err) { showAlert('Failed to delete user', 'error'); }
         }
 
-        // Courses
         async function postCourse(e) {
             e.preventDefault();
             const formData = new FormData();
@@ -971,7 +961,6 @@
             } catch (error) { showAlert('Failed', 'error'); }
         }
 
-        // Tiktok
         async function searchTiktokUser(e) {
             e.preventDefault();
             const search = document.getElementById('tiktokSearchInput').value.trim();
@@ -1033,7 +1022,55 @@
             } catch (error) { showAlert('Failed to load TikTok users', 'error'); }
         }
 
-        // Coupons
+        async function loadVendorRequests() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/coupon-requests`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                const requests = await response.json();
+                const container = document.getElementById('vendorRequestsList');
+                if (!Array.isArray(requests) || requests.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No pending requests</p></div>';
+                    return;
+                }
+                container.innerHTML = requests.map(r => `
+                    <div class="item-card" style="border-left-color: var(--warning);">
+                        <div class="item-header">
+                            <span class="item-title">@${escapeHtml(r.vendor_name)}</span>
+                            <span class="badge bg-warning">${r.status.toUpperCase()}</span>
+                        </div>
+                        <div class="item-meta">Plan: ${escapeHtml(r.plan)} | Requested: ${r.requested_count} coupons</div>
+                        <div class="item-actions">
+                            <input type="number" id="approveCount-${r.id}" placeholder="Approve Qty (Max ${r.requested_count})" min="1" max="${r.requested_count}" style="width: 120px; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                            <button class="btn btn-success btn-sm" onclick="approveCouponReq(${r.id})"><i class="bi bi-check-circle"></i> Approve</button>
+                            <button class="btn btn-danger btn-sm" onclick="rejectCouponReq(${r.id})"><i class="bi bi-x-circle"></i> Reject</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) { showAlert('Failed to load requests', 'error'); }
+        }
+
+        async function approveCouponReq(id) {
+            const count = parseInt(document.getElementById(`approveCount-${id}`).value);
+            if (!count || count < 1) return showAlert('Enter valid quantity', 'error');
+            try {
+                const res = await fetch(`${API_URL}/api/admin/approve-coupon-request/${id}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    body: JSON.stringify({ approve_count: count })
+                });
+                const data = await res.json();
+                if (res.ok) { showAlert(`✅ ${data.message}`, 'success'); loadVendorRequests(); }
+                else { showAlert(data.error || 'Failed', 'error'); }
+            } catch (err) { showAlert('Failed', 'error'); }
+        }
+
+        async function rejectCouponReq(id) {
+            if (!confirm('Reject this request?')) return;
+            try {
+                const res = await fetch(`${API_URL}/api/admin/reject-coupon-request/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                if (res.ok) { showAlert('✅ Rejected', 'success'); loadVendorRequests(); }
+                else { showAlert('Failed', 'error'); }
+            } catch (err) { showAlert('Failed', 'error'); }
+        }
+
         async function generateCoupon(e) {
             e.preventDefault();
             const plan = document.getElementById('planSelect').value;
@@ -1058,119 +1095,117 @@
         }
 
         async function searchUserByCoupon(e) {
-    e.preventDefault();
-    const coupon = document.getElementById('searchCouponInput').value.trim();
-    try {
-        const response = await fetch(`${API_URL}/api/admin/search-user-by-coupon?coupon=${encodeURIComponent(coupon)}`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-        const data = await response.json();
-        
-        if (!response.ok) {
-            showAlert(data.error || 'Search failed', 'error');
-            document.getElementById('couponSearchResult').innerHTML = '';
-            return;
-        }
-        
-        if (!data.used) {
-            showAlert('Coupon not used yet', 'error');
-            document.getElementById('couponSearchResult').innerHTML = '';
-            return;
-        }
-
-        // Display User Info + Credit/Debit Forms
-        document.getElementById('couponSearchResult').innerHTML = `
-            <div class="item-card">
-                <div class="item-header">
-                    <span class="item-title">@${escapeHtml(data.username)}</span>
-                    <span class="badge bg-light">${escapeHtml(data.coupon_plan)}</span>
-                </div>
-                <div class="item-meta">Email: ${escapeHtml(data.email)}</div>
-                <div class="item-meta">User ID: ${data.user_id}</div>
-                <div class="item-meta" style="color: var(--accent-light); font-weight: 600; margin-top: 10px;">
-                    Balances:<br>
-                    Activity Wallet: ¥${formatNumber(data.activity_wallet)}<br>
-                    Referral Wallet: ¥${formatNumber(data.referral_wallet)}
-                </div>
-
-                <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+            e.preventDefault();
+            const coupon = document.getElementById('searchCouponInput').value.trim();
+            try {
+                const response = await fetch(`${API_URL}/api/admin/search-user-by-coupon?coupon=${encodeURIComponent(coupon)}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const data = await response.json();
                 
-                <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'credit')" style="margin-bottom: 15px;">
-                    <h4 style="font-size: 14px; color: var(--success); margin-bottom: 10px;">Add Money (Credit)</h4>
-                    <div class="form-group" style="margin-bottom: 10px;">
-                        <select id="creditWalletType-${data.user_id}" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                            <option value="activity">Activity Wallet</option>
-                            <option value="referral">Referral Wallet</option>
-                        </select>
+                if (!response.ok) {
+                    showAlert(data.error || 'Search failed', 'error');
+                    document.getElementById('couponSearchResult').innerHTML = '';
+                    return;
+                }
+                
+                if (!data.used) {
+                    showAlert('Coupon not used yet', 'error');
+                    document.getElementById('couponSearchResult').innerHTML = `<div class="item-card"><p>Status: Not Used. Generated by: <strong>${data.generated_by || 'Admin'}</strong></p></div>`;
+                    return;
+                }
+
+                document.getElementById('couponSearchResult').innerHTML = `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <span class="item-title">@${escapeHtml(data.username)}</span>
+                            <span class="badge bg-light">${escapeHtml(data.coupon_plan)}</span>
+                        </div>
+                        <div class="item-meta">Email: ${escapeHtml(data.email)}</div>
+                        <div class="item-meta">User ID: ${data.user_id}</div>
+                        <div class="item-meta" style="color: var(--accent-light); font-weight: 600; margin-top: 10px;">
+                            Balances:<br>
+                            Activity Wallet: ¥${formatNumber(data.activity_wallet)}<br>
+                            Referral Wallet: ¥${formatNumber(data.referral_wallet)}
+                        </div>
+
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+                        
+                        <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'credit')" style="margin-bottom: 15px;">
+                            <h4 style="font-size: 14px; color: var(--success); margin-bottom: 10px;">Add Money (Credit)</h4>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <select id="creditWalletType-${data.user_id}" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                    <option value="activity">Activity Wallet</option>
+                                    <option value="referral">Referral Wallet</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="creditAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <input type="text" id="creditReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-plus-circle"></i> Add</button>
+                            </div>
+                        </form>
+
+                        <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'debit')">
+                            <h4 style="font-size: 14px; color: var(--danger); margin-bottom: 10px;">Remove Money (Debit)</h4>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <select id="debitWalletType-${data.user_id}" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                    <option value="activity">Activity Wallet</option>
+                                    <option value="referral">Referral Wallet</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="debitAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <input type="text" id="debitReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i> Remove</button>
+                            </div>
+                        </form>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="number" id="creditAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                        <input type="text" id="creditReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                        <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-plus-circle"></i> Add</button>
-                    </div>
-                </form>
-
-                <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'debit')">
-                    <h4 style="font-size: 14px; color: var(--danger); margin-bottom: 10px;">Remove Money (Debit)</h4>
-                    <div class="form-group" style="margin-bottom: 10px;">
-                        <select id="debitWalletType-${data.user_id}" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                            <option value="activity">Activity Wallet</option>
-                            <option value="referral">Referral Wallet</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="number" id="debitAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                        <input type="text" id="debitReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i> Remove</button>
-                    </div>
-                </form>
-            </div>
-        `;
-    } catch (error) {
-        showAlert('Search failed', 'error');
-    }
-}
-
-async function handleWalletAdjust(e, userId, action) {
-    e.preventDefault();
-    
-    const walletType = document.getElementById(`${action}WalletType-${userId}`).value;
-    const amount = parseFloat(document.getElementById(`${action}Amount-${userId}`).value);
-    const reason = document.getElementById(`${action}Reason-${userId}`).value;
-
-    if (!amount || amount <= 0) return showAlert('Invalid amount', 'error');
-
-    const endpoint = action === 'credit' ? 'credit-wallet' : 'debit-wallet';
-    const confirmMsg = action === 'credit' 
-        ? `Add ¥${amount} to ${walletType} wallet?` 
-        : `Remove ¥${amount} from ${walletType} wallet?`;
-
-    if (!confirm(confirmMsg)) return;
-
-    try {
-        const response = await fetch(`${API_URL}/api/admin/${endpoint}`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json', 
-                'Authorization': `Bearer ${localStorage.getItem('token')}` 
-            },
-            body: JSON.stringify({ user_id: userId, wallet_type: walletType, amount, reason })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            showAlert(`✅ ${action === 'credit' ? 'Credited' : 'Debited'} ¥${amount} successfully!`, 'success');
-            // Re-search the user to refresh the balances on screen
-            document.getElementById('searchCouponForm').dispatchEvent(new Event('submit'));
-        } else {
-            showAlert(data.error || 'Failed to adjust wallet', 'error');
+                `;
+            } catch (error) {
+                showAlert('Search failed', 'error');
+            }
         }
-    } catch (error) {
-        showAlert('Network error', 'error');
-    }
-}
-        // Content
+
+        async function handleWalletAdjust(e, userId, action) {
+            e.preventDefault();
+            
+            const walletType = document.getElementById(`${action}WalletType-${userId}`).value;
+            const amount = parseFloat(document.getElementById(`${action}Amount-${userId}`).value);
+            const reason = document.getElementById(`${action}Reason-${userId}`).value;
+
+            if (!amount || amount <= 0) return showAlert('Invalid amount', 'error');
+
+            const endpoint = action === 'credit' ? 'credit-wallet' : 'debit-wallet';
+            const confirmMsg = action === 'credit' 
+                ? `Add ¥${amount} to ${walletType} wallet?` 
+                : `Remove ¥${amount} from ${walletType} wallet?`;
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                    },
+                    body: JSON.stringify({ user_id: userId, wallet_type: walletType, amount, reason })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert(`✅ ${action === 'credit' ? 'Credited' : 'Debited'} ¥${amount} successfully!`, 'success');
+                    document.getElementById('searchCouponForm').dispatchEvent(new Event('submit'));
+                } else {
+                    showAlert(data.error || 'Failed to adjust wallet', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error', 'error');
+            }
+        }
+
         async function postTask(e) {
             e.preventDefault();
             try {
@@ -1211,18 +1246,30 @@ async function handleWalletAdjust(e, userId, action) {
             } catch (error) { showAlert('Failed', 'error'); }
         }
 
-        async function postVideo(e) {
+                async function postVideo(e) {
             e.preventDefault();
             try {
                 const response = await fetch(`${API_URL}/api/admin/post-video`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ title: document.getElementById('videoTitle').value, url: document.getElementById('videoUrl').value })
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    body: JSON.stringify({ 
+                        title: document.getElementById('videoTitle').value, 
+                        url: document.getElementById('videoUrl').value 
+                    })
                 });
-                if (response.ok) { showAlert('✅ Video posted!', 'success'); e.target.reset(); loadVideos(); }
-                else { const data = await response.json(); showAlert(data.error || 'Failed', 'error'); }
-            } catch (error) { showAlert('Failed', 'error'); }
+                if (response.ok) { 
+                    showAlert('✅ Video posted!', 'success'); 
+                    e.target.reset(); 
+                    loadVideos(); 
+                } else { 
+                    const data = await response.json(); 
+                    showAlert(data.error || 'Failed', 'error'); 
+                }
+            } catch (error) { 
+                showAlert('Failed', 'error'); 
+            }
         }
-
+        
         async function loadVideos() {
             try {
                 const response = await fetch(`${API_URL}/api/admin/videos`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
@@ -1291,7 +1338,6 @@ async function handleWalletAdjust(e, userId, action) {
             } catch (error) { showAlert('Failed', 'error'); }
         }
 
-        // Social Links
         async function addSocialLink(e) {
             e.preventDefault();
             try {
@@ -1332,7 +1378,6 @@ async function handleWalletAdjust(e, userId, action) {
             } catch (error) { showAlert('Failed', 'error'); }
         }
 
-        // Vendors
         async function searchUserForVendor(e) {
             e.preventDefault();
             const q = document.getElementById('vendorSearchInput').value.trim();

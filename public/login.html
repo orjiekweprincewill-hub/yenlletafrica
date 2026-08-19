@@ -216,7 +216,6 @@
         </div>
     </div>
     <script>
-        // MUST use your Render backend URL here since frontend is on Vercel
         const API_URL = 'https://yenlletafrica.onrender.com';
 
         function showAlert(message, type) {
@@ -241,7 +240,6 @@
             loginBtn.textContent = 'Logging in...';
 
             try {
-                // Fetching from the Render backend
                 const response = await fetch(`${API_URL}/api/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -258,7 +256,6 @@
                 }
 
                 if (data.success) {
-                    // Save the JWT token to localStorage
                     if (data.token) {
                         localStorage.setItem('token', data.token);
                     }

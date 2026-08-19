@@ -564,10 +564,10 @@ app.post('/api/login', authLimiter, async (req, res) => {
             { user_id: user.id, username: user.username, role: user.role || 'user' }
         );
         
-        let redirectUrl = '/dashboard.html';
-        if (user.role === 'superadmin') redirectUrl = '/admin.html';
-        else if (user.role === 'assistant') redirectUrl = '/Assistance.html';
-        
+       let redirectUrl = '/dashboard.html';
+if (user.role === 'superadmin') redirectUrl = '/admin.html';
+else if (user.role === 'assistant') redirectUrl = '/Assistance.html';
+else if (user.is_vendor) redirectUrl = '/vendor-dashboard.html'; 
         res.json({ success: true, token, user_id: user.id, username: user.username, is_admin: (user.role === 'superadmin' || user.role === 'assistant'), redirect: redirectUrl });
     } catch (err) { console.error('Login error:', err); res.status(500).json({ error: 'Login failed' }); }
 });
@@ -1255,6 +1255,103 @@ app.post('/api/apply-upgrade-coupon', isAuthenticated, async (req, res) => {
     } finally { 
         if (client) client.release(); 
     }
+});
+
+// ============================================================
+// 🎫 VENDOR COUPON SYSTEM
+// ============================================================
+
+// Vendor: Request Coupons
+app.post('/api/vendor/request-coupons', isAuthenticated, async (req, res) => {
+    const { plan, count } = req.body;
+    if (!plan || !count || count < 1) return res.status(400).json({ error: 'Plan and count are required' });
+    try {
+        const userRes = await pool.query('SELECT is_vendor FROM users WHERE id = $1', [req.user.user_id]);
+        if (!userRes.rows[0]?.is_vendor) return res.status(403).json({ error: 'Only vendors can request coupons' });
+        
+        await pool.query('INSERT INTO coupon_requests (vendor_id, plan, requested_count) VALUES ($1, $2, $3)', [req.user.user_id, plan, count]);
+        res.json({ success: true, message: 'Coupon request submitted! Admin will review it shortly.' });
+    } catch (err) { console.error('Vendor req error:', err); res.status(500).json({ error: 'Failed to submit request' }); }
+});
+
+// Vendor: Get their approved coupons
+app.get('/api/vendor/my-coupons', isAuthenticated, async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT c.code, c.plan, c.used, u.username as used_by_username 
+            FROM coupon_codes c 
+            LEFT JOIN users u ON c.used_by = u.id 
+            WHERE c.generated_by_vendor = $1 
+            ORDER BY c.created_at DESC
+        `, [req.user.user_id]);
+        res.json(result.rows);
+    } catch (err) { console.error('Vendor coupons error:', err); res.status(500).json({ error: 'Failed to load coupons' }); }
+});
+
+// Vendor: Get their request history
+app.get('/api/vendor/my-requests', isAuthenticated, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM coupon_requests WHERE vendor_id = $1 ORDER BY created_at DESC', [req.user.user_id]);
+        res.json(result.rows);
+    } catch (err) { console.error('Vendor req history error:', err); res.status(500).json({ error: 'Failed to load requests' }); }
+});
+
+// Admin: Get pending coupon requests
+app.get('/api/admin/coupon-requests', isAdmin, async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT r.*, u.username as vendor_name 
+            FROM coupon_requests r 
+            JOIN users u ON r.vendor_id = u.id 
+            WHERE r.status = 'pending' 
+            ORDER BY r.created_at DESC
+        `);
+        res.json(result.rows);
+    } catch (err) { console.error('Admin req list error:', err); res.status(500).json({ error: 'Failed to load requests' }); }
+});
+
+// Admin: Approve coupon request
+app.post('/api/admin/approve-coupon-request/:id', isAdmin, async (req, res) => {
+    const reqId = parseInt(req.params.id);
+    const { approve_count } = req.body;
+    if (!approve_count || approve_count < 1) return res.status(400).json({ error: 'Invalid count' });
+    
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
+        
+        const reqRes = await client.query('SELECT * FROM coupon_requests WHERE id = $1 AND status = $2 FOR UPDATE', [reqId, 'pending']);
+        if (reqRes.rows.length === 0) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'Request not found or already processed' }); }
+        
+        const reqData = reqRes.rows[0];
+        const actualCount = Math.min(approve_count, reqData.requested_count);
+        const planPrefixes = { 'YENLITE': 'LITE', 'YENPRO': 'PRO', 'YENVITE': 'VITE' };
+        const prefix = planPrefixes[reqData.plan];
+        
+        for (let i = 0; i < actualCount; i++) {
+            const randomPart = Math.random().toString(36).substring(2, 10).toUpperCase().padEnd(8, '0');
+            const code = `${prefix}${randomPart}`;
+            await client.query('INSERT INTO coupon_codes (code, plan, used, generated_by_vendor) VALUES ($1, $2, false, $3)', [code, reqData.plan, reqData.vendor_id]);
+        }
+        
+        await client.query('UPDATE coupon_requests SET status = $1, approved_count = $2 WHERE id = $3', ['approved', actualCount, reqId]);
+        await client.query('COMMIT');
+        
+        res.json({ success: true, message: `Successfully approved and generated ${actualCount} coupons.` });
+    } catch (err) { 
+        if (client) await client.query('ROLLBACK'); 
+        console.error('Approve req error:', err); 
+        res.status(500).json({ error: 'Failed to approve request' }); 
+    } finally { if (client) client.release(); }
+});
+
+// Admin: Reject coupon request
+app.post('/api/admin/reject-coupon-request/:id', isAdmin, async (req, res) => {
+    try {
+        await pool.query("UPDATE coupon_requests SET status = 'rejected' WHERE id = $1 AND status = 'pending'", [req.params.id]);
+        res.json({ success: true, message: 'Request rejected' });
+    } catch (err) { console.error('Reject req error:', err); res.status(500).json({ error: 'Failed to reject request' }); }
 });
 
 // ============================================================
