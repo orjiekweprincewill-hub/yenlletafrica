@@ -549,13 +549,13 @@ app.post('/api/register', authLimiter, async (req, res) => {
         if (client) client.release(); 
     }
 });
-
 app.post('/api/login', authLimiter, async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
     const hashed = hashPassword(password);
     try {
-        const result = await pool.query(`SELECT id, username, role, is_banned FROM users WHERE LOWER(username) = LOWER($1) AND password = $2`, [username, hashed]);
+        // FIX: Added is_vendor to the SELECT query
+        const result = await pool.query(`SELECT id, username, role, is_banned, is_vendor FROM users WHERE LOWER(username) = LOWER($1) AND password = $2`, [username, hashed]);
         const user = result.rows[0];
         if (!user) return res.status(401).json({ error: 'Invalid username or password' });
         if (user.is_banned) return res.status(403).json({ error: 'Your account has been banned' });
@@ -564,10 +564,11 @@ app.post('/api/login', authLimiter, async (req, res) => {
             { user_id: user.id, username: user.username, role: user.role || 'user' }
         );
         
-       let redirectUrl = '/dashboard.html';
-if (user.role === 'superadmin') redirectUrl = '/admin.html';
-else if (user.role === 'assistant') redirectUrl = '/Assistance.html';
-else if (user.is_vendor) redirectUrl = '/vendor-dashboard.html'; 
+        let redirectUrl = '/dashboard.html';
+        if (user.role === 'superadmin') redirectUrl = '/admin.html';
+        else if (user.role === 'assistant') redirectUrl = '/Assistance.html';
+        else if (user.is_vendor) redirectUrl = '/vendor-dashboard.html'; 
+        
         res.json({ success: true, token, user_id: user.id, username: user.username, is_admin: (user.role === 'superadmin' || user.role === 'assistant'), redirect: redirectUrl });
     } catch (err) { console.error('Login error:', err); res.status(500).json({ error: 'Login failed' }); }
 });
@@ -1355,30 +1356,27 @@ app.post('/api/admin/reject-coupon-request/:id', isAdmin, async (req, res) => {
 });
 
 // ============================================================
-// 🏃‍♂️ ENDLESS RUNNER GAME (WITH AI AUTO-PLAY)
+// 🏃‍♂️ ENDLESS RUNNER GAME (WITH BACKGROUND AI)
 // ============================================================
 
-// 1. Get Game Status (Check if AI is ready, cooldowns, etc.)
+// 1. Get Game Status
 app.get('/api/runner/status', isAuthenticated, async (req, res) => {
     const userId = req.user.user_id;
     try {
-        const userRes = await pool.query('SELECT plan FROM users WHERE id = $1', [userId]);
+        const userRes = await pool.query('SELECT plan, ai_auto_play_enabled FROM users WHERE id = $1', [userId]);
         const user = userRes.rows[0];
         
         if (!user) return res.status(404).json({ error: 'User not found' });
 
-        // Check plays today
         const playsRes = await pool.query(
-            "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND action = 'Runner Game' AND DATE(created_at) = CURRENT_DATE",
+            "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND (action = 'Runner Game' OR action = 'AI Runner Game') AND DATE(created_at) = CURRENT_DATE",
             [userId]
         );
 
-        // Set max plays based on plan
         let maxPlays = 0;
-        if (user.plan === 'YENPRO') maxPlays = 2;   // PRO gets 2 plays (Max ¥40)
-        if (user.plan === 'YENVITE') maxPlays = 3;  // VITE gets 3 plays (Max ¥60)
+        if (user.plan === 'YENPRO') maxPlays = 2;
+        if (user.plan === 'YENVITE') maxPlays = 3;
 
-        // AI is ready if they have plays left and are PRO/VITE
         let aiReady = false;
         if ((user.plan === 'YENPRO' || user.plan === 'YENVITE') && playsRes.rows[0].count < maxPlays) {
             aiReady = true;
@@ -1386,6 +1384,7 @@ app.get('/api/runner/status', isAuthenticated, async (req, res) => {
 
         res.json({
             plan: user.plan,
+            ai_enabled: user.ai_auto_play_enabled, // Return background status
             ai_ready: aiReady,
             plays_today: playsRes.rows[0].count,
             max_plays: maxPlays
@@ -1412,7 +1411,7 @@ app.post('/api/submit-runner-score', isAuthenticated, async (req, res) => {
         }
 
         const playsRes = await pool.query(
-            "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND action = 'Runner Game' AND DATE(created_at) = CURRENT_DATE",
+            "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND (action = 'Runner Game' OR action = 'AI Runner Game') AND DATE(created_at) = CURRENT_DATE",
             [userId]
         );
 
@@ -1439,50 +1438,34 @@ app.post('/api/submit-runner-score', isAuthenticated, async (req, res) => {
     }
 });
 
-// 3. Activate AI Auto-Play (PRO & VITE ONLY)
+// 3. Activate AI Background Play
 app.post('/api/runner/activate-ai', isAuthenticated, async (req, res) => {
     const userId = req.user.user_id;
     try {
         const userRes = await pool.query('SELECT plan FROM users WHERE id = $1', [userId]);
         const user = userRes.rows[0];
 
-        if (!user) return res.status(404).json({ error: 'User not found' });
-
-        // RESTRICTION: PRO and VITE can use AI
         if (user.plan !== 'YENPRO' && user.plan !== 'YENVITE') {
             return res.status(403).json({ error: 'AI Auto-Play is for PRO and VITE users only.' });
         }
 
-        let maxPlays = user.plan === 'YENPRO' ? 2 : 3;
-
-        const playsRes = await pool.query(
-            "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND action = 'Runner Game' AND DATE(created_at) = CURRENT_DATE",
-            [userId]
-        );
-        const playsToday = playsRes.rows[0].count;
-
-        if (playsToday >= maxPlays) {
-            return res.status(403).json({ error: 'Daily play limit reached! AI cannot play anymore.' });
-        }
-
-        // AI always gets a perfect score (1000) to earn the max 20 Yen
-        const aiScore = 1000;
-        const reward = Math.min(Math.floor(aiScore / 50), 20);
-
-        await pool.query('UPDATE users SET activity_wallet = activity_wallet + $1 WHERE id = $2', [reward, userId]);
-        await addActivityFeed(userId, 'AI Runner Game', reward, `AI Auto-Play scored ${aiScore} points`);
-        await createNotification(userId, `🤖 AI played for you and earned ¥${reward.toLocaleString()}!`);
-
-        res.json({ 
-            success: true, 
-            reward, 
-            plays_today: playsToday + 1,
-            max_plays: maxPlays,
-            message: `AI played and earned ¥${reward}!` 
-        });
+        await pool.query('UPDATE users SET ai_auto_play_enabled = true WHERE id = $1', [userId]);
+        res.json({ success: true, message: 'AI activated! It will play in the background. You can close this page.' });
     } catch (err) {
         console.error('AI activate error:', err);
         res.status(500).json({ error: 'Failed to activate AI' });
+    }
+});
+
+// 4. Disable AI Background Play
+app.post('/api/runner/disable-ai', isAuthenticated, async (req, res) => {
+    const userId = req.user.user_id;
+    try {
+        await pool.query('UPDATE users SET ai_auto_play_enabled = false WHERE id = $1', [userId]);
+        res.json({ success: true, message: 'AI Auto-Play disabled.' });
+    } catch (err) {
+        console.error('AI disable error:', err);
+        res.status(500).json({ error: 'Failed to disable AI' });
     }
 });
 
@@ -2689,6 +2672,36 @@ app.get('/api/public/stats', async (req, res) => {
         res.json({ total_users: usersResult.rows[0].total, total_payout: parseFloat(payoutResult.rows[0].total) });
     } catch (err) { console.error('Public stats error:', err); res.status(500).json({ error: 'Failed to load stats' }); }
 });
+
+// ============================================================
+// 🤖 AI BACKGROUND WORKER (RUNNER GAME)
+// ============================================================
+setInterval(async () => {
+    try {
+        const aiUsersRes = await pool.query('SELECT id, plan FROM users WHERE ai_auto_play_enabled = true');
+        const aiUsers = aiUsersRes.rows;
+
+        for (const user of aiUsers) {
+            const maxPlays = user.plan === 'YENPRO' ? 2 : (user.plan === 'YENVITE' ? 3 : 0);
+            if (maxPlays === 0) continue;
+
+            const playsRes = await pool.query(
+                "SELECT COUNT(*)::int as count FROM activity_feed WHERE user_id = $1 AND (action = 'Runner Game' OR action = 'AI Runner Game') AND DATE(created_at) = CURRENT_DATE",
+                [user.id]
+            );
+            const playsToday = playsRes.rows[0].count;
+
+            if (playsToday < maxPlays) {
+                const reward = 20;
+                await pool.query('UPDATE users SET activity_wallet = activity_wallet + $1 WHERE id = $2', [reward, user.id]);
+                await addActivityFeed(user.id, 'AI Runner Game', reward, `AI Auto-Play scored 1000 points`);
+                await createNotification(user.id, `🤖 AI played for you in the background and earned ¥${reward}!`);
+            }
+        }
+    } catch (err) {
+        console.error('AI Background Task Error:', err);
+    }
+}, 10000); // Runs every 10 seconds automatically on the server
 
 // ============================================================
 // ❌ ERROR HANDLING

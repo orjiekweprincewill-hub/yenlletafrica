@@ -118,17 +118,38 @@
         .tap-hint { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 20px; font-size: 12px; color: rgba(255,255,255,0.6); pointer-events: none; z-index: 5; animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); } 40% { transform: translateX(-50%) translateY(-10px); } }
 
-        #aiLog { margin: 20px 0; max-height: 200px; overflow-y: auto; width: 100%; max-width: 300px; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; font-size: 14px; }
+        /* Menu Overlay */
+        .menu-overlay { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background: linear-gradient(180deg, var(--primary-dark) 0%, #0d2b4e 100%); overflow-x: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 40px rgba(0,0,0,0.3); }
+        .menu-overlay-content { position: relative; width: 100%; padding: 80px 30px 30px 30px; }
+        .closebtn { position: absolute; top: 20px; right: 30px; font-size: 40px; color: var(--white); text-decoration: none; cursor: pointer; }
+        .menu-list { list-style: none; }
+        .menu-list li { margin-bottom: 5px; }
+        .menu-list a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: 12px; transition: var(--transition); font-family: 'Inter', sans-serif; }
+        .menu-list a:hover { color: var(--accent-light); background: rgba(255, 255, 255, 0.05); padding-left: 20px; }
+        .menu-list i { font-size: 20px; color: var(--accent-light); }
     </style>
 </head>
 <body>
+    <!-- Side Menu -->
+    <div id="myNav" class="menu-overlay">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="menu-overlay-content">
+            <ul class="menu-list">
+                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
+                <li><a href="bank-setup.html"><i class="bi bi-bank"></i> Bank Setup</a></li>
+                <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
+            </ul>
+        </div>
+    </div>
+
     <div class="game-header">
-        <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i></a>
+        <a href="javascript:void(0)" class="back-btn" onclick="openNav()"><i class="bi bi-list"></i></a>
         <div class="header-center">
             <div class="score-display">SCORE: <span id="scoreText">0</span></div>
             <div class="plays-left">Plays Left: <span id="playsLeftText">-</span></div>
         </div>
-        <div class="header-right"></div>
+        <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left-right"></i></a>
     </div>
 
     <div class="canvas-wrapper">
@@ -161,15 +182,6 @@
         <button class="btn btn-ai hidden" id="aiBtnOver">🤖 ACTIVATE AI AUTO-PLAY</button>
     </div>
 
-    <!-- AI Playing Screen -->
-    <div class="overlay hidden" id="aiPlayingScreen">
-        <h1>🤖 AI Auto-Playing</h1>
-        <div id="loadingSpinner"></div>
-        <div id="aiLog"></div>
-        <p style="font-size: 0.9rem; color: var(--gray);">AI will play your remaining games automatically every 10 seconds.</p>
-        <button class="btn btn-danger" id="aiDisableBtn">Disable AI & Play Manually</button>
-    </div>
-
     <script>
         const API_URL = 'https://yenlletafrica.onrender.com';
         const canvas = document.getElementById('gameCanvas');
@@ -179,15 +191,14 @@
         let score = 0;
         let speed = 5;
         let animationId;
-        let userStatus = { plan: 'YENLITE', ai_ready: false, plays_today: 0, max_plays: 0 };
-
-        // AI State
-        let aiPlaying = false;
-        let aiTimeoutId = null;
+        let userStatus = { plan: 'YENLITE', ai_enabled: false, ai_ready: false, plays_today: 0, max_plays: 0 };
 
         const player = { x: 50, y: 500, width: 40, height: 40, vy: 0, gravity: 0.8, jumpPower: -15, jumping: false };
         let obstacles = [];
         let obstacleTimer = 0;
+
+        function openNav() { document.getElementById("myNav").style.width = "80%"; }
+        function closeNav() { document.getElementById("myNav").style.width = "0%"; }
 
         function jump() {
             if (!player.jumping) {
@@ -263,7 +274,7 @@
                 
                 if (res.ok) {
                     document.getElementById('rewardText').textContent = `+¥${data.reward}`;
-                    checkStatus();
+                    checkStatus(); // Refresh status to update plays left
                 } else {
                     document.getElementById('rewardText').textContent = `❌ ${data.error}`;
                 }
@@ -294,67 +305,51 @@
         // ============================================
         // AI AUTO-PLAY LOGIC
         // ============================================
-        document.getElementById('aiBtn').addEventListener('click', startAIPlay);
-        document.getElementById('aiBtnOver').addEventListener('click', startAIPlay);
-        document.getElementById('aiDisableBtn').addEventListener('click', stopAI);
+        document.getElementById('aiBtn').addEventListener('click', toggleAI);
+        document.getElementById('aiBtnOver').addEventListener('click', toggleAI);
 
-        async function startAIPlay() {
-            if (!confirm('Activate AI? It will automatically play your remaining games (earning ¥20 each) every 10 seconds. You can disable it anytime to play manually.')) return;
+        async function toggleAI() {
+            const isEnabled = userStatus.ai_enabled;
+            const endpoint = isEnabled ? 'disable-ai' : 'activate-ai';
+            const msg = isEnabled 
+                ? 'Disable AI? You will need to play manually again.' 
+                : 'Activate AI? It will play your remaining games automatically in the background every 10 seconds. You can close this page and it will continue!';
             
-            aiPlaying = true;
-            document.getElementById('startScreen').classList.add('hidden');
-            document.getElementById('gameOverScreen').classList.add('hidden');
-            document.getElementById('aiPlayingScreen').classList.remove('hidden');
-            document.getElementById('aiLog').innerHTML = '';
-            document.getElementById('aiDisableBtn').textContent = 'Disable AI & Play Manually';
+            if (!confirm(msg)) return;
             
-            await runAIGame();
-        }
-
-        async function runAIGame() {
-            if (!aiPlaying) return;
-
-            const log = document.getElementById('aiLog');
-            log.innerHTML += `<p style="color: var(--accent-light); margin-bottom: 5px;">🤖 AI starting game...</p>`;
-            log.scrollTop = log.scrollHeight;
-
             try {
-                const res = await fetch(`${API_URL}/api/runner/activate-ai`, {
+                const res = await fetch(`${API_URL}/api/runner/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
                 const data = await res.json();
 
                 if (res.ok) {
-                    log.innerHTML += `<p style="color: var(--success); margin-bottom: 10px;">✅ Game complete! Earned ¥${data.reward}</p>`;
-                    log.scrollTop = log.scrollHeight;
-                    
-                    if (data.plays_today >= data.max_plays) {
-                        aiPlaying = false;
-                        log.innerHTML += `<p style="color: var(--warning); margin-top: 10px;">🏁 AI finished all daily plays!</p>`;
-                        document.getElementById('aiDisableBtn').textContent = 'Close';
-                    } else {
-                        log.innerHTML += `<p style="color: var(--gray); margin-bottom: 10px;">⏳ Next AI game in 10 seconds...</p>`;
-                        log.scrollTop = log.scrollHeight;
-                        aiTimeoutId = setTimeout(() => {
-                            runAIGame();
-                        }, 10000);
-                    }
+                    showAlert(`✅ ${data.message}`, 'success');
+                    checkStatus(); // Refresh UI
                 } else {
-                    log.innerHTML += `<p style="color: var(--danger); margin-bottom: 10px;">❌ ${data.error}</p>`;
-                    stopAI();
+                    showAlert(`❌ ${data.error}`, 'error');
                 }
             } catch (err) {
-                log.innerHTML += `<p style="color: var(--danger); margin-bottom: 10px;">❌ Network Error</p>`;
-                stopAI();
+                showAlert('❌ Network Error', 'error');
             }
         }
 
-        function stopAI() {
-            aiPlaying = false;
-            if (aiTimeoutId) clearTimeout(aiTimeoutId);
-            document.getElementById('aiPlayingScreen').classList.add('hidden');
-            checkStatus();
+        function showAlert(msg, type) {
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.left = '50%';
+            div.style.transform = 'translateX(-50%)';
+            div.style.padding = '10px 20px';
+            div.style.borderRadius = '8px';
+            div.style.zIndex = '9999';
+            div.style.background = type === 'success' ? '#4caf50' : '#f44336';
+            div.style.color = 'white';
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
         }
 
         // ============================================
@@ -387,39 +382,38 @@
                     startMsg.innerHTML = '<span style="color: var(--danger);">You cannot earn from this game.</span><br>Upgrade to YENPRO to earn.';
                     startBtn.disabled = true;
                     restartBtn.disabled = true;
+                    restartBtn.textContent = 'UPGRADE TO EARN';
                 } 
-                else if (userStatus.plan === 'YENPRO') {
-                    planBadge.textContent = 'YENPRO';
-                    planBadge.className = 'badge-plan badge-pro';
-                    startMsg.innerHTML = 'Tap anywhere to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>2 plays per day (Max ¥40).';
+                else if (userStatus.plan === 'YENPRO' || userStatus.plan === 'YENVITE') {
+                    planBadge.textContent = userStatus.plan;
+                    planBadge.className = userStatus.plan === 'YENPRO' ? 'badge-plan badge-pro' : 'badge-plan badge-vite';
+                    startMsg.innerHTML = 'Tap anywhere to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>' + (userStatus.plan === 'YENPRO' ? '2 plays per day (Max ¥40).' : '3 plays per day (Max ¥60).');
                     
                     if (playsLeft <= 0) {
                         startBtn.disabled = true;
                         restartBtn.disabled = true;
-                        startMsg.innerHTML = '<span style="color: var(--danger);">Daily limit (2 plays) reached!</span><br>Come back in 24 hours.';
+                        restartBtn.textContent = 'COME BACK TOMORROW';
+                        startMsg.innerHTML = '<span style="color: var(--danger);">Daily limit reached!</span><br>Come back in 24 hours.';
                     } else {
                         startBtn.disabled = false;
                         restartBtn.disabled = false;
-                    }
-                } 
-                else if (userStatus.plan === 'YENVITE') {
-                    planBadge.textContent = 'YENVITE';
-                    planBadge.className = 'badge-plan badge-vite';
-                    startMsg.innerHTML = 'Tap anywhere to Jump.<br>Earn 1 Yencoin per 50 points (Max ¥20).<br>3 plays per day (Max ¥60).';
-                    
-                    if (playsLeft <= 0) {
-                        startBtn.disabled = true;
-                        restartBtn.disabled = true;
-                        startMsg.innerHTML = '<span style="color: var(--danger);">Daily limit (3 plays) reached!</span><br>Come back in 24 hours.';
-                    } else {
-                        startBtn.disabled = false;
-                        restartBtn.disabled = false;
+                        restartBtn.textContent = 'PLAY AGAIN';
                     }
                 }
 
-                // Show AI button if ready (has plays left and is PRO/VITE)
-                if (userStatus.ai_ready) {
+                // Handle AI Button State
+                if (userStatus.ai_enabled) {
+                    startBtn.disabled = true;
+                    restartBtn.disabled = true;
+                    startMsg.innerHTML = '<span style="color: var(--warning);">🤖 AI AUTO-PLAY IS ACTIVE</span><br>AI is playing in the background. You can close this page.';
+                    aiBtn.textContent = '🤖 DISABLE AI AUTO-PLAY';
                     aiBtn.classList.remove('hidden');
+                    aiBtnOver.textContent = '🤖 DISABLE AI AUTO-PLAY';
+                    aiBtnOver.classList.remove('hidden');
+                } else if (userStatus.ai_ready) {
+                    aiBtn.textContent = '🤖 ACTIVATE AI AUTO-PLAY';
+                    aiBtn.classList.remove('hidden');
+                    aiBtnOver.textContent = '🤖 ACTIVATE AI AUTO-PLAY';
                     aiBtnOver.classList.remove('hidden');
                 }
 
@@ -441,7 +435,7 @@
         });
         
         function handleTap(e) {
-            if (isPlaying && !e.target.closest('button') && !e.target.closest('.overlay')) {
+            if (isPlaying && !e.target.closest('button') && !e.target.closest('.overlay') && !e.target.closest('.menu-overlay')) {
                 e.preventDefault();
                 jump();
             }
