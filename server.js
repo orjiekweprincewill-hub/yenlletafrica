@@ -573,8 +573,26 @@ app.post('/api/login', authLimiter, async (req, res) => {
     } catch (err) { console.error('Login error:', err); res.status(500).json({ error: 'Login failed' }); }
 });
 
-app.get('/api/check-session', isAuthenticated, (req, res) => {
-    res.json({ user_id: req.user.user_id, username: req.user.username, role: req.user.role, is_admin: (req.user.role === 'superadmin' || req.user.role === 'assistant'), authenticated: true });
+app.get('/api/check-session', isAuthenticated, async (req, res) => {
+    try {
+        // Fetch the user from the database to get the most up-to-date is_vendor status
+        const userRes = await pool.query('SELECT username, role, is_vendor FROM users WHERE id = $1', [req.user.user_id]);
+        const user = userRes.rows[0];
+        
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        res.json({ 
+            user_id: req.user.user_id, 
+            username: user.username, 
+            role: user.role, 
+            is_admin: (user.role === 'superadmin' || user.role === 'assistant'), 
+            is_vendor: user.is_vendor, // NOW WE RETURN THE VENDOR STATUS
+            authenticated: true 
+        });
+    } catch (err) {
+        console.error('Session check error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
 });
 
 app.post('/api/logout', (req, res) => {
