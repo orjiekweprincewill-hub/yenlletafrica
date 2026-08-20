@@ -308,12 +308,12 @@
         document.getElementById('aiBtn').addEventListener('click', toggleAI);
         document.getElementById('aiBtnOver').addEventListener('click', toggleAI);
 
-        async function toggleAI() {
+               async function toggleAI() {
             const isEnabled = userStatus.ai_enabled;
             const endpoint = isEnabled ? 'disable-ai' : 'activate-ai';
             const msg = isEnabled 
                 ? 'Disable AI? You will need to play manually again.' 
-                : 'Activate AI? It will play your remaining games automatically in the background every 10 seconds. You can close this page and it will continue!';
+                : 'Activate AI? It will play your remaining games automatically in the background every 10 seconds. \n\nIMPORTANT: Once activated, it will automatically play for you EVERY DAY until you manually disable it. You can close this page and it will continue!';
             
             if (!confirm(msg)) return;
             
@@ -334,7 +334,7 @@
                 showAlert('❌ Network Error', 'error');
             }
         }
-
+        
         function showAlert(msg, type) {
             const div = document.createElement('div');
             div.className = `alert alert-${type}`;
