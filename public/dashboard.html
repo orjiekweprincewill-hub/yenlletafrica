@@ -205,6 +205,7 @@
         <div class="overlay-content">
             <ul class="menu-list">
                 <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li id="vendorLinkContainer" style="display: none;"><a href="vendor-dashboard.html"><i class="bi bi-shop"></i> Vendor Dashboard</a></li>
                 <li><a href="transfer.html"><i class="bi bi-arrow-left-right"></i> Transfer</a></li>
                 <li><a href="tiktok.html"><i class="bi bi-tiktok"></i> Tiktok</a></li>
                 <li><a href="whatsapp.html"><i class="bi bi-whatsapp"></i> Whatsapp</a></li>
@@ -219,9 +220,7 @@
                 <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
                 <li><a href="upgrade.html"><i class="bi bi-stars"></i> Upgrade Plan</a></li>
             </ul>
-            <button class="logout-btn" onclick="logout()">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
+            <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
         </div>
     </div>
 
@@ -529,19 +528,18 @@
             }
         }
 
-        // ============================================
+               // ============================================
         // DASHBOARD DATA LOADING
         // ============================================
         function loadDashboard(data) {
             const usernameEl = document.getElementById('usernameDisplay');
             if (usernameEl && data.username) { usernameEl.textContent = data.username; }
 
-          const profilePic = document.getElementById('profilePic');
-if (profilePic && data.profile_picture) {
-    // data.profile_picture is already a full Cloudinary URL, so we use it directly!
-    profilePic.src = data.profile_picture;
-    profilePic.onerror = () => { profilePic.src = 'https://via.placeholder.com/150'; }; // Fallback image
-}
+            const profilePic = document.getElementById('profilePic');
+            if (profilePic && data.profile_picture) {
+                profilePic.src = data.profile_picture;
+                profilePic.onerror = () => { profilePic.src = 'https://via.placeholder.com/150'; };
+            }
 
             safeSetText('activityWallet', (data.activity_wallet ?? 0).toLocaleString());
             safeSetText('referralWallet', (data.referral_wallet ?? 0).toLocaleString());
@@ -555,11 +553,17 @@ if (profilePic && data.profile_picture) {
             const linkInput = document.getElementById('referralLink');
             if (linkInput) linkInput.value = referralLink;
 
+            // ---> ADD THIS BLOCK RIGHT HERE <---
+            // Show Vendor Dashboard link if the user is a vendor
+            if (data.is_vendor) {
+                const vendorLink = document.getElementById('vendorLinkContainer');
+                if (vendorLink) vendorLink.style.display = 'block';
+            }
+
             loadUserActivities();
             loadUserReferrals();
             loadSocialLinks();
         }
-
         function safeSetText(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
 
         async function loadUserActivities() {
