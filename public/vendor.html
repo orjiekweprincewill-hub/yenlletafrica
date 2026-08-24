@@ -1,22 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!--PWA Configuration-->
-    <link rel="manifest"
-    href="/manifest.json">
-    <meta name="theme-color"
-    content="#667eea">
-    <meta name="mobile-web-app-capabel" content="yes">
-    <meta name="apple-mobile-web-app-capabel" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="YENLLET">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http:www.w3.org/2000/svg'  viewBox='0 0 180 180'><rect fill='%23667eea'width='180' height='180'
-        rx='40'/><text x='50%'y='50%' font-size='90' font-weight='bold' fill='white'
-        text-anchor='middle' dominant-baseline='central'
-        >TN</text></svg>">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d47a1">
     <title>Vendors - YENLLET</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">  <style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">  
+    <style>
         :root {
             --primary-dark: #0a1628;
             --primary: #0d47a1;
@@ -35,11 +25,7 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -48,68 +34,58 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }
-/* Header */ 
-.header { 
-  background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%); 
-  color: white; 
-  padding: 24px 20px; 
-  text-align: center; 
-  position: relative; 
-  overflow: hidden; 
-} 
 
-.header::before { 
-  content: ''; 
-  position: absolute; 
-  top: -50%; 
-  left: -50%; 
-  width: 200%; 
-  height: 200%; 
-  background: radial-gradient(circle, rgba(37,211,102,0.1) 0%, transparent 70%); /* Merged animations */
-  pointer-events: none;
-  animation: pulse 8s ease-in-out infinite; 
-} 
+        .header { 
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%); 
+            color: white; 
+            padding: 24px 20px; 
+            text-align: center; 
+            position: relative; 
+            overflow: hidden; 
+        } 
 
-@keyframes pulse { 
-  0%, 100% { transform: scale(1); opacity: 0.5; } 
-  50% { transform: scale(1.1); opacity: 0.8; } 
-} 
+        .header::before { 
+            content: ''; 
+            position: absolute; 
+            top: -50%; 
+            left: -50%; 
+            width: 200%; 
+            height: 200%; 
+            background: radial-gradient(circle, rgba(37,211,102,0.1) 0%, transparent 70%); 
+            pointer-events: none;
+            animation: pulse 8s ease-in-out infinite; 
+        } 
 
-.logo { 
-  font-size: 28px; 
-  font-weight: 700; 
-  letter-spacing: -0.5px; 
-  margin-bottom: 8px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  gap: 12px; /* Smooth spacing between logo image and text */
-} 
+        @keyframes pulse { 
+            0%, 100% { transform: scale(1); opacity: 0.5; } 
+            50% { transform: scale(1.1); opacity: 0.8; } 
+        } 
 
-/* Styles for your logo image */
-.logo img {
-  width: 40px; /* Controls the size of your logo image */
-  height: 40px; 
-  object-fit: contain; /* Prevents logo distortion or stretching */
-  border-radius: 8px; /* Optional: Softens sharp image corners */
-  flex-shrink: 0; /* Prevents image from shrinking on tiny screens */
-}
+        .logo { 
+            font-size: 28px; 
+            font-weight: 700; 
+            letter-spacing: -0.5px; 
+            margin-bottom: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+        } 
 
-.logo span { 
-  background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%); 
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent; 
-  background-clip: text; 
-}
+        .logo img {
+            width: 40px; 
+            height: 40px; 
+            object-fit: contain; 
+            border-radius: 8px; 
+            flex-shrink: 0; 
+        }
 
-/* Tagline styling for clean spacing */
-.tagline {
-  font-size: 14px;
-  max-width: 600px;
-  margin: 0 auto;
-  opacity: 0.9;
-  line-height: 1.4;
-}
+        .logo span { 
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text; 
+        }
 
         .tagline {
             font-size: 14px;
@@ -119,7 +95,6 @@
             margin: 0 auto;
         }
 
-        /* Quick Links */
         .quick-links {
             background: white;
             border-bottom: 1px solid var(--border);
@@ -141,7 +116,6 @@
             color: var(--primary-light);
         }
 
-        /* Region Tabs */
         .region-tabs {
             display: flex;
             justify-content: center;
@@ -175,7 +149,6 @@
             box-shadow: 0 2px 8px rgba(13,71,161,0.2);
         }
 
-        /* Section Title */
         .section-title {
             text-align: center;
             padding: 12px 20px 24px;
@@ -193,7 +166,6 @@
             color: var(--text-light);
         }
 
-        /* Vendor Grid */
         .vendor-grid {
             max-width: 800px;
             margin: 0 auto;
@@ -203,7 +175,6 @@
             gap: 16px;
         }
 
-        /* Vendor Card */
         .vendor-card {
             background: var(--card);
             border-radius: 16px;
@@ -227,42 +198,42 @@
             border-color: var(--border);
             transform: translateY(-2px);
         }
-.vendor-avatar { 
-  width: 64px; 
-  height: 64px; 
-  border-radius: 50%; 
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary)); 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  color: white; 
-  font-size: 24px; 
-  font-weight: 600; 
-  flex-shrink: 0; 
-  position: relative; 
-  overflow: hidden; /* Prevent image from spilling outside the circle */
-} 
 
-/* Styles for the new image tag */
-.vendor-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Prevents image distortion */
-  border-radius: 50%; /* Ensures the image respects the container shape */
-}
+        .vendor-avatar { 
+            width: 64px; 
+            height: 64px; 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary)); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-size: 24px; 
+            font-weight: 600; 
+            flex-shrink: 0; 
+            position: relative; 
+            overflow: hidden; 
+        } 
 
-.vendor-avatar::after { 
-  content: ''; 
-  position: absolute; 
-  bottom: 2px; 
-  right: 2px; 
-  width: 14px; 
-  height: 14px; 
-  background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); 
-  border: 2px solid white; 
-  border-radius: 50%; 
-  z-index: 2; /* Keeps the badge layered on top of the image */
-}
+        .vendor-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            border-radius: 50%; 
+        }
+
+        .vendor-avatar::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: 2px; 
+            right: 2px; 
+            width: 14px; 
+            height: 14px; 
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); 
+            border: 2px solid white; 
+            border-radius: 50%; 
+            z-index: 2; 
+        }
 
         .vendor-info {
             flex: 1;
@@ -333,7 +304,6 @@
             height: 18px;
         }
 
-        /* Support Section */
         .support-section {
             background: white;
             border-top: 1px solid var(--border);
@@ -376,7 +346,6 @@
             box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
         }
 
-        /* Footer */
         .footer {
             text-align: center;
             padding: 20px;
@@ -385,7 +354,6 @@
             background: var(--off-white);
         }
 
-        /* Mobile */
         @media (max-width: 600px) {
             .vendor-card {
                 flex-direction: column;
@@ -407,8 +375,6 @@
             display: none !important;
         }
     </style>
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
 
@@ -443,144 +409,8 @@
 
     <!-- Vendor Grid -->
     <div class="vendor-grid" id="vendorGrid">
-        <!-- Nigeria -->
-        <div class="vendor-card" data-region="nigeria">
-            <div class="vendor-avatar">TJ</div>
-            <div class="vendor-info">
-                <div class="vendor-name">TechHub Lagos</div>
-                <div class="vendor-meta">
-                    <span class="vendor-location">📍 Lagos, Nigeria</span>
-                    <span class="vendor-badge ng">Verified</span>
-                </div>
-            </div>
-            <a href="https://wa.me/2348012345678?text=Hello%20TechHub%20Lagos%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20" class="chat-btn" target="_blank">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                Chat
-            </a>
-        </div>
-
-        <div class="vendor-card" data-region="nigeria">
-            <div class="vendor-avatar">FP</div>
-            <div class="vendor-info">
-                <div class="vendor-name">Fashion Plus Abuja</div>
-                <div class="vendor-meta">
-                    <span class="vendor-location">📍 Abuja, Nigeria</span>
-                    <span class="vendor-badge ng">Verified</span>
-                </div>
-            </div>
-            <a href="https://wa.me/2348098765432?text=Hello%20Fashion%20Plus%20Abuja%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20" class="chat-btn" target="_blank">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                Chat
-            </a>
-        </div>
-<div class="vendor-card" data-region="nigeria"> 
-  <div class="vendor-avatar">
-    <!-- Replace text with an image tag -->
-    <img src="IMG-20260621-WA0010.jpg" alt="ElectroKano Avatar">
-  </div> 
-  <div class="vendor-info"> 
-    <div class="vendor-name">ElectroKano</div> 
-    <div class="vendor-meta"> 
-      <span class="vendor-location">📍 Yenllet</span> 
-      <span class="vendor-badge ng">Verified</span> 
-    </div> 
-  </div> 
-  <a href="https://wa.me/2348076543210?text=Hello%20ElectroKano%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20" class="chat-btn" target="_blank"> 
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> 
-    Chat 
-  </a> 
-</div>
-
-        <!-- Cameroon -->
-        <div class="vendor-card" data-region="cameroon">
-            <div class="vendor-avatar">DY</div>
-            <div class="vendor-info">
-                <div class="vendor-name">Digital Store Yaoundé</div>
-                <div class="vendor-meta">
-                    <span class="vendor-location">📍 Yaoundé, Cameroon</span>
-                    <span class="vendor-badge cm">Verified</span>
-                </div>
-            </div>
-            <a href="https://wa.me/237651234567?text=Hello%20Digital%20Store%20Yaounde%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20" class="chat-btn" target="_blank">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                Chat
-            </a>
-        </div>
-
-        <div class="vendor-card" data-region="cameroon">
-            <div class="vendor-avatar">BD</div>
-            <div class="vendor-info">
-                <div class="vendor-name">Boutique Douala</div>
-                <div class="vendor-meta">
-                    <span class="vendor-location">📍 Douala, Cameroon</span>
-                    <span class="vendor-badge cm">Verified</span>
-                </div>
-            </div>
-            <a href="https://wa.me/237678901234?text=Hello%20Boutique%20Douala%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20" class="chat-btn" target="_blank">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                Chat
-            </a>
-        </div>
-
-        <div class="vendor-card" data-region="cameroon">
-            <div class="vendor-avatar">BM</div>
-            <div class="vendor-info">
-                <div class="vendor-name">Bamenda Market Hub</div>
-                <div class="vendor-meta">
-                    <span class="vendor-location">📍 Bamenda, Cameroon</span>
-                    <span class="vendor-badge cm">Verified</span>
-                </div>
-            </div>
-            <a href="https://wa.me/237612345678?text=Hello%20Bamenda%20Market%20Hub%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20" class="chat-btn" target="_blank">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                Chat
-            </a>
-        </div>
-
-        <!-- Ghana -->
-        <div class="vendor-card" data-region="ghana">
-            <div class="vendor-avatar">TA</div>
-            <div class="vendor-info">
-                <div class="vendor-name">TechZone Accra</div>
-                <div class="vendor-meta">
-                    <span class="vendor-location">📍 Accra, Ghana</span>
-                    <span class="vendor-badge gh">Verified</span>
-                </div>
-            </div>
-            <a href="https://wa.me/233201234567?text=Hello%20TechZone%20Accra%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20" class="chat-btn" target="_blank">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                Chat
-            </a>
-        </div>
-
-        <div class="vendor-card" data-region="ghana">
-            <div class="vendor-avatar">SK</div>
-            <div class="vendor-info">
-                <div class="vendor-name">StyleHub Kumasi</div>
-                <div class="vendor-meta">
-                    <span class="vendor-location">📍 Kumasi, Ghana</span>
-                    <span class="vendor-badge gh">Verified</span>
-                </div>
-            </div>
-            <a href="https://wa.me/233509876543?text=Hello%20StyleHub%20Kumasi%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20" class="chat-btn" target="_blank">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                Chat
-            </a>
-        </div>
-
-        <div class="vendor-card" data-region="ghana">
-            <div class="vendor-avatar">GT</div>
-            <div class="vendor-info">
-                <div class="vendor-name">Ghana Trade Center</div>
-                <div class="vendor-meta">
-                    <span class="vendor-location">📍 Tamale, Ghana</span>
-                    <span class="vendor-badge gh">Verified</span>
-                </div>
-            </div>
-            <a href="https://wa.me/233245678901?text=Hello%20Ghana%20Trade%20Center%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20" class="chat-btn" target="_blank">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                Chat
-            </a>
+        <div class="vendor-card" style="justify-content: center;">
+            <p>Loading vendors...</p>
         </div>
     </div>
 
@@ -599,30 +429,75 @@
     </div>
 
     <script>
+        const API_URL = 'https://yenlletafrica.onrender.com';
+        let allVendors = [];
+
+        function escapeHtml(str) {
+            if (str == null) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        async function loadVendors() {
+            try {
+                const res = await fetch(`${API_URL}/api/public/vendors`);
+                if (!res.ok) throw new Error('Failed to fetch');
+                allVendors = await res.json();
+                renderVendors('all');
+            } catch (err) {
+                document.getElementById('vendorGrid').innerHTML = '<div class="vendor-card" style="justify-content: center;"><p>Failed to load vendors. Please refresh.</p></div>';
+            }
+        }
+
+        function renderVendors(region) {
+            const grid = document.getElementById('vendorGrid');
+            const filtered = region === 'all' ? allVendors : allVendors.filter(v => v.region === region);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="vendor-card" style="justify-content: center;"><p>No vendors found in this region.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map((v, index) => {
+                const regionClass = v.region === 'nigeria' ? 'ng' : (v.region === 'cameroon' ? 'cm' : 'gh');
+                const flag = v.region === 'nigeria' ? '🇳🇬' : (v.region === 'cameroon' ? '🇨🇲' : '🇬🇭');
+                const message = `Hello%20${encodeURIComponent(v.name)}%2C%20I%20want%20to%20purchase%20a%20product%20and%20verify%20coupon%20code%3A%20`;
+                const imageUrl = v.image_url || 'https://via.placeholder.com/64';
+
+                return `
+                    <div class="vendor-card" data-region="${v.region}" style="animation-delay: ${index * 0.05}s">
+                        <div class="vendor-avatar">
+                            <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(v.name)} Avatar">
+                        </div>
+                        <div class="vendor-info">
+                            <div class="vendor-name">${escapeHtml(v.name)}</div>
+                            <div class="vendor-meta">
+                                <span class="vendor-location">📍 ${flag} ${v.region.charAt(0).toUpperCase() + v.region.slice(1)}</span>
+                                <span class="vendor-badge ${regionClass}">Verified</span>
+                            </div>
+                        </div>
+                        <a href="https://wa.me/${escapeHtml(v.whatsapp_number)}?text=${message}" class="chat-btn" target="_blank">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.3A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                            Chat
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        }
+
         // Region filtering
         const tabs = document.querySelectorAll('.region-tab');
-        const cards = document.querySelectorAll('.vendor-card');
-
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-
-                const region = tab.dataset.region;
-
-                cards.forEach((card, index) => {
-                    if (region === 'all' || card.dataset.region === region) {
-                        card.classList.remove('hidden');
-                        card.style.animationDelay = (index * 0.05) + 's';
-                        card.style.animation = 'none';
-                        card.offsetHeight; // trigger reflow
-                        card.style.animation = 'fadeIn 0.4s ease forwards';
-                    } else {
-                        card.classList.add('hidden');
-                    }
-                });
+                renderVendors(tab.dataset.region);
             });
         });
+
+        // Init
+        loadVendors();
     </script>
 
 </body>

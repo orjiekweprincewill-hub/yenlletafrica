@@ -133,9 +133,9 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(26px); }
 
-        .item-card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 16px; margin-bottom: 15px; border-left: 4px solid var(--accent); transition: var(--transition); }
+        .item-card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 16px; margin-bottom: 15px; border-left: 4px solid var(--accent); transition: var(--transition); display: flex; align-items: center; gap: 15px; }
         .item-card:hover { background: rgba(255,255,255,0.08); transform: translateX(5px); }
-        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; flex: 1; }
         .item-title { font-weight: 600; color: var(--white); font-size: 15px; display: flex; align-items: center; gap: 8px; }
         .item-meta { font-size: 13px; color: rgba(255,255,255,0.5); margin: 6px 0; }
         .item-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
@@ -234,11 +234,12 @@
                     <button class="tab active" onclick="switchTab('withdrawals', event)"><i class="bi bi-wallet2"></i> Withdrawals</button>
                     <button class="tab" onclick="switchTab('users', event)"><i class="bi bi-people"></i> Users</button>
                     <button class="tab" onclick="switchTab('courses', event)"><i class="bi bi-mortarboard"></i> Courses</button>
+                    <button class="tab" onclick="switchTab('vendorlist', event)"><i class="bi bi-shop"></i> Vendor List</button>
                     <button class="tab" onclick="switchTab('tiktok', event)"><i class="bi bi-music"></i> TikTok</button>
                     <button class="tab" onclick="switchTab('coupons', event)"><i class="bi bi-ticket-perforated"></i> Coupons</button>
                     <button class="tab" onclick="switchTab('content', event)"><i class="bi bi-file-earmark-text"></i> Content</button>
                     <button class="tab" onclick="switchTab('social', event)"><i class="bi bi-link-45deg"></i> Social</button>
-                    <button class="tab" onclick="switchTab('vendors', event)"><i class="bi bi-headset"></i> Vendors</button>
+                    <button class="tab" onclick="switchTab('vendors', event)"><i class="bi bi-headset"></i> Support Vendors</button>
                 </div>
 
                 <!-- WITHDRAWALS TAB -->
@@ -322,6 +323,28 @@
                     </form>
                     <h3 style="font-size: 16px; margin-top: 30px; margin-bottom: 15px; color: var(--white);">Existing Courses</h3>
                     <div id="coursesList"></div>
+                </div>
+
+                <!-- VENDOR LIST TAB -->
+                <div id="vendorlist-tab" class="tab-content">
+                    <div class="section-title"><i class="bi bi-shop"></i> Public Vendor List Management</div>
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--white);">Add New Vendor</h3>
+                    <form id="publicVendorForm" onsubmit="addPublicVendor(event)" enctype="multipart/form-data">
+                        <div class="form-group"><label>Vendor Name <span style="color: var(--danger);">*</span></label><input type="text" id="pvendorName" required placeholder="e.g. TechHub Lagos"></div>
+                        <div class="form-group">
+                            <label>Region <span style="color: var(--danger);">*</span></label>
+                            <select id="pvendorRegion" required>
+                                <option value="nigeria">🇳🇬 Nigeria</option>
+                                <option value="cameroon">🇨🇲 Cameroon</option>
+                                <option value="ghana">🇬🇭 Ghana</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>WhatsApp Number (with country code, no +) <span style="color: var(--danger);">*</span></label><input type="text" id="pvendorWhatsapp" required placeholder="e.g. 2348012345678"></div>
+                        <div class="form-group"><label>Profile Picture <span style="color: var(--danger);">*</span></label><input type="file" id="pvendorImage" accept="image/*" required></div>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Vendor</button>
+                    </form>
+                    <h3 style="font-size: 16px; margin-top: 30px; margin-bottom: 15px; color: var(--white);">Existing Vendors</h3>
+                    <div id="publicVendorsList"></div>
                 </div>
 
                 <!-- TIKTOK TAB -->
@@ -531,6 +554,7 @@
                 case 'withdrawals': loadWithdrawals(); break;
                 case 'tiktok': loadTiktokUsers(); break;
                 case 'courses': loadCourses(); break;
+                case 'vendorlist': loadPublicVendors(); break;
                 case 'coupons': loadVendorRequests(); break;
                 case 'content': loadContentTab('tasks'); break;
                 case 'social': loadSocialLinks(); break;
@@ -778,7 +802,6 @@
                 `;
             }).join('');
             
-            // Create a hidden iframe to bypass html2canvas rendering bugs
             const iframe = document.createElement('iframe');
             iframe.style.position = 'absolute';
             iframe.style.left = '-9999px';
@@ -959,6 +982,64 @@
                 if (response.ok) { showAlert('✅ Course deleted', 'success'); loadCourses(); }
                 else { const data = await response.json(); showAlert(data.error || 'Failed', 'error'); }
             } catch (error) { showAlert('Failed', 'error'); }
+        }
+
+        // Public Vendor List Logic
+        async function addPublicVendor(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('name', document.getElementById('pvendorName').value);
+            formData.append('region', document.getElementById('pvendorRegion').value);
+            formData.append('whatsapp_number', document.getElementById('pvendorWhatsapp').value);
+            const imageFile = document.getElementById('pvendorImage').files[0];
+            if (imageFile) formData.append('image', imageFile);
+            
+            try {
+                const res = await fetch(`${API_URL}/api/admin/add-public-vendor`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok) { showAlert(`✅ ${data.message}`, 'success'); e.target.reset(); loadPublicVendors(); }
+                else { showAlert(data.error || 'Failed', 'error'); }
+            } catch (err) { showAlert('Failed', 'error'); }
+        }
+
+        async function loadPublicVendors() {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/public-vendors`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                const vendors = await res.json();
+                const container = document.getElementById('publicVendorsList');
+                if (!Array.isArray(vendors) || vendors.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No public vendors added yet</p></div>';
+                    return;
+                }
+                container.innerHTML = vendors.map(v => `
+                    <div class="item-card">
+                        ${v.image_url ? `<img src="${escapeHtml(v.image_url)}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">` : ''}
+                        <div style="flex: 1;">
+                            <div class="item-header" style="margin-bottom: 0;">
+                                <span class="item-title">${escapeHtml(v.name)}</span>
+                                <span class="badge bg-light">${v.region.toUpperCase()}</span>
+                            </div>
+                            <div class="item-meta">WhatsApp: ${escapeHtml(v.whatsapp_number)}</div>
+                        </div>
+                        <div class="item-actions" style="margin-top: 0;">
+                            <button class="btn btn-danger btn-sm" onclick="deletePublicVendor(${v.id})"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { showAlert('Failed', 'error'); }
+        }
+
+        async function deletePublicVendor(id) {
+            if (!confirm('Delete this vendor from the public list?')) return;
+            try {
+                const res = await fetch(`${API_URL}/api/admin/delete-public-vendor/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                if (res.ok) { showAlert('✅ Deleted', 'success'); loadPublicVendors(); }
+                else { showAlert('Failed', 'error'); }
+            } catch (err) { showAlert('Failed', 'error'); }
         }
 
         async function searchTiktokUser(e) {
@@ -1246,7 +1327,7 @@
             } catch (error) { showAlert('Failed', 'error'); }
         }
 
-                async function postVideo(e) {
+        async function postVideo(e) {
             e.preventDefault();
             try {
                 const response = await fetch(`${API_URL}/api/admin/post-video`, {

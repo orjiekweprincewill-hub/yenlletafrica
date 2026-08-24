@@ -2722,6 +2722,69 @@ setInterval(async () => {
 }, 10000); // Runs every 10 seconds automatically on the server
 
 // ============================================================
+// 🏪 PUBLIC VENDOR MANAGEMENT
+// ============================================================
+
+// Admin: Add Public Vendor
+app.post('/api/admin/add-public-vendor', isAdmin, upload.single('image'), async (req, res) => {
+    const { name, region, whatsapp_number } = req.body;
+    if (!name || !region || !whatsapp_number) {
+        return res.status(400).json({ error: 'Name, region, and WhatsApp number are required' });
+    }
+    try {
+        let imageUrl = null;
+        if (req.file) {
+            const result = await uploadToCloudinary(req.file.buffer, 'public_vendors');
+            imageUrl = result.secure_url;
+        }
+        const result = await pool.query(
+            'INSERT INTO public_vendors (name, region, whatsapp_number, image_url) VALUES ($1, $2, $3, $4) RETURNING id',
+            [name.trim(), region.trim().toLowerCase(), whatsapp_number.trim(), imageUrl]
+        );
+        res.status(201).json({ success: true, message: 'Vendor added successfully', vendor_id: result.rows[0].id });
+    } catch (err) {
+        console.error('Add public vendor error:', err);
+        res.status(500).json({ error: 'Failed to add vendor' });
+    }
+});
+
+// Admin: Get Public Vendors
+app.get('/api/admin/public-vendors', isAdmin, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM public_vendors ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Get public vendors error:', err);
+        res.status(500).json({ error: 'Failed to load vendors' });
+    }
+});
+
+// Admin: Delete Public Vendor
+app.delete('/api/admin/delete-public-vendor/:id', isAdmin, async (req, res) => {
+    const vendorId = parseInt(req.params.id);
+    if (!vendorId) return res.status(400).json({ error: 'Invalid vendor ID' });
+    try {
+        const result = await pool.query('DELETE FROM public_vendors WHERE id = $1 RETURNING id', [vendorId]);
+        if (result.rowCount === 0) return res.status(404).json({ error: 'Vendor not found' });
+        res.json({ success: true, message: 'Vendor deleted successfully' });
+    } catch (err) {
+        console.error('Delete public vendor error:', err);
+        res.status(500).json({ error: 'Failed to delete vendor' });
+    }
+});
+
+// Public: Get Public Vendors
+app.get('/api/public/vendors', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, name, region, whatsapp_number, image_url FROM public_vendors ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Public vendors fetch error:', err);
+        res.status(500).json({ error: 'Failed to load vendors' });
+    }
+});
+
+// ============================================================
 // ❌ ERROR HANDLING
 // ============================================================
 app.use((err, req, res, next) => {
