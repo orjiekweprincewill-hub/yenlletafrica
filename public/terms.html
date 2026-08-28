@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d47a1">
+    <title>Terms & Privacy - YENLLET AFRICA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #00bcd4;
+            --accent-light: #4fc3f7;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray: #8892b0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--off-white);
+            color: var(--primary-dark);
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* ===== TOP HEADER ===== */
+        .top-header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0 20px; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { color: var(--white); text-decoration: none; font-size: 24px; display: flex; align-items: center; gap: 5px; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); font-weight: 800; font-size: 1.4rem; }
+        .logo span { background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        /* ===== HERO BG ===== */
+        .hero-bg { min-height: 100vh; background: linear-gradient(135deg, var(--primary-dark) 0%, #0d2b4e 50%, var(--primary) 100%); position: relative; overflow: hidden; padding-top: 90px; padding-bottom: 60px; }
+        .hero-bg::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0,188,212,0.1) 0%, transparent 60%); animation: pulse 8s ease-in-out infinite; pointer-events: none; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
+
+        .main-content { position: relative; z-index: 1; padding: 20px; max-width: 800px; margin: 0 auto; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px);
+            padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); margin-bottom: 25px; color: var(--white);
+        }
+
+        .page-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .last-updated { font-size: 13px; color: var(--gray); margin-bottom: 30px; }
+
+        .section-title { font-size: 20px; font-weight: 700; color: var(--accent-light); margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: var(--accent); }
+        
+        .text-content p { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.8); margin-bottom: 15px; }
+        .text-content ul { margin-left: 20px; margin-bottom: 15px; }
+        .text-content li { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.8); margin-bottom: 8px; }
+        .text-content strong { color: var(--white); }
+
+        .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 40px 0; }
+
+        .agree-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 15px; margin-top: 20px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+            color: var(--white); border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none;
+            transition: var(--transition);
+        }
+        .agree-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4); }
+
+        @media (max-width: 600px) {
+            .glass-card { padding: 20px; }
+            .page-title { font-size: 24px; }
+            .section-title { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i></a>
+            <a href="dashboard.html" class="logo">
+                <span>YenlletAfrica</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="hero-bg">
+        <div class="main-content">
+            <div class="glass-card">
+                <h1 class="page-title">Terms of Service & Privacy Policy</h1>
+                <p class="last-updated">Last Updated: October 24, 2023</p>
+
+                <div class="text-content">
+                    <p>Welcome to <strong>YENLLET AFRICA</strong>. By creating an account, accessing our platform, or participating in any of our earning activities (including tasks, games, and referrals), you agree to be bound by these Terms of Service and acknowledge our Privacy Policy.</p>
+
+                    <!-- TERMS OF SERVICE -->
+                    <h2 class="section-title"><i class="bi bi-file-earmark-text"></i> Terms of Service</h2>
+
+                    <h3 style="color: var(--white); margin-bottom: 10px; font-size: 16px;">1. Account Registration & Security</h3>
+                    <ul>
+                        <li>You must provide accurate and complete information during registration (Email, Phone Number, Username).</li>
+                        <li>Coupon codes are required for registration and plan upgrades. Misuse, forging, or sharing of unauthorized coupon codes will result in account termination.</li>
+                        <li>You are responsible for keeping your withdrawal PIN and password safe. YENLLET is not liable for unauthorized access to your account.</li>
+                    </ul>
+
+                    <h3 style="color: var(--white); margin-bottom: 10px; font-size: 16px;">2. Earnings & Wallets</h3>
+                    <ul>
+                        <li><strong>Yencoin (¥):</strong> The virtual currency used within the app. It can be earned via tasks, videos, quizzes, referrals, and the Yen Runner game.</li>
+                        <li><strong>Withdrawal Limits:</strong> Withdrawals are subject to minimum limits based on your plan (YENLITE, YENPRO, YENVITE) and active region (Nigeria, Ghana, Cameroon).</li>
+                        <li><strong>Processing Time:</strong> Withdrawals are processed manually by the admin. Funds will be sent to your provided bank account.</li>
+                        <li>YENLLET reserves the right to reverse any wallet balance credited due to a system glitch or bug.</li>
+                    </ul>
+
+                    <h3 style="color: var(--white); margin-bottom: 10px; font-size: 16px;">3. Yen Runner Game & AI Auto-Play</h3>
+                    <ul>
+                        <li><strong>Daily Limits:</strong> YENPRO users have 2 manual plays/day. YENVITE users have 3 manual plays/day. Maximum ¥20 can be earned per game.</li>
+                        <li><strong>AI Background Worker:</strong> VITE users can activate AI to play automatically. If activated, the AI will continue to play daily until manually disabled.</li>
+                        <li>Any attempt to manipulate the game API, bypass daily limits, or use unauthorized scripts will result in an immediate account ban and forfeiture of all wallet balances.</li>
+                    </ul>
+
+                    <h3 style="color: var(--white); margin-bottom: 10px; font-size: 16px;">4. Prohibited Activities</h3>
+                    <ul>
+                        <li>Creating multiple accounts (self-referrals) to farm referral bonuses.</li>
+                        <li>Using VPNs or proxies to bypass country-specific withdrawal locks.</li>
+                        <li>Harassing vendors, support staff, or other users via the chat system.</li>
+                        <li>Posting inappropriate content in WhatsApp shares or support tickets.</li>
+                    </ul>
+
+                    <div class="divider"></div>
+
+                    <!-- PRIVACY POLICY -->
+                    <h2 class="section-title"><i class="bi bi-shield-lock"></i> Privacy Policy</h2>
+
+                    <h3 style="color: var(--white); margin-bottom: 10px; font-size: 16px;">1. Information We Collect</h3>
+                    <ul>
+                        <li><strong>Personal Data:</strong> Email address, phone number, bank details, and withdrawal PIN.</li>
+                        <li><strong>Usage Data:</strong> IP address, browser type, activities performed on the platform, and referral history.</li>
+                        <li><strong>Media:</strong> Profile pictures and WhatsApp share screenshots uploaded to our secure Cloudinary servers.</li>
+                    </ul>
+
+                    <h3 style="color: var(--white); margin-bottom: 10px; font-size: 16px;">2. How We Use Your Information</h3>
+                    <ul>
+                        <li>To process your withdrawals and verify your bank details.</li>
+                        <li>To send you notifications regarding your account, earnings, and platform updates.</li>
+                        <li>To provide customer support via our vendor ticketing system.</li>
+                        <li>To prevent fraud, monitor fair play in games, and enforce our Terms of Service.</li>
+                    </ul>
+
+                    <h3 style="color: var(--white); margin-bottom: 10px; font-size: 16px;">3. Data Security</h3>
+                    <p>Your passwords are hashed securely using SHA-256 cryptography. Your withdrawal PIN is also hashed and cannot be viewed by anyone, including the admin. We use a secure Neon PostgreSQL database and host our backend on Render. However, no method of transmission over the Internet is 100% secure.</p>
+
+                    <h3 style="color: var(--white); margin-bottom: 10px; font-size: 16px;">4. Data Retention</h3>
+                    <p>If you request account deletion by an admin, all your personal data, wallet balances, and activity history will be permanently erased from our database.</p>
+
+                    <h3 style="color: var(--white); margin-bottom: 10px; font-size: 16px;">5. Third-Party Services</h3>
+                    <p>We use third-party services such as Cloudinary (for image hosting), Nodemailer/Gmail (for password resets), and WhatsApp/Telegram (for community links). These services have their own privacy policies.</p>
+                </div>
+
+                <a href="dashboard.html" class="agree-btn">
+                    <i class="bi bi-check-circle-fill"></i> I Understand & Agree
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Optional: Add dark mode sync if user has it saved
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (savedDarkMode) { document.body.classList.add('dark-mode'); }
+    </script>
+</body>
+</html>

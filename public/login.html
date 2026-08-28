@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- SEO Search Engine Optimization -->
+    <meta name="description" content="YenlletAfrica: The premier platform delivering secure financial opportunities across Africa.">
+    
+    <!-- Open Graph / WhatsApp / Facebook Preview Cards -->
+    <meta property="og:site_name" content="YenlletAfrica">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yenllet.name.ng/">
+    <meta property="og:title" content="YenlletAfrica - Earn With Confidence">
+    <meta property="og:description" content="YenlletAfrica: The premier platform delivering secure financial opportunities across Africa.">
+    <meta property="og:image" content="https://yenllet.name.ng/launch-banner.jpg">
+
+    <!-- Twitter / X Preview Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yenllet.name.ng/">
+    <meta name="twitter:title" content="YenlletAfrica - Earn With Confidence">
+    <meta name="twitter:description" content="YenlletAfrica: The premier platform delivering secure financial opportunities across Africa.">
+    <meta name="twitter:image" content="https://yenllet.name.ng/launch-banner.jpg">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Login - YENLLET</title>
@@ -147,27 +165,10 @@
         .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); }
         .divider span { background: transparent; padding: 0 12px; position: relative; color: var(--gray); font-size: 0.8rem; font-weight: 500; }
 
-        .admin-btn {
-            width: 100%;
-            padding: 14px;
-            background: rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.85);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-        .admin-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
-
-        .register-link { text-align: center; margin-top: 22px; color: var(--gray); font-size: 0.9rem; }
+        .register-link { text-align: center; margin-top: 22px; color: var(--gray); font-size: 0.9rem; line-height: 1.8; }
         .register-link a { color: var(--accent-light); text-decoration: none; font-weight: 600; transition: var(--transition); }
         .register-link a:hover { color: var(--white); text-decoration: underline; }
+        .terms-link { display: block; margin-top: 10px; font-size: 0.8rem; opacity: 0.8; }
 
         @media (max-width: 480px) {
             .login-container { padding: 35px 25px; }
@@ -205,12 +206,9 @@
             <a href="register.html">Create Account</a>
         </div>
 
-        <div class="divider"><span>OR</span></div>
-
-      
-
         <div class="register-link">
             Don't have an account? <a href="register.html">Register now</a>
+            <a href="terms.html" class="terms-link"><i class="bi bi-shield-lock"></i> Terms & Privacy Policy</a>
         </div>
     </div>
     <script>
