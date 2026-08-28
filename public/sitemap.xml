@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://sitemaps.org">
+  <!-- Homepage -->
   <url>
     <loc>https://yenllet.name.ng</loc>
     <lastmod>2026-08-28</lastmod>
     <priority>1.0</priority>
+  </url>
+  <!-- Login Page -->
+  <url>
+    <loc>https://yenllet.name.nglogin.html</loc>
+    <lastmod>2026-08-28</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <!-- Register Page -->
+  <url>
+    <loc>https://yenllet.name.ngregister.html</loc>
+    <lastmod>2026-08-28</lastmod>
+    <priority>0.8</priority>
   </url>
 </urlset>
