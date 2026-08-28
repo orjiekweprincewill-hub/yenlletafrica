@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        :root { --primary-dark: #0a1628; --primary: #0d47a1; --primary-light: #1565c0; --accent: #00bcd4; --accent-light: #4fc3f7; --white: #ffffff; --off-white: #f0f4f8; --gray: #8892b0; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        :root { --primary-dark: #0a1628; --primary: #0d47a1; --primary-light: #1565c0; --accent: #00bcd4; --accent-light: #4fc3f7; --white: #ffffff; --off-white: #f0f4f8; --gray: #8892b0; --success: #4caf50; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--off-white); color: var(--primary-dark); overflow-x: hidden; min-height: 100vh; }
         body.dark-mode { background: var(--primary-dark); color: var(--white); }
@@ -25,7 +25,6 @@
         .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); font-weight: 800; font-size: 1.4rem; }
         .logo span { background: linear-gradient(135deg, var(--white) 0%, var(--accent-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .header-controls { display: flex; align-items: center; gap: 10px; }
-        .dark-mode-toggle { background: rgba(255,255,255,0.1); border: none; color: var(--white); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
         .header-profile { display: flex; align-items: center; gap: 10px; }
         .profile-pic { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: #333; }
         .username { color: var(--white); font-weight: 600; font-size: 14px; }
@@ -41,13 +40,24 @@
         .form-group label { display: block; margin-bottom: 8px; color: rgba(255,255,255,0.8); font-size: 14px; }
         .form-group select, .form-group input { width: 100%; padding: 12px 15px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.15); border-radius: 12px; color: var(--white); font-size: 14px; font-family: 'Inter', sans-serif; }
         .form-group select option { background: var(--primary-dark); }
-        .btn-primary { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); color: var(--white); border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .btn-primary { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%); color: var(--white); border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3); }
         
+        /* Coupon Item Styling */
         .coupon-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent); }
-        .coupon-code { font-family: monospace; font-size: 16px; font-weight: 700; color: var(--accent-light); }
+        .coupon-code-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; transition: var(--transition); }
+        .coupon-code-wrapper:hover .coupon-code { color: var(--white); }
+        .coupon-code-wrapper:hover .copy-icon { color: var(--success); }
+        
+        .coupon-code { font-family: monospace; font-size: 16px; font-weight: 700; color: var(--accent-light); transition: var(--transition); }
+        .copy-icon { font-size: 14px; color: var(--gray); transition: var(--transition); }
+        
+        .coupon-meta { text-align: right; }
         .coupon-status { font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
         .status-active { background: rgba(76, 175, 80, 0.2); color: var(--success); }
         .status-used { background: rgba(255, 152, 0, 0.2); color: #ffb74d; }
+        .usage-info { font-size: 11px; color: var(--gray); margin-top: 4px; }
+        
         .empty-state { text-align: center; padding: 30px; color: rgba(255,255,255,0.5); }
         .empty-state i { font-size: 40px; margin-bottom: 10px; display: block; opacity: 0.3; }
 
@@ -65,9 +75,10 @@
         .menu-list i { font-size: 20px; color: var(--accent-light); }
         .logout-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: var(--white); border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 30px; }
         
-        .alert { position: fixed; top: 80px; right: 20px; padding: 15px 20px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 3000; color: white; font-weight: 600; }
-        .alert-success { background: #4caf50; }
+        .alert { position: fixed; top: 80px; right: 20px; padding: 15px 20px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 3000; color: white; font-weight: 600; animation: slideIn 0.3s ease; }
+        .alert-success { background: var(--success); }
         .alert-error { background: #f44336; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -80,7 +91,8 @@
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <div class="overlay-content">
             <ul class="menu-list">
-                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li><a href="dashboard.html"><i class="bi bi-house-door-fill"></i> User Dashboard</a></li>
+                <li><a href="vendor-dashboard.html"><i class="bi bi-shop"></i> Vendor Dashboard</a></li>
                 <li><a href="withdraw.html"><i class="bi bi-cash-coin"></i> Withdraw</a></li>
                 <li><a href="profile.html"><i class="bi bi-person-circle"></i> Profile</a></li>
             </ul>
@@ -193,14 +205,43 @@
 
                 container.innerHTML = coupons.map(c => `
                     <div class="coupon-item">
-                        <div>
+                        <div class="coupon-code-wrapper" onclick="copyCouponCode('${c.code}')">
                             <div class="coupon-code">${c.code}</div>
-                            <div style="font-size: 11px; color: var(--gray); margin-top: 4px;">${c.plan} ${c.used ? `| Used by: ${c.used_by_username || 'N/A'}` : ''}</div>
+                            <i class="bi bi-clipboard copy-icon"></i>
                         </div>
-                        <span class="coupon-status ${c.used ? 'status-used' : 'status-active'}">${c.used ? 'USED' : 'ACTIVE'}</span>
+                        <div class="coupon-meta">
+                            <span class="coupon-status ${c.used ? 'status-used' : 'status-active'}">${c.used ? 'USED' : 'ACTIVE'}</span>
+                            ${c.used ? `<div class="usage-info">By: ${c.used_by_username || 'N/A'}</div>` : `<div class="usage-info">${c.plan}</div>`}
+                        </div>
                     </div>
                 `).join('');
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error(err);
+                document.getElementById('couponsList').innerHTML = '<div class="empty-state"><i class="bi bi-exclamation-circle"></i><p>Failed to load coupons.</p></div>';
+            }
+        }
+
+        async function copyCouponCode(code) {
+            try {
+                await navigator.clipboard.writeText(code);
+                showAlert(`📋 Copied: ${code}`, 'success');
+            } catch (err) {
+                // Fallback for older mobile browsers
+                const textArea = document.createElement("textarea");
+                textArea.value = code;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showAlert(`📋 Copied: ${code}`, 'success');
+                } catch (execErr) {
+                    showAlert('Failed to copy', 'error');
+                }
+                document.body.removeChild(textArea);
+            }
         }
 
         async function loadRequests() {
@@ -229,10 +270,13 @@
         }
 
         function showAlert(msg, type) {
+            const container = document.getElementById('alertContainer');
+            if (!container) return;
+            container.innerHTML = '';
             const div = document.createElement('div');
             div.className = `alert alert-${type}`;
             div.textContent = msg;
-            document.getElementById('alertContainer').appendChild(div);
+            container.appendChild(div);
             setTimeout(() => div.remove(), 4000);
         }
 
