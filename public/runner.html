@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#0a1628">
     <title>Yen Runner - YENLLET AFRICA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
@@ -51,6 +50,7 @@
             position: relative; z-index: 10; display: flex; justify-content: space-between; align-items: center;
             padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top));
             background: rgba(10, 22, 40, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0; /* Prevent header from shrinking */
         }
         
         .back-btn { color: var(--white); text-decoration: none; font-size: 24px; display: flex; align-items: center; }
@@ -59,15 +59,17 @@
         .plays-left { font-size: 11px; color: var(--gray); margin-top: 2px; }
         .header-right { min-width: 40px; text-align: right; }
 
+        /* FIX: Mobile canvas scaling */
         .canvas-wrapper {
-            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            flex: 1; display: flex; align-items: center; justify-content: center;
             position: relative; z-index: 1; overflow: hidden; padding: 10px;
+            min-height: 0; /* Crucial for flexbox scaling */
         }
 
         canvas {
             background: linear-gradient(180deg, #0d2b4e 0%, #0a1628 100%);
             border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            max-width: 100%; max-height: 100%; aspect-ratio: 2/3; touch-action: none;
+            height: 100%; width: auto; max-width: 100%; aspect-ratio: 2/3; touch-action: none;
         }
 
         .overlay {
@@ -149,7 +151,7 @@
             <div class="score-display">SCORE: <span id="scoreText">0</span></div>
             <div class="plays-left">Plays Left: <span id="playsLeftText">-</span></div>
         </div>
-        <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left-right"></i></a>
+        <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i></a>
     </div>
 
     <div class="canvas-wrapper">
@@ -308,7 +310,7 @@
         document.getElementById('aiBtn').addEventListener('click', toggleAI);
         document.getElementById('aiBtnOver').addEventListener('click', toggleAI);
 
-               async function toggleAI() {
+        async function toggleAI() {
             const isEnabled = userStatus.ai_enabled;
             const endpoint = isEnabled ? 'disable-ai' : 'activate-ai';
             const msg = isEnabled 
