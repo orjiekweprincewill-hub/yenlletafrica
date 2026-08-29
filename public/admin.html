@@ -1220,14 +1220,16 @@
                                     <option value="referral">Referral Wallet</option>
                                 </select>
                             </div>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="number" id="creditAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                <input type="text" id="creditReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-plus-circle"></i> Add</button>
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                                <input type="number" id="creditAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <input type="text" id="creditReason-${data.user_id}" placeholder="Reason (Optional)" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-plus-circle"></i> Add Money</button>
                             </div>
                         </form>
 
-                        <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'debit')">
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+
+                        <form onsubmit="handleWalletAdjust(event, ${data.user_id}, 'debit')" style="margin-bottom: 15px;">
                             <h4 style="font-size: 14px; color: var(--danger); margin-bottom: 10px;">Remove Money (Debit)</h4>
                             <div class="form-group" style="margin-bottom: 10px;">
                                 <select id="debitWalletType-${data.user_id}" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
@@ -1235,10 +1237,21 @@
                                     <option value="referral">Referral Wallet</option>
                                 </select>
                             </div>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="number" id="debitAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                <input type="text" id="debitReason-${data.user_id}" placeholder="Reason (Optional)" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
-                                <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i> Remove</button>
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                                <input type="number" id="debitAmount-${data.user_id}" placeholder="Amount ¥" step="0.01" min="0.01" required style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <input type="text" id="debitReason-${data.user_id}" placeholder="Reason (Optional)" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i> Remove Money</button>
+                            </div>
+                        </form>
+
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+
+                        <form onsubmit="adminChangeUserPassword(event, ${data.user_id})">
+                            <h4 style="font-size: 14px; color: var(--accent-light); margin-bottom: 10px;">Change User Password</h4>
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                                <input type="password" id="newPass-${data.user_id}" placeholder="New Password (min 6 chars)" required minlength="6" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <input type="password" id="confirmPass-${data.user_id}" placeholder="Confirm Password" required minlength="6" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white;">
+                                <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-key"></i> Update Password</button>
                             </div>
                         </form>
                     </div>
@@ -1281,6 +1294,43 @@
                     document.getElementById('searchCouponForm').dispatchEvent(new Event('submit'));
                 } else {
                     showAlert(data.error || 'Failed to adjust wallet', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error', 'error');
+            }
+        }
+
+        async function adminChangeUserPassword(e, userId) {
+            e.preventDefault();
+            const newPass = document.getElementById(`newPass-${userId}`).value;
+            const confirmPass = document.getElementById(`confirmPass-${userId}`).value;
+
+            if (newPass !== confirmPass) {
+                return showAlert('Passwords do not match', 'error');
+            }
+            if (newPass.length < 6) {
+                return showAlert('Password must be at least 6 characters', 'error');
+            }
+
+            if (!confirm(`Are you sure you want to change this user's password?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/change-user-password`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                    },
+                    body: JSON.stringify({ user_id: userId, new_password: newPass })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert(`✅ ${data.message}`, 'success');
+                    document.getElementById('searchCouponForm').dispatchEvent(new Event('submit'));
+                } else {
+                    showAlert(data.error || 'Failed to change password', 'error');
                 }
             } catch (error) {
                 showAlert('Network error', 'error');

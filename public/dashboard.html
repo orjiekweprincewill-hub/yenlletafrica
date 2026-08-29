@@ -549,7 +549,7 @@
             if (data.account_number) { safeSetText('accountNumber', data.account_number); }
             if (data.bank_name) { safeSetText('bankName', data.bank_name); }
 
-            const referralLink = `https://yenlletafrica.vercel.app/register.html?ref=${encodeURIComponent(data.username || '')}`;
+            const referralLink = `https://yenllet.name.ng/register.html?ref=${encodeURIComponent(data.username || '')}`;
             const linkInput = document.getElementById('referralLink');
             if (linkInput) linkInput.value = referralLink;
 
